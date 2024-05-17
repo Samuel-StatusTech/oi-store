@@ -1,12 +1,15 @@
 import { useState } from "react"
 import * as S from "./styled"
 import Ticket from "../Ticket"
-import { TTicket } from "../../../utils/@types/ticket"
-import { formatMoney } from "../../../utils/tb/formatMoney"
+import { TTicketDisposal } from "../../utils/@types/ticket"
+import { formatMoney } from "../../utils/tb/formatMoney"
+import { useNavigate } from "react-router-dom"
 
 const TicketsControl = () => {
+  const navigate = useNavigate()
+
   const [installment] = useState(10)
-  const [tickets, setTickets] = useState<TTicket[]>([
+  const [tickets, setTickets] = useState<TTicketDisposal[]>([
     {
       id: 1,
       name: "Off Feminino + 1 Caipirinha até 22hrs",
@@ -40,10 +43,13 @@ const TicketsControl = () => {
     return formatMoney(val)
   }
 
-  const changeQnt = (ticketId: number, action: "decrease" | "increase") => {
+  const changeQnt = (
+    ticketId: number | string,
+    action: "decrease" | "increase"
+  ) => {
     let nList = [...tickets]
 
-    const tk = nList.find((t) => t.id === ticketId) as TTicket
+    const tk = nList.find((t) => t.id === ticketId) as TTicketDisposal
 
     if (action === "decrease") {
       if (tk.qnt > 1) {
@@ -70,6 +76,10 @@ const TicketsControl = () => {
     setTickets(nList)
   }
 
+  const handleBuy = () => {
+    navigate("/payment")
+  }
+
   return (
     <S.Component>
       <S.Top>
@@ -88,7 +98,7 @@ const TicketsControl = () => {
           <S.Total>{`Total ${calcTotal()}`}</S.Total>
           <S.Installments>{`Pague em até ${installment}x`}</S.Installments>
         </S.Resume>
-        <S.BuyBtn>Comprar</S.BuyBtn>
+        <S.BuyBtn onClick={handleBuy}>Comprar</S.BuyBtn>
       </S.Bottom>
     </S.Component>
   )

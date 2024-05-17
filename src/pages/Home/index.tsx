@@ -1,15 +1,15 @@
-import Header from "../components/Header"
+import Header from "../../components/Header"
 import * as S from "./styled"
 
-import Container from "../components/Container"
-import BlockInfo from "../components/BlockInfo"
+import Container from "../../components/Container"
+import BlockInfo from "../../components/BlockInfo"
 
 import example from "../../assets/images/exemplo.png"
 import calendar from "../../assets/icons/calendar.png"
 import location from "../../assets/icons/pin.png"
-import TicketsControl from "../components/TicketsControl"
-import Footer from "../components/Footer"
-import Organizer from "../components/Organizer"
+import TicketsControl from "../../components/TicketsControl"
+import Footer from "../../components/Footer"
+import Organizer from "../../components/Organizer"
 
 const Home = () => {
   return (

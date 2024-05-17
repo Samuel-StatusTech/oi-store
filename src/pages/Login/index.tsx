@@ -1,5 +1,6 @@
 import { useState } from "react"
 import * as S from "./styled"
+import { useLocation, useNavigate } from "react-router-dom"
 
 type IProps = {
   label: string
@@ -21,8 +22,24 @@ const Input = ({ label, value, onChange }: IProps) => {
 }
 
 const Login = () => {
+  const location = useLocation()
+  const navigate = useNavigate()
+
   const [email, setEmail] = useState("")
   const [pass, setPass] = useState("")
+
+  const handleClick = () => {
+    // check errors
+
+    localStorage.setItem("logged", "true")
+
+    if (location.state) {
+      const { originalPath } = location.state
+      navigate(originalPath ?? "/")
+    } else {
+      navigate("/")
+    }
+  }
 
   return (
     <S.Page>
@@ -34,7 +51,7 @@ const Login = () => {
           <Input label="Senha" value={pass} onChange={setPass} />
         </S.Inputs>
 
-        <S.Button>Entrar</S.Button>
+        <S.Button onClick={handleClick}>Entrar</S.Button>
       </S.FormArea>
     </S.Page>
   )

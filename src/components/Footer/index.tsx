@@ -1,5 +1,5 @@
 import * as S from "./styled"
-import logo from "../../../assets/images/oi-tickets.png"
+import logo from "../../assets/images/oi-tickets.png"
 import Container from "../Container"
 import { Link } from "react-router-dom"
 

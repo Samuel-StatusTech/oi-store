@@ -2,7 +2,7 @@ import { Link } from "react-router-dom"
 import Container from "../Container"
 import * as S from "./styled"
 
-import MainLogo from "../../../assets/images/oi-tickets.png"
+import MainLogo from "../../assets/images/oi-tickets.png"
 
 const Header = () => {
   return (

@@ -61,6 +61,7 @@ export const Installments = styled.span`
 `
 
 export const BuyBtn = styled.button`
+  cursor: pointer;
   background: ${({ theme }) => theme.colors.green.main};
   border: none;
   outline: none;
