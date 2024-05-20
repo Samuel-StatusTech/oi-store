@@ -30,16 +30,16 @@ const Home = () => {
               <BlockInfo
                 title="Data e Hora"
                 description={["De 11 a 14 de dezembro de 2022", "17:00"]}
-                icon={<img src={calendar} alt={""} />}
+                icon={<img src={calendar} alt={""} width={84} />}
               />
               <BlockInfo
                 title="Localização"
                 description={[
                   "Rua Aubé, nº 895",
-                  "Centro, Joinville - SC",
+                  "Centro, Joinville - SC - Centro, Joinville - SC",
                   "89205-00",
                 ]}
-                icon={<img src={location} alt={""} />}
+                icon={<img src={location} alt={""} width={84} />}
               />
             </S.Blocks>
           </S.MainData>
@@ -78,6 +78,28 @@ Não fique de fora e venha curtir a vibe que só a Pipa tem! Animação, música
 
       <Container>
         <S.Organizers>
+          <Organizer
+            icon={
+              "https://static.vecteezy.com/system/resources/previews/012/871/371/original/google-search-icon-google-product-illustration-free-png.png"
+            }
+            name={"GR Produções, Shows e Eventos!"}
+            phone={"(38) 99221-6176"}
+            description={[
+              "GR Produções, Shows e Eventos!",
+              "Eventos com qualidade e segurança!",
+            ]}
+          />
+          <Organizer
+            icon={
+              "https://static.vecteezy.com/system/resources/previews/012/871/371/original/google-search-icon-google-product-illustration-free-png.png"
+            }
+            name={"GR Produções, Shows e Eventos!"}
+            phone={"(38) 99221-6176"}
+            description={[
+              "GR Produções, Shows e Eventos!",
+              "Eventos com qualidade e segurança!",
+            ]}
+          />
           <Organizer
             icon={
               "https://static.vecteezy.com/system/resources/previews/012/871/371/original/google-search-icon-google-product-illustration-free-png.png"

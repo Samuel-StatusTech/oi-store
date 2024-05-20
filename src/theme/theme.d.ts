@@ -22,5 +22,11 @@ declare module "styled-components" {
         secondary: string
       }
     }
+    bp: {
+      large: number
+      medium: number
+      small: number
+      xsmall: number
+    }
   }
 }

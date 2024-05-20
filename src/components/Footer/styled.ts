@@ -24,6 +24,15 @@ export const ColsArea = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 64px;
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    & > div:nth-child(1),
+    & > div:nth-child(4) {
+      display: none;
+    }
+
+    flex-direction: column;
+  }
 `
 
 export const Col = styled.div`
@@ -61,6 +70,12 @@ export const CopyArea = styled.div`
   background-color: rgb(42, 42, 42);
   padding: 6px 0;
   gap: 4px;
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    flex-direction: column;
+    align-items: center;
+    padding: 24px;
+  }
 `
 
 export const CopyItem = styled.span`

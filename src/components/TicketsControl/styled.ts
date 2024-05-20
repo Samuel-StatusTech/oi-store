@@ -13,6 +13,16 @@ export const Component = styled.aside`
   overflow: hidden;
   box-shadow: 0 4px 8px 4px rgba(0, 0, 0, 0.23);
   background-color: ${({ theme }) => theme.colors.white.main};
+
+  @media (max-width: ${({ theme }) => theme.bp.large}px) {
+    max-width: calc((100% / 5) * 2);
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    position: unset;
+    z-index: unset;
+    max-width: unset;
+  }
 `
 
 export const Top = styled.div`
@@ -40,6 +50,12 @@ export const Bottom = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 12px;
+
+  @media (max-width: 340px) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 24px;
+  }
 `
 
 export const Resume = styled.div`
@@ -69,4 +85,8 @@ export const BuyBtn = styled.button`
   border-radius: 4px;
   color: ${({ theme }) => theme.colors.white.main};
   font-weight: 500;
+
+  @media (max-width: 340px) {
+    width: 100%;
+  }
 `

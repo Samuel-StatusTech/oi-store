@@ -21,4 +21,10 @@ export const theme: DefaultTheme = {
       secondary: "#E6E7EA",
     },
   },
+  bp: {
+    large: 1240,
+    medium: 920,
+    small: 520,
+    xsmall: 320,
+  },
 }

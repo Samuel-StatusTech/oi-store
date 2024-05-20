@@ -16,6 +16,22 @@ export const Component = styled.div`
   &:hover {
     box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.18);
   }
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    
+    svg {
+      width: 98px;
+      height: 98px;
+    }
+  }
+
+  @media (max-width: 420px) {
+    
+    svg {
+      width: 128px;
+      height: 128px;
+    }
+  }
 `
 
 export const TicketTitle = styled.span`

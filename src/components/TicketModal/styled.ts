@@ -17,11 +17,11 @@ export const Wrapper = styled.div`
   cursor: pointer;
   transition: opacity 0.6s;
   opacity: 0;
-  
+
   &.shown {
     opacity: 1;
   }
-  
+
   &.visible {
     width: unset;
     height: unset;
@@ -45,12 +45,38 @@ export const Component = styled.div`
     width: 360px;
     height: 360px;
   }
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    width: 100%;
+    max-width: calc(100vw - 64px - 64px);
+    margin: 0 64px;
+    padding: 24px 48px;
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    height: fit-content;
+
+    svg {
+      width: 100%;
+      height: auto;
+      aspect-ratio: 1;
+    }
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
+    padding: 24px;
+    max-width: calc(100vw - 64px - 24px);
+  }
 `
 
 export const TicketTitle = styled.span`
   font-size: 32px;
   font-weight: bold;
   color: #222;
+
+  @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
+    font-size: 24px;
+  }
 `
 
 export const TicketStatus = styled.span<{ $status?: TTicketStatus }>`
@@ -64,4 +90,8 @@ export const TicketStatus = styled.span<{ $status?: TTicketStatus }>`
       : $status === "expired"
       ? theme.colors.orange.main
       : "transparent"};
+
+  @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
+    font-size: 20px;
+  }
 `

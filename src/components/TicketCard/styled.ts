@@ -46,6 +46,11 @@ export const CardBottom = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
+
+  @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
+    flex-direction: column;
+    align-items: flex-start;
+  }
 `
 
 export const EventDate = styled.span`

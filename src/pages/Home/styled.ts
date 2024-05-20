@@ -34,24 +34,50 @@ export const EventDataArea = styled.section`
   display: flex;
   flex: 5;
   gap: 48px;
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    flex-direction: column;
+    z-index: unset;
+  }
 `
 
 export const MainData = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
+  width: 100%;
+  max-width: calc((100% / 5) * 3);
+
+  @media (max-width: ${({ theme }) => theme.bp.large}px) {
+    max-width: calc(((100% / 5) * 3) - 24px);
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    max-width: 100%;
+    width: 100%;
+  }
 `
 
 export const EventName = styled.h1`
   font-size: 36px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.black.secondary};
+
+  @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
+    margin: 0;
+    font-size: 28px;
+  }
 `
 
 export const Blocks = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: 24px;
   padding: 24px 0;
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    flex-direction: column;
+  }
 `
 
 // Description
@@ -80,10 +106,16 @@ export const DescTexts = styled.div`
 
 export const DescText = styled.div<{ $bold?: boolean }>`
   padding-right: 48px;
-  max-width: calc((100% / 5) * 3);
+  max-width: calc(((100% / 5) * 3) - 48px);
   white-space: newline;
   font-weight: ${({ $bold }) => ($bold ? 500 : "normal")};
   margin-top: 6px;
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    max-width: 100%;
+    padding-right: 0;
+    text-align: justify;
+  }
 `
 
 export const DescSubText = styled.span`
@@ -96,4 +128,11 @@ export const Organizers = styled.div`
   display: flex;
   gap: 64px;
   flex-wrap: wrap;
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    img {
+      width: 100%;
+      height: auto;
+    }
+  }
 `

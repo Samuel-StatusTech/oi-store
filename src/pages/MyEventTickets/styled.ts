@@ -22,4 +22,16 @@ export const List = styled.div`
   grid-template-columns: repeat(4, 1fr);
   gap: 24px;
   max-width: 100%;
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  @media (max-width: 420px) {
+    grid-template-columns: repeat(1, 1fr);
+  }
 `

@@ -6,17 +6,31 @@ export const Component = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: space-between;
+  align-items: center;
   padding: 24px 0;
+
+  @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
+    flex-direction: column;
+  }
 `
 
 export const LogoArea = styled.div`
   width: fit-content;
+
   a {
     width: fit-content;
 
     img {
       width: auto;
       height: 40px;
+    }
+  }
+
+  @media (max-width: ${({theme}) => theme.bp.small}px) {
+
+    a img {
+      width: 120px;
+      height: auto;
     }
   }
 `
@@ -37,5 +51,19 @@ export const UserArea = styled.div`
     padding: 0.6em 1.4em;
     border-radius: 32px;
     cursor: pointer;
+  }
+
+  @media (max-width: ${({theme}) => theme.bp.small}px) {
+
+    .myTickets {
+      font-size: 14px;
+      line-height: 14px;
+      padding: 0.6rem 0.8rem;
+    }
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
+    margin-top: 14px;
+    align-self: flex-end;
   }
 `
