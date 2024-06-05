@@ -48,11 +48,22 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
 
   const sumTaxes = () => {
     let total = 0
+    const hasTax = event?.eCommerce.adminTax
+    const isTaxAbsolute = event?.eCommerce.adminTaxValue !== 0
 
     const ticketsTotal = sumTickets()
 
-    total = ticketsTotal * 0.15
-    // ((event?.eCommerce.adminTaxPercentage ?? 100) / 100 / 100) ?? 0
+    if (hasTax) {
+      if (isTaxAbsolute) total = +event?.eCommerce.adminTaxValue
+      else {
+        const taxMin = event?.eCommerce.adminTaxMinimum
+        const calculedTax =
+          ticketsTotal * (+event.eCommerce.adminTaxPercentage / 100 / 100)
+
+        const min = Math.max(taxMin, calculedTax)
+        total = min
+      }
+    }
 
     return total
   }
@@ -72,6 +83,22 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
     const minutes = String(today.getMinutes()).padStart(2, "0")
 
     return `${hours}:${minutes}`
+  }
+
+  const renderTaxResume = () => {
+    let str = ""
+
+    if (event) {
+      const minValue = +event.eCommerce.adminTaxMinimum ?? 0
+      const percentTax = sumTaxes()
+
+      str =
+        percentTax > minValue
+          ? `(${+event.eCommerce.adminTaxPercentage / 100}%)`
+          : "min"
+    }
+
+    return str
   }
 
   return (
@@ -100,7 +127,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
             <span>{formatMoney(sumTickets(), true)}</span>
           </S.TotalItem>
           <S.TotalItem>
-            <span>Taxas (1.5%)</span>
+            <span>Taxas {renderTaxResume()}</span>
             <span>{formatMoney(sumTaxes(), true)}</span>
           </S.TotalItem>
           <S.TotalItem $main={true}>

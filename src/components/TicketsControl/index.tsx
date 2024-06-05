@@ -60,15 +60,10 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
     setTickets(nList)
   }
 
-  const storeCart = () => {
-    localStorage.setItem(`cart`, JSON.stringify(tickets))
-  }
-
   const handleBuy = () => {
-    // save cart on state manager...
-    storeCart()
-
-    navigate("/payment")
+    navigate("/payment", {
+      state: { tickets },
+    })
   }
 
   return (
@@ -83,7 +78,6 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
             return daysRelation[d.getDay()]
           }}
           disablePast={true}
-          format="DD/MM/YYYY"
           sx={{
             ".MuiInputBase-root > input": {
               padding: ".6rem .8rem",

@@ -20,6 +20,7 @@ export type TEventData = {
     pix: boolean
     splitPercentage: number
     splitValue: number
+    nominal?: boolean
   }
   email: string
   expireAt: number

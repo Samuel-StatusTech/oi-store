@@ -45,36 +45,16 @@ const Home = () => {
     }
   }, [])
 
-  const mixLists = (list1: TTicketDisposal[], list2: TTicketDisposal[]) => {
-    let list: TTicketDisposal[] = []
-
-    list1.forEach((i) => {
-      if (list2.findIndex((i1) => i1.id === i.id) > -1) {
-        let storedQnt = list2.find((i1) => i1.id === i.id)?.qnt ?? 0
-
-        list.push({ ...i, qnt: storedQnt })
-      } else list.push(i)
-    })
-
-    return list
-  }
-
   const fetchTickets = useCallback(async () => {
-    let localList = []
+    try {
+      const req = await Api.get.products({ eventId })
 
-    const cart = JSON.parse(localStorage.getItem("cart") ?? "[]")
-    if (Array.isArray(cart) && cart.length > 0) localList = cart
-
-    const req = await Api.get.products({ eventId })
-
-    if (req.ok) {
-      const list = req.data.list
-      const backList = parseDisposalTickets(list)
-
-      const mixedList = mixLists(backList, localList)
-
-      localStorage.setItem(`cart`, JSON.stringify(mixedList))
-      setTickets(mixedList)
+      if (req.ok) {
+        const list = req.data.list
+        setTickets(parseDisposalTickets(list))
+      }
+    } catch (error) {
+      alert("Erro ao carregar os tickets")
     }
   }, [])
 

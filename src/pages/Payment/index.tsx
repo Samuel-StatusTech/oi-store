@@ -18,9 +18,11 @@ import cardDiscover from "../../assets/icons/payment/ic-discover.png"
 import OrderResume from "../../components/OrderResume"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { TForm, TTicketForm, initialForm } from "../../utils/placeData/form"
-import { Link, useNavigate } from "react-router-dom"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 import { TEventData } from "../../utils/@types/data/event"
 import { Api } from "../../api"
+import { formatCpf } from "../../utils/masks/cpf"
+import { formatPhone } from "../../utils/masks/phone"
 
 type MProps = {
   checked: boolean
@@ -136,6 +138,7 @@ const monthsRelations = [
 ]
 
 const Payment = () => {
+  const lctn = useLocation()
   const navigate = useNavigate()
 
   const [event, setEvent] = useState<null | TEventData>(null)
@@ -149,7 +152,13 @@ const Payment = () => {
     const req = await Api.get.eventInfo({ eventId })
 
     if (req.ok) {
-      setEvent(req.data)
+      setEvent({
+        ...req.data,
+        eCommerce: {
+          ...req.data.eCommerce,
+          nominal: true, // to remove
+        },
+      })
     }
   }, [])
 
@@ -158,12 +167,10 @@ const Payment = () => {
     else setMethod(newMethod)
   }
 
-  const loadLocalTickets = () => {
-    const tickets = JSON.parse(localStorage.getItem("cart") ?? "[]")
-    setTickets(tickets)
-  }
-
   const handleForm = (field: keyof TForm["buyer"], value: string) => {
+    if (field === "cpf") value = formatCpf(value)
+    if (field === "phone") value = formatPhone(value)
+
     setForm({
       ...form,
       buyer: {
@@ -184,7 +191,6 @@ const Payment = () => {
                 ...t,
                 person: {
                   name: form.buyer.name,
-                  surname: form.buyer.surname,
                 },
               }
         ),
@@ -322,13 +328,6 @@ const Payment = () => {
     }
   }
 
-  const handlePay = () => {
-    // check errors
-
-    if (method === "pix") navigate("/payment/pix")
-    else if (method === "credit") return
-  }
-
   const getDatePeriod = () => {
     let str = ""
 
@@ -362,6 +361,20 @@ const Payment = () => {
     return "17:00"
   }
 
+  const checkErrors = () => {
+    // ...
+    return null
+  }
+
+  const handlePay = () => {
+    const errors = checkErrors()
+
+    if (!errors) {
+      if (method === "pix") navigate("/payment/pix")
+      else if (method === "credit") return
+    }
+  }
+
   useEffect(() => {
     setForm({
       ...form,
@@ -375,9 +388,15 @@ const Payment = () => {
   }, [tickets])
 
   useEffect(() => {
-    loadData()
-    loadLocalTickets()
-  }, [loadData])
+    if (lctn.state) {
+      const pickedTickets = lctn.state.tickets ?? null
+
+      if (pickedTickets) {
+        loadData()
+        setTickets(pickedTickets)
+      } else navigate("/")
+    } else navigate("/")
+  }, [lctn.state, loadData, navigate])
 
   return (
     <S.Page>
@@ -387,7 +406,7 @@ const Payment = () => {
         <S.Main>
           <S.EventResume>
             <S.EventData>
-              <S.EventName>Me encontra no Pagode!</S.EventName>
+              <S.EventName>{event?.name}</S.EventName>
               <BlockInfo
                 small={true}
                 icon={<img src={calendar} alt={""} width={40} />}
@@ -427,87 +446,74 @@ const Payment = () => {
                   <S.FormLines>
                     <S.FormLine>
                       <Input
-                        label={"Nome"}
+                        label={"Nome e sobrenome"}
                         value={form.buyer.name}
                         onChange={(v: string) => handleForm("name", v)}
                       />
                       <Input
-                        label={"Sobrenome"}
-                        value={form.buyer.surname}
-                        onChange={(v: string) => handleForm("surname", v)}
-                      />
-                    </S.FormLine>
-                    <S.FormLine>
-                      <Input
-                        label={"Email"}
-                        value={form.buyer.email}
-                        onChange={(v: string) => handleForm("email", v)}
-                      />
-                      <Input
                         label={"Telefone"}
-                        value={""}
-                        onChange={() => {}}
+                        value={form.buyer.phone}
+                        onChange={(v: string) => handleForm("phone", v)}
                       />
                     </S.FormLine>
+                    {method === "credit" && (
+                      <S.FormLine>
+                        <Input
+                          label={"CPF"}
+                          value={form.buyer.cpf}
+                          onChange={(v: string) => handleForm("cpf", v)}
+                        />
+                      </S.FormLine>
+                    )}
                   </S.FormLines>
                 </S.FormBlock>
 
                 <S.FormBlock>
                   <span>Informações dos participantes</span>
 
-                  {form.tickets.map((ticket, k) => (
-                    <S.TicketBlock key={k}>
-                      <S.TicketName>
-                        <span>Ingresso {k + 1}: </span>
-                        <span>{ticket.name}</span>
-                      </S.TicketName>
+                  {event?.eCommerce.nominal &&
+                    form.tickets.map((ticket, k) => (
+                      <S.TicketBlock key={k}>
+                        <S.TicketName>
+                          <span>Ingresso {k + 1}: </span>
+                          <span>{ticket.name}</span>
+                        </S.TicketName>
 
-                      <S.Checkbox htmlFor={`check-${k}`}>
-                        <input
-                          id={`check-${k}`}
-                          type="checkbox"
-                          checked={
-                            !!ticket.person.name &&
-                            !!ticket.person.surname &&
-                            ticket.person.name === form.buyer.name &&
-                            ticket.person.surname === form.buyer.surname
-                          }
-                          onClick={() => {
-                            // eslint-disable-next-line react-hooks/rules-of-hooks
-                            usePayer(
-                              ticket,
-                              !(
-                                !!ticket.person.name &&
-                                !!ticket.person.surname &&
-                                ticket.person.name === form.buyer.name &&
-                                ticket.person.surname === form.buyer.surname
+                        <S.Checkbox htmlFor={`check-${k}`}>
+                          <input
+                            id={`check-${k}`}
+                            type="checkbox"
+                            checked={
+                              !!ticket.person.name &&
+                              ticket.person.name === form.buyer.name
+                            }
+                            onClick={() => {
+                              // eslint-disable-next-line react-hooks/rules-of-hooks
+                              usePayer(
+                                ticket,
+                                !(
+                                  !!ticket.person.name &&
+                                  ticket.person.name === form.buyer.name
+                                )
                               )
-                            )
-                          }}
-                        />
-                        <span>Utilizar dados do(a) comprador(a)</span>
-                      </S.Checkbox>
+                            }}
+                          />
+                          <span>Utilizar dados do(a) comprador(a)</span>
+                        </S.Checkbox>
 
-                      <S.FormLines>
-                        <S.FormLine>
-                          <Input
-                            label={"Nome"}
-                            value={ticket.person.name}
-                            onChange={(v: string) =>
-                              handleTicketForm(ticket, "name", v)
-                            }
-                          />
-                          <Input
-                            label={"Sobrenome"}
-                            value={ticket.person.surname}
-                            onChange={(v: string) =>
-                              handleTicketForm(ticket, "surname", v)
-                            }
-                          />
-                        </S.FormLine>
-                      </S.FormLines>
-                    </S.TicketBlock>
-                  ))}
+                        <S.FormLines>
+                          <S.FormLine>
+                            <Input
+                              label={"Nome e sobrenome"}
+                              value={ticket.person.name}
+                              onChange={(v: string) =>
+                                handleTicketForm(ticket, "name", v)
+                              }
+                            />
+                          </S.FormLine>
+                        </S.FormLines>
+                      </S.TicketBlock>
+                    ))}
                 </S.FormBlock>
 
                 {method === "credit" && (
@@ -573,7 +579,7 @@ const Payment = () => {
                     <Link to={""}> Termos de Serviço</Link>
                     <span>as Diretrizes e a </span>
                     <Link to={""}>Política de Privacidade</Link>
-                    <span>da Oi Tickets.</span>
+                    <span>de {event?.corporateName}.</span>
                   </div>
                 </S.Checkbox>
 

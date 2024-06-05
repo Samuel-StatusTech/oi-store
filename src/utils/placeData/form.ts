@@ -3,8 +3,8 @@ import { TTicketDisposal } from "../@types/data/ticket"
 export const initialForm = {
   buyer: {
     name: "",
-    surname: "",
-    email: "",
+    phone: "",
+    cpf: "",
   },
   tickets: [] as TTicketForm[],
   card: {
@@ -19,7 +19,6 @@ export const initialForm = {
 export type TTicketForm = Partial<TTicketDisposal> & {
   person: {
     name: string
-    surname: string
   }
 }
 
