@@ -1,4 +1,4 @@
-import { TTicketDisposal } from "../@types/ticket"
+import { TTicketDisposal } from "../@types/data/ticket"
 
 export const initialForm = {
   buyer: {

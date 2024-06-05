@@ -1,4 +1,4 @@
-import { TTicketStatus } from "../@types/ticket"
+import { TTicketStatus } from "../@types/data/ticket"
 
 export const statusRelations: { [key in TTicketStatus]: string } = {
   purchased: "Disponível",

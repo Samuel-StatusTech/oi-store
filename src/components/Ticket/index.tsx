@@ -3,11 +3,14 @@ import * as S from "./styled"
 import minus from "../../assets/icons/minus.png"
 import plus from "../../assets/icons/plus.png"
 import { formatMoney } from "../../utils/tb/formatMoney"
-import { TTicketDisposal } from "../../utils/@types/ticket"
+import { TTicketDisposal } from "../../utils/@types/data/ticket"
 
 type Props = {
   ticket: TTicketDisposal
-  changeQnt?: (ticketId: number | string, action: "decrease" | "increase") => void
+  changeQnt?: (
+    ticketId: number | string,
+    action: "decrease" | "increase"
+  ) => void
   hasControl?: boolean
 }
 
@@ -16,8 +19,8 @@ const Ticket = ({ ticket, changeQnt, hasControl = true }: Props) => {
     <S.Component>
       <S.TicketInfo>
         <S.TicketName>{ticket.name}</S.TicketName>
-        {ticket.price && (
-          <S.TicketPrice>{formatMoney(ticket.price)}</S.TicketPrice>
+        {ticket.price_sell && (
+          <S.TicketPrice>{formatMoney(ticket.price_sell)}</S.TicketPrice>
         )}
       </S.TicketInfo>
       <S.Quantity>

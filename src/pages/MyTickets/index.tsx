@@ -23,7 +23,7 @@ const MyTickets = () => {
     <S.Page>
       <Header />
 
-      <Container>
+      <Container fullHeight={true}>
         <S.Main>
           <S.PageTitle>Meus tickets</S.PageTitle>
 

@@ -1,3 +1,4 @@
+import { useCallback, useEffect, useState } from "react"
 import Header from "../../components/Header"
 import * as S from "./styled"
 
@@ -10,8 +11,99 @@ import location from "../../assets/icons/pin.png"
 import TicketsControl from "../../components/TicketsControl"
 import Footer from "../../components/Footer"
 import Organizer from "../../components/Organizer"
+import { Api } from "../../api"
+import { TEventData } from "../../utils/@types/data/event"
+import { TTicketDisposal } from "../../utils/@types/data/ticket"
+import { parseDisposalTickets } from "../../utils/tb/ticketsToDisposal"
+
+const eventId = "216fb5ab4ddf"
+
+const monthsRelations = [
+  "janeiro",
+  "fevereiro",
+  "março",
+  "abril",
+  "maio",
+  "junho",
+  "julho",
+  "agosto",
+  "setembro",
+  "outubro",
+  "novembro",
+  "dezembro",
+]
 
 const Home = () => {
+  const [event, setEvent] = useState<null | TEventData>(null)
+  const [tickets, setTickets] = useState<TTicketDisposal[]>([])
+
+  const loadData = useCallback(async () => {
+    const req = await Api.get.eventInfo({ eventId })
+
+    if (req.ok) {
+      setEvent(req.data)
+    }
+  }, [])
+
+  const mixLists = (list1: TTicketDisposal[], list2: TTicketDisposal[]) => {
+    let list: TTicketDisposal[] = []
+
+    list1.forEach((i) => {
+      if (list2.findIndex((i1) => i1.id === i.id) > -1) {
+        let storedQnt = list2.find((i1) => i1.id === i.id)?.qnt ?? 0
+
+        list.push({ ...i, qnt: storedQnt })
+      } else list.push(i)
+    })
+
+    return list
+  }
+
+  const fetchTickets = useCallback(async () => {
+    let localList = []
+
+    const cart = JSON.parse(localStorage.getItem("cart") ?? "[]")
+    if (Array.isArray(cart) && cart.length > 0) localList = cart
+
+    const req = await Api.get.products({ eventId })
+
+    if (req.ok) {
+      const list = req.data.list
+      const backList = parseDisposalTickets(list)
+
+      const mixedList = mixLists(backList, localList)
+
+      localStorage.setItem(`cart`, JSON.stringify(mixedList))
+      setTickets(mixedList)
+    }
+  }, [])
+
+  const getDatePeriod = () => {
+    let str = ""
+
+    const [iniDate, endDate] = [
+      new Date(event?.date_ini as string),
+      new Date(event?.date_end as string),
+    ]
+
+    const isMultipleDays = iniDate.getTime() !== endDate.getTime()
+
+    if (isMultipleDays) {
+      str = `De ${String(iniDate.getUTCDate()).padStart(2, "0")}`
+      str += ` a ${String(endDate.getUTCDate()).padStart(2, "0")}`
+    } else str = String(iniDate.getUTCDate()).padStart(2, "0")
+
+    str += ` de ${monthsRelations[endDate.getMonth()]}`
+    str += ` de ${endDate.getFullYear()}`
+
+    return str
+  }
+
+  useEffect(() => {
+    loadData()
+    fetchTickets()
+  }, [loadData, fetchTickets])
+
   return (
     <S.Page>
       <Header />
@@ -25,18 +117,18 @@ const Home = () => {
       <Container>
         <S.EventDataArea>
           <S.MainData>
-            <S.EventName>Evento Teste</S.EventName>
+            <S.EventName>{event?.name}</S.EventName>
             <S.Blocks>
               <BlockInfo
                 title="Data e Hora"
-                description={["De 11 a 14 de dezembro de 2022", "17:00"]}
+                description={[getDatePeriod(), "17:00"]}
                 icon={<img src={calendar} alt={""} width={84} />}
               />
               <BlockInfo
                 title="Localização"
                 description={[
                   "Rua Aubé, nº 895",
-                  "Centro, Joinville - SC - Centro, Joinville - SC",
+                  `${event?.city} - ${event?.uf}`,
                   "89205-00",
                 ]}
                 icon={<img src={location} alt={""} width={84} />}
@@ -44,7 +136,7 @@ const Home = () => {
             </S.Blocks>
           </S.MainData>
 
-          <TicketsControl />
+          <TicketsControl tickets={tickets} setTickets={setTickets} />
         </S.EventDataArea>
       </Container>
 
@@ -55,12 +147,16 @@ const Home = () => {
             <S.DescTexts>
               <S.DescText>
                 {`Parango Beach acontece dia 3 de dezembro e traz Parangolé e Xandy Harmonia juntos, na Pipa Beach Club
-A vibe do verão vai invadir, mais uma vez, a barraca Pipa - tradicional clube de praia localizado na Praia do Flamengo.
-E dessa vez a Pipa levará o pagode do Parangolé, liderado por Tony Salles e o inconfundível som de Xandy Harmonia para animar a galera.
-Depois de levar nomes como Léo Santana, Timbalada e Thiago Aquino para a beira da praia, a Pipa aposta agora em duas atrações de peso para embalar ainda mais o clima de verão que o clube de praia tem.
-Com um repertório repleto de maiores sucessos de suas carreiras, Tony e Xandy não escondem a alegria de estarem juntos, em mais um projeto.
-E para quem curte o som do Parango e de Xandy, a oportunidade de curtir dois super shows é essa! Ad vendas iniciam hoje, às 12h no site do Sympla e no site da Bora Tickets, ou na loja do Bora, localizada no 2° piso do Shopping da Bahia.
-Não fique de fora e venha curtir a vibe que só a Pipa tem! Animação, música boa e astral único!`}
+                A vibe do verão vai invadir, mais uma vez, a barraca Pipa - tradicional clube de praia localizado na Praia do Flamengo.
+                E dessa vez a Pipa levará o pagode do Parangolé, liderado por Tony Salles e o inconfundível som de Xandy Harmonia para animar a galera.`}
+              </S.DescText>
+              <S.DescText>
+                {`Depois de levar nomes como Léo Santana, Timbalada e Thiago Aquino para a beira da praia, a Pipa aposta agora em duas atrações de peso para embalar ainda mais o clima de verão que o clube de praia tem.
+                Com um repertório repleto de maiores sucessos de suas carreiras, Tony e Xandy não escondem a alegria de estarem juntos, em mais um projeto.`}
+              </S.DescText>
+              <S.DescText>
+                {`E para quem curte o som do Parango e de Xandy, a oportunidade de curtir dois super shows é essa! Ad vendas iniciam hoje, às 12h no site do Sympla e no site da Bora Tickets, ou na loja do Bora, localizada no 2° piso do Shopping da Bahia.
+                Não fique de fora e venha curtir a vibe que só a Pipa tem! Animação, música boa e astral único!`}
               </S.DescText>
             </S.DescTexts>
           </S.DescriptionSection>
@@ -68,7 +164,7 @@ Não fique de fora e venha curtir a vibe que só a Pipa tem! Animação, música
             <S.DescTitle>Local</S.DescTitle>
             <S.DescText>{`Centro de Eventos X`}</S.DescText>
             <S.DescText $bold={true}>Endereço</S.DescText>
-            <S.DescSubText>{`Rua Aubé, 895 - Brusque, Joinville - SC,`}</S.DescSubText>
+            <S.DescSubText>{`Rua Aubé, 895 - ${event?.city} - ${event?.uf},`}</S.DescSubText>
             <S.DescSubText>{`89205-000`}</S.DescSubText>
             <S.DescText $bold={true}>Telefone</S.DescText>
             <S.DescSubText>{`(47) 3207-3009`}</S.DescSubText>

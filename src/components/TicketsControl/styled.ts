@@ -36,7 +36,15 @@ export const Top = styled.div`
 `
 
 export const DateArea = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 24px;
   padding: 12px;
+  position: relative;
+
+  span {
+    white-space: nowrap;
+  }
 `
 
 export const Tickets = styled.div`

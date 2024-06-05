@@ -1,5 +1,5 @@
 import styled from "styled-components"
-import { TTicketStatus } from "../../utils/@types/ticket"
+import { TTicketStatus } from "../../utils/@types/data/ticket"
 
 export const Component = styled.div`
   display: flex;

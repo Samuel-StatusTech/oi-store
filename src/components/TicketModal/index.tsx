@@ -1,5 +1,5 @@
 import { QRCodeSVG } from "qrcode.react"
-import { TTicket } from "../../utils/@types/ticket"
+import { TTicket } from "../../utils/@types/data/ticket"
 import * as S from "./styled"
 import { statusRelations } from "../../utils/placeData/statusRelations"
 import { useEffect, useRef } from "react"
@@ -51,7 +51,7 @@ const TicketModal = ({ shown, data, handleClose }: Props) => {
   return (
     <S.Wrapper onClick={close} ref={wrapperRef}>
       <S.Component>
-        <S.TicketTitle>{data?.title ?? ""}</S.TicketTitle>
+        <S.TicketTitle>{data?.name ?? ""}</S.TicketTitle>
         <QRCodeSVG value={data?.code ?? ""} />
         <S.TicketStatus $status={data?.status ?? undefined}>
           {renderStatus()}

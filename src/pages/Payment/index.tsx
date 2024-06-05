@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import * as S from "./styled"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
@@ -16,9 +16,11 @@ import cardDiners from "../../assets/icons/payment/ic-diners.png"
 import cardElo from "../../assets/icons/payment/ic-elo.png"
 import cardDiscover from "../../assets/icons/payment/ic-discover.png"
 import OrderResume from "../../components/OrderResume"
-import { TTicketDisposal } from "../../utils/@types/ticket"
+import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { TForm, TTicketForm, initialForm } from "../../utils/placeData/form"
 import { Link, useNavigate } from "react-router-dom"
+import { TEventData } from "../../utils/@types/data/event"
+import { Api } from "../../api"
 
 type MProps = {
   checked: boolean
@@ -116,34 +118,49 @@ type TCardFlag =
   | "DINERSCLUB"
   | "ELO"
 
+const eventId = "216fb5ab4ddf"
+
+const monthsRelations = [
+  "janeiro",
+  "fevereiro",
+  "março",
+  "abril",
+  "maio",
+  "junho",
+  "julho",
+  "agosto",
+  "setembro",
+  "outubro",
+  "novembro",
+  "dezembro",
+]
+
 const Payment = () => {
   const navigate = useNavigate()
 
+  const [event, setEvent] = useState<null | TEventData>(null)
   const [method, setMethod] = useState<"" | "pix" | "credit">("")
   const [form, setForm] = useState<TForm>(initialForm)
   const [flag, setFlag] = useState<TCardFlag>(null)
 
-  const [tickets] = useState<Partial<TTicketDisposal>[]>([
-    {
-      id: 1,
-      name: "OFF FEMININO + 1 CAIPIRINHA",
-      price: 5000,
-    },
-    {
-      id: 2,
-      name: "MASCULINO",
-      price: 6000,
-    },
-    {
-      id: 3,
-      name: "MASCULINO",
-      price: 6000,
-    },
-  ])
+  const [tickets, setTickets] = useState<TTicketDisposal[]>([])
+
+  const loadData = useCallback(async () => {
+    const req = await Api.get.eventInfo({ eventId })
+
+    if (req.ok) {
+      setEvent(req.data)
+    }
+  }, [])
 
   const handleSelect = (newMethod: "pix" | "credit") => {
     if (method === newMethod) setMethod("")
     else setMethod(newMethod)
+  }
+
+  const loadLocalTickets = () => {
+    const tickets = JSON.parse(localStorage.getItem("cart") ?? "[]")
+    setTickets(tickets)
   }
 
   const handleForm = (field: keyof TForm["buyer"], value: string) => {
@@ -312,6 +329,39 @@ const Payment = () => {
     else if (method === "credit") return
   }
 
+  const getDatePeriod = () => {
+    let str = ""
+
+    const [iniDate, endDate] = [
+      new Date(event?.date_ini as string),
+      new Date(event?.date_end as string),
+    ]
+
+    const isMultipleDays = iniDate.getTime() !== endDate.getTime()
+
+    if (isMultipleDays) {
+      str = `De ${String(iniDate.getUTCDate()).padStart(2, "0")}`
+      str += ` a ${String(endDate.getUTCDate()).padStart(2, "0")}`
+    } else str = String(iniDate.getUTCDate()).padStart(2, "0")
+
+    str += ` de ${monthsRelations[endDate.getMonth()]}`
+    str += ` de ${endDate.getFullYear()}`
+
+    return str
+  }
+
+  const getIniHour = () => {
+    // let str = ""
+
+    // const iniDate = new Date(event?.date_ini as string)
+
+    // str = `${String(iniDate.getUTCHours()).padStart(2, "0")}:`
+    // str += `${String(iniDate.getMinutes()).padStart(2, "0")}`
+
+    // return str
+    return "17:00"
+  }
+
   useEffect(() => {
     setForm({
       ...form,
@@ -320,8 +370,14 @@ const Payment = () => {
         person: { name: "", surname: "" },
       })),
     })
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tickets])
+
+  useEffect(() => {
+    loadData()
+    loadLocalTickets()
+  }, [loadData])
 
   return (
     <S.Page>
@@ -335,17 +391,14 @@ const Payment = () => {
               <BlockInfo
                 small={true}
                 icon={<img src={calendar} alt={""} width={40} />}
-                description={[
-                  "Centro de Evento - Rua Aubé, 895 - centro,",
-                  "Joiville - SC, 89205-000",
-                ]}
+                description={[getDatePeriod(), getIniHour()]}
               />
               <BlockInfo
                 small={true}
                 icon={<img src={location} alt={""} width={40} />}
                 description={[
-                  "Centro de Evento - Rua Aubé, 895 - centro,",
-                  "Joiville - SC, 89205-000",
+                  `${event?.city} - ${event?.uf} - Rua Aubé, nº 895`,
+                  "89205-00",
                 ]}
               />
             </S.EventData>
@@ -529,7 +582,11 @@ const Payment = () => {
             )}
           </S.EventResume>
 
-          <OrderResume />
+          <OrderResume
+            datePeriod={getDatePeriod()}
+            ticketsList={tickets}
+            setTickets={setTickets}
+          />
         </S.Main>
       </Container>
 

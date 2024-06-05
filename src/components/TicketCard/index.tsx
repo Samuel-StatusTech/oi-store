@@ -1,22 +1,17 @@
+import { TCardTicket } from "../../utils/@types/data/ticket"
 import * as S from "./styled"
 
 import { Link } from "react-router-dom"
 
 type Props = {
-  data: {
-    eventId: string
-    eventBanner: string
-    eventName: string
-    eventDate: string
-    ticketsQnt: string
-  }
+  data: TCardTicket
 }
 
 const TicketCard = ({ data }: Props) => {
   return (
     <S.Component>
       <Link
-        to={data.eventId}
+        to={data.name.toLowerCase().replace(/\s+/g, "-")}
         state={{
           data,
         }}
@@ -25,9 +20,9 @@ const TicketCard = ({ data }: Props) => {
           <img src={data.eventBanner} alt={""} />
         </S.ImageContainer>
         <S.EventInfo>
-          <S.EventName>{data.eventName}</S.EventName>
+          <S.EventName>{data.name}</S.EventName>
           <S.CardBottom>
-            <S.EventDate>{data.eventDate}</S.EventDate>
+            <S.EventDate>{data.price_sell}</S.EventDate>
             <S.TicketsQnt>Tickets: {data.ticketsQnt}</S.TicketsQnt>
           </S.CardBottom>
         </S.EventInfo>

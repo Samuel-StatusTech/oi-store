@@ -8,12 +8,12 @@ import Container from "../../components/Container"
 import { placeList } from "./placeList"
 import { useLocation } from "react-router-dom"
 import EventTicketItem from "../../components/EventTicketItem"
-import { TTicket } from "../../utils/@types/ticket"
+import { TCardTicket, TTicket } from "../../utils/@types/data/ticket"
 import TicketModal from "../../components/TicketModal"
 
 const MyEventTickets = () => {
   const location = useLocation()
-  const { data: event } = location.state
+  const data = location.state.data as TCardTicket
 
   const [list, setList] = useState<TTicket[]>([])
   const [modal, setModal] = useState<any>({ shown: false, data: null })
@@ -32,11 +32,14 @@ const MyEventTickets = () => {
 
   const getData = useCallback(() => {
     // ... get tickets for event
+    // await Api... (retiradas)
 
-    const sortedList = sortList(placeList)
+    const sortedList = sortList(
+      placeList.map((t) => ({ ...t, name: data.name }))
+    )
 
     setList(sortedList)
-  }, [])
+  }, [data.name])
 
   const handleExpand = (ticket: TTicket) => {
     setModal({
@@ -60,7 +63,7 @@ const MyEventTickets = () => {
 
       <Container>
         <S.Main>
-          <S.PageTitle>Meus tickets para {event?.eventName} </S.PageTitle>
+          <S.PageTitle>Meus tickets "{data?.name}"</S.PageTitle>
 
           <S.List>
             {list.map((ticket, k) => (

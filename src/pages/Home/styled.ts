@@ -101,6 +101,8 @@ export const DescTitle = styled.h3`
 
 export const DescTexts = styled.div`
   display: flex;
+  flex-direction: column;
+  gap: 12px;
   flex: 5;
 `
 

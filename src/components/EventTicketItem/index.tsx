@@ -1,5 +1,5 @@
 import { QRCodeSVG } from "qrcode.react"
-import { TTicket } from "../../utils/@types/ticket"
+import { TTicket } from "../../utils/@types/data/ticket"
 import * as S from "./styled"
 import { statusRelations } from "../../utils/placeData/statusRelations"
 
@@ -16,7 +16,7 @@ const EventTicketItem = ({ data, handleExpand }: Props) => {
 
   return (
     <S.Component onClick={() => handleExpand(data)}>
-      <S.TicketTitle>{data.title}</S.TicketTitle>
+      <S.TicketTitle>{data.name}</S.TicketTitle>
       <QRCodeSVG value={data.code} />
       <S.TicketStatus $status={data.status}>{renderStatus()}</S.TicketStatus>
     </S.Component>

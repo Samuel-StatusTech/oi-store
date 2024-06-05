@@ -1,7 +1,12 @@
 import * as S from "./styled"
 
-const Container = ({ children }: { children?: JSX.Element | JSX.Element[] }) => {
-  return <S.Component>{children}</S.Component>
+type Props = {
+  children?: JSX.Element | JSX.Element[]
+  fullHeight?: boolean
+}
+
+const Container = ({ children, fullHeight }: Props) => {
+  return <S.Component $fullHeight={fullHeight}>{children}</S.Component>
 }
 
 export default Container

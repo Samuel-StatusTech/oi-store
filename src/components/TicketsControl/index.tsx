@@ -1,44 +1,26 @@
 import { useState } from "react"
 import * as S from "./styled"
 import Ticket from "../Ticket"
-import { TTicketDisposal } from "../../utils/@types/ticket"
+import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { formatMoney } from "../../utils/tb/formatMoney"
 import { useNavigate } from "react-router-dom"
 
-const TicketsControl = () => {
+import { DatePicker } from "@mui/x-date-pickers"
+
+type Props = {
+  tickets: TTicketDisposal[]
+  setTickets: (list: TTicketDisposal[]) => void
+}
+
+const daysRelation = ["D", "S", "T", "Q", "Q", "S", "S"]
+
+const TicketsControl = ({ tickets, setTickets }: Props) => {
   const navigate = useNavigate()
 
   const [installment] = useState(10)
-  const [tickets, setTickets] = useState<TTicketDisposal[]>([
-    {
-      id: 1,
-      name: "Off Feminino + 1 Caipirinha até 22hrs",
-      price: 6000,
-      qnt: 1,
-      availability: 0,
-    },
-    {
-      id: 2,
-      name: "Feminino",
-      price: 4000,
-      qnt: 2,
-    },
-    {
-      id: 3,
-      name: "Masculino",
-      price: 10000,
-      qnt: 1,
-    },
-    {
-      id: 4,
-      name: "Mesa",
-      price: 35000,
-      qnt: 1,
-    },
-  ])
 
   const calcTotal = () => {
-    let val = tickets.reduce((qnt, tk) => qnt + tk.price * tk.qnt, 0)
+    let val = tickets.reduce((qnt, tk) => qnt + tk.price_sell * tk.qnt, 0)
 
     return formatMoney(val)
   }
@@ -52,7 +34,7 @@ const TicketsControl = () => {
     const tk = nList.find((t) => t.id === ticketId) as TTicketDisposal
 
     if (action === "decrease") {
-      if (tk.qnt > 1) {
+      if (tk.qnt > 0) {
         nList = nList.map((tkt) =>
           tkt.id !== tk.id
             ? tkt
@@ -61,22 +43,31 @@ const TicketsControl = () => {
                 qnt: tk.qnt - 1,
               }
         )
-      } else nList = nList.filter((t) => t.id !== ticketId)
+      }
     } else if (action === "increase") {
-      nList = nList.map((tkt) =>
-        tkt.id !== tk.id
-          ? tkt
-          : {
-              ...tkt,
-              qnt: tk.qnt + 1,
-            }
-      )
+      if (tk.qnt + 1 <= tk.quantity) {
+        nList = nList.map((tkt) =>
+          tkt.id !== tk.id
+            ? tkt
+            : {
+                ...tkt,
+                qnt: tk.qnt + 1,
+              }
+        )
+      }
     }
 
     setTickets(nList)
   }
 
+  const storeCart = () => {
+    localStorage.setItem(`cart`, JSON.stringify(tickets))
+  }
+
   const handleBuy = () => {
+    // save cart on state manager...
+    storeCart()
+
     navigate("/payment")
   }
 
@@ -87,6 +78,18 @@ const TicketsControl = () => {
       </S.Top>
       <S.DateArea>
         <span>Selecione uma data</span>
+        <DatePicker
+          dayOfWeekFormatter={(d) => {
+            return daysRelation[d.getDay()]
+          }}
+          disablePast={true}
+          format="DD/MM/YYYY"
+          sx={{
+            ".MuiInputBase-root > input": {
+              padding: ".6rem .8rem",
+            },
+          }}
+        />
       </S.DateArea>
       <S.Tickets>
         {tickets.map((t, k) => (

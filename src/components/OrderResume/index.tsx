@@ -6,46 +6,78 @@ import eventLogo from "../../assets/images/exemplo.png"
 import clockIcon from "../../assets/icons/time.png"
 
 import Ticket from "../Ticket"
+import { TTicketDisposal } from "../../utils/@types/data/ticket"
+import { Api } from "../../api"
+import { TEventData } from "../../utils/@types/data/event"
 
-const OrderResume = () => {
-  const [ticketsList] = useState([
-    {
-      id: 1,
-      name: "Off Feminino + 1 Caipirinha até 22hrs",
-      price: 6000,
-      qnt: 1,
-      availability: 0,
-    },
-    {
-      id: 2,
-      name: "Feminino",
-      price: 4000,
-      qnt: 2,
-    },
-    {
-      id: 3,
-      name: "Masculino",
-      price: 10000,
-      qnt: 1,
-    },
-    {
-      id: 4,
-      name: "Mesa",
-      price: 35000,
-      qnt: 1,
-    },
-  ])
-  const [event, setEvent] = useState<any>(null)
+const eventId = "216fb5ab4ddf"
+
+type Props = {
+  datePeriod: string
+  ticketsList: TTicketDisposal[]
+  setTickets: (list: TTicketDisposal[]) => void
+}
+
+const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
+  const [event, setEvent] = useState<null | TEventData>(null)
+
+  const loadEventInfo = async () => {
+    const data = await Api.get.eventInfo({ eventId }).then((res) => {
+      return res.ok ? res.data : null
+    })
+
+    // @ts-ignore
+    if (data) setEvent({ ...data, image: eventLogo })
+    // @ts-ignore
+    else setEvent({ image: eventLogo })
+  }
 
   useEffect(() => {
-    setEvent({
-      image: eventLogo,
-    })
+    loadEventInfo()
   }, [])
+
+  const sumTickets = () => {
+    let total = 0
+
+    ticketsList.forEach((t) => {
+      total += t.price_sell * t.qnt
+    })
+
+    return total
+  }
+
+  const sumTaxes = () => {
+    let total = 0
+
+    const ticketsTotal = sumTickets()
+
+    total = ticketsTotal * 0.15
+    // ((event?.eCommerce.adminTaxPercentage ?? 100) / 100 / 100) ?? 0
+
+    return total
+  }
+
+  const sumTotal = () => {
+    const ticketsTotal = sumTickets()
+    const taxesTotal = sumTaxes()
+
+    return ticketsTotal + taxesTotal
+  }
+
+  const getRefreshHour = () => {
+    const today = new Date()
+    today.setHours(today.getHours() + 3)
+
+    const hours = String(today.getHours()).padStart(2, "0")
+    const minutes = String(today.getMinutes()).padStart(2, "0")
+
+    return `${hours}:${minutes}`
+  }
 
   return (
     <S.Component>
       <S.ImageContainer>
+        {/* @ts-ignore */}
         <img src={event?.image} alt={""} />
       </S.ImageContainer>
 
@@ -54,7 +86,7 @@ const OrderResume = () => {
           <S.ResumeText>Resumo do pedido</S.ResumeText>
           <div style={{ display: "flex" }}>
             <S.DateText>Data</S.DateText>
-            <S.DateText>14 de dezembro de 2022</S.DateText>
+            <S.DateText>{datePeriod}</S.DateText>
           </div>
         </S.EventResume>
         <S.TicketsList>
@@ -65,15 +97,15 @@ const OrderResume = () => {
         <S.Total>
           <S.TotalItem>
             <span>Subtotal</span>
-            <span>{formatMoney(10000, true)}</span>
+            <span>{formatMoney(sumTickets(), true)}</span>
           </S.TotalItem>
           <S.TotalItem>
-            <span>Taxas</span>
-            <span>{formatMoney(0, true)}</span>
+            <span>Taxas (1.5%)</span>
+            <span>{formatMoney(sumTaxes(), true)}</span>
           </S.TotalItem>
           <S.TotalItem $main={true}>
             <span>TOTAL</span>
-            <span>{formatMoney(10000, true)}</span>
+            <span>{formatMoney(sumTotal(), true)}</span>
           </S.TotalItem>
         </S.Total>
       </S.Info>
@@ -82,7 +114,7 @@ const OrderResume = () => {
       <S.ReleaseBlock>
         <S.RLeft>
           <img src={clockIcon} alt={""} />
-          <span>15:00</span>
+          <span>{getRefreshHour()}</span>
         </S.RLeft>
         <S.RRight>
           <span>
