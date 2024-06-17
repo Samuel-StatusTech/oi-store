@@ -12,77 +12,34 @@ import TicketsControl from "../../components/TicketsControl"
 import Footer from "../../components/Footer"
 import Organizer from "../../components/Organizer"
 import { Api } from "../../api"
-import { TEventData } from "../../utils/@types/data/event"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { parseDisposalTickets } from "../../utils/tb/ticketsToDisposal"
-
-const eventId = "216fb5ab4ddf"
-
-const monthsRelations = [
-  "janeiro",
-  "fevereiro",
-  "março",
-  "abril",
-  "maio",
-  "junho",
-  "julho",
-  "agosto",
-  "setembro",
-  "outubro",
-  "novembro",
-  "dezembro",
-]
+import getStore from "../../store"
+import { getDatePeriod } from "../../utils/tb/getDatePeriod"
 
 const Home = () => {
-  const [event, setEvent] = useState<null | TEventData>(null)
+  const { event } = getStore()
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
 
-  const loadData = useCallback(async () => {
-    const req = await Api.get.eventInfo({ eventId })
-
-    if (req.ok) {
-      setEvent(req.data)
-    }
-  }, [])
-
   const fetchTickets = useCallback(async () => {
-    try {
-      const req = await Api.get.products({ eventId })
+    if (event) {
+      try {
+        const req = await Api.get.products({ eventId: event?.id })
 
-      if (req.ok) {
-        const list = req.data.list
-        setTickets(parseDisposalTickets(list))
+        if (req.ok) {
+          const list = req.data.list
+          setTickets(parseDisposalTickets(list))
+        }
+      } catch (error) {
+        alert("Erro ao carregar os tickets")
       }
-    } catch (error) {
-      alert("Erro ao carregar os tickets")
     }
-  }, [])
-
-  const getDatePeriod = () => {
-    let str = ""
-
-    const [iniDate, endDate] = [
-      new Date(event?.date_ini as string),
-      new Date(event?.date_end as string),
-    ]
-
-    const isMultipleDays = iniDate.getTime() !== endDate.getTime()
-
-    if (isMultipleDays) {
-      str = `De ${String(iniDate.getUTCDate()).padStart(2, "0")}`
-      str += ` a ${String(endDate.getUTCDate()).padStart(2, "0")}`
-    } else str = String(iniDate.getUTCDate()).padStart(2, "0")
-
-    str += ` de ${monthsRelations[endDate.getMonth()]}`
-    str += ` de ${endDate.getFullYear()}`
-
-    return str
-  }
+  }, [event])
 
   useEffect(() => {
-    loadData()
+    // loadData()
     fetchTickets()
-  }, [loadData, fetchTickets])
+  }, [fetchTickets])
 
   return (
     <S.Page>
@@ -101,7 +58,13 @@ const Home = () => {
             <S.Blocks>
               <BlockInfo
                 title="Data e Hora"
-                description={[getDatePeriod(), "17:00"]}
+                description={[
+                  getDatePeriod(
+                    event?.date_ini as string,
+                    event?.date_end as string
+                  ),
+                  "17:00",
+                ]}
                 icon={<img src={calendar} alt={""} width={84} />}
               />
               <BlockInfo

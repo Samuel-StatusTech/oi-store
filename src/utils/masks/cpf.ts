@@ -10,5 +10,5 @@ export const formatCpf = (v: string) => {
     }
   )
 
-  return f
+  return f.slice(0, 14)
 }

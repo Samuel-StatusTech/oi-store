@@ -1,6 +1,7 @@
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom"
 
 // Pages
+import EventSelect from "../pages/EventSelect"
 import Home from "../pages/Home"
 import Login from "../pages/Login"
 import MyTickets from "../pages/MyTickets"
@@ -14,9 +15,12 @@ const Router = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/">
-          <Route path="" element={<Home />} />
+          <Route path="" element={<EventSelect />} />
           <Route path="login" element={<Login />} />
           <Route element={<AuthRoute />}>
+            <Route path="event">
+              <Route path=":eventId" element={<Home />} />
+            </Route>
             <Route path="mytickets">
               <Route path="" element={<MyTickets />} />
               <Route path=":eventId" element={<MyEventTickets />} />

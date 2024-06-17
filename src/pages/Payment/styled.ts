@@ -222,9 +222,9 @@ export const TicketBlock = styled.div`
 
 export const TicketName = styled.div``
 
-export const Button = styled.button`
+export const Button = styled.button<{$disabled: boolean}>`
   outline: none;
-  background-color: ${({ theme }) => theme.colors.blue.main};
+  background-color: ${({ $disabled, theme }) => !$disabled ? theme.colors.blue.main : "#CCC"};
   border: none;
   cursor: pointer;
   padding: 0.6rem 1.4rem;

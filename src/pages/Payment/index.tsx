@@ -19,10 +19,13 @@ import OrderResume from "../../components/OrderResume"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { TForm, TTicketForm, initialForm } from "../../utils/placeData/form"
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import { TEventData } from "../../utils/@types/data/event"
 import { Api } from "../../api"
 import { formatCpf } from "../../utils/masks/cpf"
 import { formatPhone } from "../../utils/masks/phone"
+import { getDatePeriod } from "../../utils/tb/getDatePeriod"
+import getStore from "../../store"
+import { formatCardDate } from "../../utils/masks/date"
+import { formatCardCode } from "../../utils/masks/cardcode"
 
 type MProps = {
   checked: boolean
@@ -120,28 +123,15 @@ type TCardFlag =
   | "DINERSCLUB"
   | "ELO"
 
-const eventId = "216fb5ab4ddf"
-
-const monthsRelations = [
-  "janeiro",
-  "fevereiro",
-  "março",
-  "abril",
-  "maio",
-  "junho",
-  "julho",
-  "agosto",
-  "setembro",
-  "outubro",
-  "novembro",
-  "dezembro",
-]
-
 const Payment = () => {
   const lctn = useLocation()
   const navigate = useNavigate()
 
-  const [event, setEvent] = useState<null | TEventData>(null)
+  const store = getStore()
+  const { event } = store
+
+  const [termsAgreed, setTermsAgreed] = useState(false)
+
   const [method, setMethod] = useState<"" | "pix" | "credit">("")
   const [form, setForm] = useState<TForm>(initialForm)
   const [flag, setFlag] = useState<TCardFlag>(null)
@@ -149,18 +139,20 @@ const Payment = () => {
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
 
   const loadData = useCallback(async () => {
-    const req = await Api.get.eventInfo({ eventId })
+    if (store.event) {
+      const req = await Api.get.eventInfo({ eventId: store.event?.id })
 
-    if (req.ok) {
-      setEvent({
-        ...req.data,
-        eCommerce: {
-          ...req.data.eCommerce,
-          nominal: true, // to remove
-        },
-      })
+      if (req.ok) {
+        store.controllers.event.setData({
+          ...req.data,
+          eCommerce: {
+            ...req.data.eCommerce,
+            nominal: true, // to remove
+          },
+        })
+      }
     }
-  }, [])
+  }, [store.controllers.event, store.event])
 
   const handleSelect = (newMethod: "pix" | "credit") => {
     if (method === newMethod) setMethod("")
@@ -276,6 +268,8 @@ const Payment = () => {
       else setFlag(null)
     }
 
+    if (field === "date") v = formatCardDate(v)
+    if (field === "code") v = formatCardCode(v)
     if (field === "address") v = formatCep(v)
 
     setForm({
@@ -328,27 +322,6 @@ const Payment = () => {
     }
   }
 
-  const getDatePeriod = () => {
-    let str = ""
-
-    const [iniDate, endDate] = [
-      new Date(event?.date_ini as string),
-      new Date(event?.date_end as string),
-    ]
-
-    const isMultipleDays = iniDate.getTime() !== endDate.getTime()
-
-    if (isMultipleDays) {
-      str = `De ${String(iniDate.getUTCDate()).padStart(2, "0")}`
-      str += ` a ${String(endDate.getUTCDate()).padStart(2, "0")}`
-    } else str = String(iniDate.getUTCDate()).padStart(2, "0")
-
-    str += ` de ${monthsRelations[endDate.getMonth()]}`
-    str += ` de ${endDate.getFullYear()}`
-
-    return str
-  }
-
   const getIniHour = () => {
     // let str = ""
 
@@ -392,7 +365,6 @@ const Payment = () => {
       const pickedTickets = lctn.state.tickets ?? null
 
       if (pickedTickets) {
-        loadData()
         setTickets(pickedTickets)
       } else navigate("/")
     } else navigate("/")
@@ -410,7 +382,13 @@ const Payment = () => {
               <BlockInfo
                 small={true}
                 icon={<img src={calendar} alt={""} width={40} />}
-                description={[getDatePeriod(), getIniHour()]}
+                description={[
+                  getDatePeriod(
+                    event?.date_ini as string,
+                    event?.date_end as string
+                  ),
+                  getIniHour(),
+                ]}
               />
               <BlockInfo
                 small={true}
@@ -468,11 +446,11 @@ const Payment = () => {
                   </S.FormLines>
                 </S.FormBlock>
 
-                <S.FormBlock>
-                  <span>Informações dos participantes</span>
+                {event?.eCommerce.nominal && (
+                  <S.FormBlock>
+                    <span>Informações dos participantes</span>
 
-                  {event?.eCommerce.nominal &&
-                    form.tickets.map((ticket, k) => (
+                    {form.tickets.map((ticket, k) => (
                       <S.TicketBlock key={k}>
                         <S.TicketName>
                           <span>Ingresso {k + 1}: </span>
@@ -514,7 +492,8 @@ const Payment = () => {
                         </S.FormLines>
                       </S.TicketBlock>
                     ))}
-                </S.FormBlock>
+                  </S.FormBlock>
+                )}
 
                 {method === "credit" && (
                   <S.FormBlock>
@@ -573,7 +552,11 @@ const Payment = () => {
                 {/* Terms */}
 
                 <S.Checkbox htmlFor={`check-terms`}>
-                  <input id={`check-terms`} type="checkbox" />
+                  <input
+                    id={`check-terms`}
+                    type="checkbox"
+                    onChange={(value) => setTermsAgreed(value.target.checked)}
+                  />
                   <div className={"terms"}>
                     <span>Concordo com os </span>
                     <Link to={""}> Termos de Serviço</Link>
@@ -583,13 +566,21 @@ const Payment = () => {
                   </div>
                 </S.Checkbox>
 
-                <S.Button onClick={handlePay}>PAGAR</S.Button>
+                <S.Button
+                  $disabled={termsAgreed === false}
+                  onClick={termsAgreed ? handlePay : undefined}
+                >
+                  PAGAR
+                </S.Button>
               </S.Form>
             )}
           </S.EventResume>
 
           <OrderResume
-            datePeriod={getDatePeriod()}
+            datePeriod={getDatePeriod(
+              event?.date_ini as string,
+              event?.date_end as string
+            )}
             ticketsList={tickets}
             setTickets={setTickets}
           />

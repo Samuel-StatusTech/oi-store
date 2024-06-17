@@ -1,4 +1,4 @@
-import { TEventData } from "../data/event"
+import { TEventData, TEventMin } from "../data/event"
 import { TProduct } from "../data/product"
 
 type TDefaultRes<T> =
@@ -13,9 +13,8 @@ type TDefaultRes<T> =
 
 type TResponses = {
   get: {
-    eventInfo: Promise<
-      TDefaultRes<TEventData>
-    >
+    events: Promise<TDefaultRes<TEventMin[]>>
+    eventInfo: Promise<TDefaultRes<TEventData>>
     products: Promise<
       TDefaultRes<{
         list: TProduct[]

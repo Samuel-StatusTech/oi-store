@@ -35,6 +35,17 @@ export type TEventData = {
     pix: number
   }
   uf: string
-  uid: string
+  id: string
   uidUser: string
+}
+
+export type TEventMin = {
+  id: string
+  name: string
+  date_ini: string
+  date_end: string
+  status: number
+  logo: null | string
+  city: string
+  state: string
 }

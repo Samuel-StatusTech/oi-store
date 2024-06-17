@@ -9,6 +9,39 @@ axios.defaults.headers.common.Authorization =
  * Getters
  */
 
+const getEvents: TApi["get"]["events"] = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await axios
+        .get(`event/getSelect?status=ativo`)
+        .then((res) => {
+          const info = res.data.events
+
+          if (info) {
+            resolve({
+              ok: true,
+              data: info,
+            })
+          } else {
+            reject({
+              error: "Erro ao carregar os eventos. Tente novamente mais tarde",
+            })
+          }
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Erro ao carregar os eventos. Tente novamente mais tarde",
+          })
+        })
+    } catch (error) {
+      reject({
+        error: "Erro ao carregar os eventos. Tente novamente mais tarde",
+      })
+    }
+  })
+}
+
 const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -87,6 +120,7 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
 
 export const Api: TApi = {
   get: {
+    events: getEvents,
     eventInfo: getEventInfo,
     products: getProducts,
   },
