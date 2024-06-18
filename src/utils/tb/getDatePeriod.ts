@@ -1,4 +1,4 @@
-const monthsRelations = [
+export const monthsRelations = [
   "janeiro",
   "fevereiro",
   "março",

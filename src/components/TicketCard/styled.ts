@@ -11,11 +11,14 @@ export const Component = styled.div`
     flex-direction: column;
     text-decoration: none;
     width: 100%;
-    cursor: pointer;
   }
 
   &:hover {
     box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.18);
+  }
+
+  &:hover .iconsArea {
+    opacity: 1;
   }
 `
 
@@ -50,6 +53,29 @@ export const CardBottom = styled.div`
   @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
     flex-direction: column;
     align-items: flex-start;
+  }
+`
+
+export const Icons = styled.div`
+  display: flex;
+  align-items: flex-start;
+  align-self: stretch;
+  gap: 6px;
+  opacity: 0;
+  transition: opacity 0.3s;
+
+  button {
+    background: none;
+    border: none;
+    outline: none;
+    padding: 4px;
+    border-radius: 2px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+
+    &:hover {
+      background-color: #eee;
+    }
   }
 `
 

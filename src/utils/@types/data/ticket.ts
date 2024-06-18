@@ -16,6 +16,12 @@ export type TTicket = {
   id: number | string
   name: string
   code: string
+  bucket?: string
+  group_name?: string
+  price_sell?: string
+  user?: {
+    name: string
+  }
   status: TTicketStatus
 }
 
