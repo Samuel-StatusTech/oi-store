@@ -26,12 +26,25 @@ const TicketCard = ({ data }: Props) => {
     e.preventDefault()
 
     if (event) {
-      await downloadTickets(event, tickets)
+      await downloadTickets(event, tickets, true)
     }
   }
 
-  const handleShare = (e: any) => {
+  const handleShare = async (e: any) => {
     e.preventDefault()
+
+    if (navigator.canShare() && event) {
+      try {
+        const file = await downloadTickets(event, tickets)
+
+        if (file instanceof File) {
+          navigator.share({
+            title: `Meus Tickets para ${event.name}`,
+            files: [file],
+          })
+        }
+      } catch (error) {}
+    }
   }
 
   const loadTickets = useCallback(async () => {
@@ -104,9 +117,11 @@ const TicketCard = ({ data }: Props) => {
               <button onClick={handleDownload}>
                 <DownloadIcon width={24} height={24} />
               </button>
-              <button onClick={handleShare}>
-                <ShareIcon width={24} height={24} />
-              </button>
+              {window.navigator.canShare() && (
+                <button onClick={handleShare}>
+                  <ShareIcon width={24} height={24} />
+                </button>
+              )}
             </S.Icons>
           </S.CardBottom>
           <S.CardBottom>

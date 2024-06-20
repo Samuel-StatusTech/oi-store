@@ -77,6 +77,12 @@ export const Icons = styled.div`
       background-color: #eee;
     }
   }
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    button {
+      opacity: 1;
+    }
+  }
 `
 
 export const EventDate = styled.span`

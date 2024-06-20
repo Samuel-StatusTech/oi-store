@@ -4,30 +4,81 @@ import Footer from "../../components/Footer"
 import Container from "../../components/Container"
 import BlockInfo from "../../components/BlockInfo"
 
-import qrExample from "../../assets/images/exemplo-qr.png"
-
 import example from "../../assets/images/exemplo.png"
 import calendar from "../../assets/icons/calendar.png"
 import location from "../../assets/icons/pin.png"
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { temporizadorDeCincoMinutos } from "../../utils/tb/timer"
+import getStore from "../../store"
+import { Api } from "../../api"
+import { getDatePeriod } from "../../utils/tb/getDatePeriod"
+import QRCode from "qrcode.react"
+import { useLocation, useNavigate } from "react-router-dom"
+import { TTicket } from "../../utils/@types/data/ticket"
 
 const Payment = () => {
+  const lctn = useLocation()
+  const navigate = useNavigate()
+
+  const { event } = getStore()
+
   const [time, setTime] = useState("05:00")
-  const [qrCode] = useState("código QR")
+  const [qrCode, setQrCode] = useState("")
 
   const copyQRToClipboard = () => {
-    navigator.clipboard.writeText(qrCode).then(
-      function () {
-        // ...
-      },
-      function () {
-        // ...
-      }
-    )
+    navigator.clipboard.writeText(qrCode).then(() => {
+      alert("Código copiado")
+    })
   }
 
-  useEffect(() => {
+  const getOrderData = useCallback(() => {
+    const tickets = (lctn.state.tickets as TTicket[]) ?? null
+
+    if (tickets) {
+      const obj = {
+        items: tickets.map((t) => ({
+          name: t.name,
+          quantity: 1,
+          unit_amount: +(t.price_sell ?? "0"),
+        })),
+        qr_codes: [
+          {
+            amount: {
+              value: tickets.reduce(
+                (sum, ticket) => sum + +(ticket.price_sell ?? "0"),
+                0
+              ),
+            },
+          },
+        ],
+      }
+
+      return obj
+    } else return null
+  }, [lctn.state.tickets])
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const returnPage = () => {
+    navigate(-1)
+  }
+
+  const getPBcode = useCallback(async () => {
+    if (!lctn.state.tickets) return returnPage()
+    else {
+      const orderData = getOrderData()
+      if (orderData) {
+        const req = await Api.get.qrcode({ order: orderData })
+
+        if (req.ok) {
+          setQrCode(req.data.qr_codes[0].text)
+
+          runTimer()
+        }
+      }
+    }
+  }, [getOrderData, lctn.state.tickets, returnPage])
+
+  const runTimer = () => {
     const timer = temporizadorDeCincoMinutos()
 
     timer.iniciar()
@@ -35,7 +86,11 @@ const Payment = () => {
     setInterval(() => {
       setTime(timer.tempoAtualFormatado())
     }, 1000)
-  }, [])
+  }
+
+  useEffect(() => {
+    getPBcode()
+  }, [getPBcode])
 
   return (
     <S.Page>
@@ -55,16 +110,20 @@ const Payment = () => {
                   small={true}
                   icon={<img src={calendar} alt={""} width={40} />}
                   description={[
-                    "Centro de Evento - Rua Aubé, 895 - centro,",
-                    "Joiville - SC, 89205-000",
+                    getDatePeriod(
+                      event?.date_ini as string,
+                      event?.date_end as string
+                    ),
+                    "17:00",
                   ]}
                 />
                 <BlockInfo
                   small={true}
                   icon={<img src={location} alt={""} width={40} />}
                   description={[
-                    "Centro de Evento - Rua Aubé, 895 - centro,",
-                    "Joiville - SC, 89205-000",
+                    "Rua Aubé, nº 895",
+                    `${event?.city} - ${event?.uf}`,
+                    "89205-00",
                   ]}
                 />
               </div>
@@ -82,12 +141,13 @@ const Payment = () => {
                 </span>
               </S.PixInstructions>
               <S.QR>
-                <img src={qrExample} alt={""} />
+                {qrCode && <QRCode value={qrCode} />}
+
                 <S.Button onClick={copyQRToClipboard}>Copiar código</S.Button>
               </S.QR>
               <S.PixTime>
                 <span>Você tem</span>
-                <span>{time}</span>
+                <span>{time} </span>
                 <span>para realizar o pagamento</span>
               </S.PixTime>
             </S.PixArea>

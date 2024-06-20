@@ -3,8 +3,11 @@ import Container from "../Container"
 import * as S from "./styled"
 
 import MainLogo from "../../assets/images/oi-tickets.png"
+import getStore from "../../store"
 
 const Header = () => {
+  const { event } = getStore()
+
   return (
     <S.Wrapper>
       <Container>
@@ -15,9 +18,11 @@ const Header = () => {
             </Link>
           </S.LogoArea>
           <S.UserArea>
-            <Link to={"/mytickets"} className="myTickets">
-              Meus Ingressos
-            </Link>
+            {event && (
+              <Link to={"/mytickets"} className="myTickets">
+                Meus Ingressos
+              </Link>
+            )}
           </S.UserArea>
         </S.Component>
       </Container>

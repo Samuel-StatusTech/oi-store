@@ -1,13 +1,52 @@
 import axios from "axios"
 import { TApi } from "../utils/@types/api"
+import Cookies from "js-cookie"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
-axios.defaults.headers.common.Authorization =
-  "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZqTFpROEQyOVBmQ3dJMlNiS3dQZ0I3cjdnRDMiLCJkYXRhYmFzZSI6IkRCNGI5MzEzZTNjZWUwOGQ5YWMzZDE0NGUxODg3MGJjMGRiMjA4MTNjZCIsImNsaWVudEtleSI6Ii1OYWxaenZiMndhc1VfNmR1R2NuIiwiaWF0IjoxNzE3NDk1MzQzLCJleHAiOjE5NzQxMDMzNDN9.50knxx6WtR8TBD0byCCPo7Qaxe6SV6MXvHujZYYd4rI"
+axios.defaults.headers.common.Authorization = `Bearer ${Cookies.get("dtoken")}`
 
 /*
  * Getters
  */
+
+const getQrCode: TApi["get"]["qrcode"] = async ({ order }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const pbToken = Cookies.get("pbtoken")
+
+      await axios
+        .post(`https://sandbox.api.pagseguro.com/orders`, order, {
+          headers: {
+            Authorization: `Bearer ${pbToken}`,
+          },
+        })
+        .then((res) => {
+          const info = res.data
+
+          if (info) {
+            resolve({
+              ok: true,
+              data: info,
+            })
+          } else {
+            reject({
+              error: "Erro ao carregar o qrcode. Tente novamente mais tarde",
+            })
+          }
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Erro ao carregar o qrcode. Tente novamente mais tarde",
+          })
+        })
+    } catch (error) {
+      reject({
+        error: "Erro ao carregar o qrcode. Tente novamente mais tarde",
+      })
+    }
+  })
+}
 
 const getEvents: TApi["get"]["events"] = async () => {
   return new Promise(async (resolve, reject) => {
@@ -120,6 +159,7 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
 
 export const Api: TApi = {
   get: {
+    qrcode: getQrCode,
     events: getEvents,
     eventInfo: getEventInfo,
     products: getProducts,

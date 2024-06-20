@@ -8,8 +8,11 @@ import EventCard from "../../components/EventCard"
 
 import { Api } from "../../api"
 import { parseList } from "../../utils/tb/parseList"
+import getStore from "../../store"
 
 const EventSelect = () => {
+  const store = getStore()
+
   const [list, setList] = useState<any[]>([])
 
   const getData = useCallback(async () => {
@@ -23,8 +26,10 @@ const EventSelect = () => {
   }, [])
 
   useEffect(() => {
+    store.controllers.event.clear()
+
     getData()
-  }, [getData])
+  }, [store.controllers, getData])
 
   return (
     <S.Page>

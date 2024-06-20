@@ -132,9 +132,10 @@ const Payment = () => {
 
   const [termsAgreed, setTermsAgreed] = useState(false)
 
-  const [method, setMethod] = useState<"" | "pix" | "credit">("")
+  const [method, setMethod] = useState<"" | "pix" | "credit">("pix")
   const [form, setForm] = useState<TForm>(initialForm)
   const [flag, setFlag] = useState<TCardFlag>(null)
+  const [fieldsOk, setFieldsOk] = useState(false)
 
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
 
@@ -343,7 +344,7 @@ const Payment = () => {
     const errors = checkErrors()
 
     if (!errors) {
-      if (method === "pix") navigate("/payment/pix")
+      if (method === "pix") navigate("/payment/pix", { state: { tickets } })
       else if (method === "credit") return
     }
   }
@@ -369,6 +370,10 @@ const Payment = () => {
       } else navigate("/")
     } else navigate("/")
   }, [lctn.state, loadData, navigate])
+
+  useEffect(() => {
+    setFieldsOk(!!form.buyer.name && !!form.buyer.phone)
+  }, [form.buyer])
 
   return (
     <S.Page>
@@ -408,11 +413,11 @@ const Payment = () => {
                   type={"pix"}
                   onSelect={handleSelect}
                 />
-                <Method
+                {/* <Method
                   checked={method === "credit"}
                   type={"credit"}
                   onSelect={handleSelect}
-                />
+                /> */}
               </S.Methods>
             </S.PaymentData>
 
@@ -567,7 +572,7 @@ const Payment = () => {
                 </S.Checkbox>
 
                 <S.Button
-                  $disabled={termsAgreed === false}
+                  $disabled={termsAgreed === false || !fieldsOk}
                   onClick={termsAgreed ? handlePay : undefined}
                 >
                   PAGAR

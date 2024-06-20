@@ -6,7 +6,11 @@ import { Content, TDocumentDefinitions } from "pdfmake/interfaces"
 import { TEventData } from "../@types/data/event"
 import { TTicket } from "../@types/data/ticket"
 
-const downloadTickets = async (eventData: TEventData, tickets: TTicket[]) => {
+const downloadTickets = async (
+  eventData: TEventData,
+  tickets: TTicket[],
+  shouldDownload?: boolean
+): Promise<void | File> => {
   pdfMake.vfs = pdfFonts.pdfMake.vfs
 
   return new Promise((resolve) => {
@@ -14,7 +18,7 @@ const downloadTickets = async (eventData: TEventData, tickets: TTicket[]) => {
 
     // File
 
-    const filename = "Nome legal"
+    const filename = `Meus Tickets para ${eventData.name}.pdf`
 
     const docDefs: TDocumentDefinitions = {
       pageSize: "A4",
@@ -27,9 +31,13 @@ const downloadTickets = async (eventData: TEventData, tickets: TTicket[]) => {
 
     const pdf = pdfMake.createPdf(docDefs)
 
-    // if (mustDownload)
-    pdf.download(`Relatório financeiro ${"event.name"} ${filename}.pdf`)
-    // else pdf.getBlob((blob) => resolve(blob))
+    if (shouldDownload) pdf.download(filename)
+    else {
+      let blob: null | Blob = null
+      pdf.getBlob((blobData) => (blob = blobData))
+
+      return resolve(new File([blob as unknown as Blob], filename))
+    }
   })
 }
 

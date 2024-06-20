@@ -10,7 +10,6 @@ import calendar from "../../assets/icons/calendar.png"
 import location from "../../assets/icons/pin.png"
 import TicketsControl from "../../components/TicketsControl"
 import Footer from "../../components/Footer"
-import Organizer from "../../components/Organizer"
 import { Api } from "../../api"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { parseDisposalTickets } from "../../utils/tb/ticketsToDisposal"
@@ -114,7 +113,7 @@ const Home = () => {
           </S.DescriptionSection>
         </Container>
       </S.DescriptionWrapper>
-
+      {/* 
       <Container>
         <S.Organizers>
           <Organizer
@@ -128,30 +127,8 @@ const Home = () => {
               "Eventos com qualidade e segurança!",
             ]}
           />
-          <Organizer
-            icon={
-              "https://static.vecteezy.com/system/resources/previews/012/871/371/original/google-search-icon-google-product-illustration-free-png.png"
-            }
-            name={"GR Produções, Shows e Eventos!"}
-            phone={"(38) 99221-6176"}
-            description={[
-              "GR Produções, Shows e Eventos!",
-              "Eventos com qualidade e segurança!",
-            ]}
-          />
-          <Organizer
-            icon={
-              "https://static.vecteezy.com/system/resources/previews/012/871/371/original/google-search-icon-google-product-illustration-free-png.png"
-            }
-            name={"GR Produções, Shows e Eventos!"}
-            phone={"(38) 99221-6176"}
-            description={[
-              "GR Produções, Shows e Eventos!",
-              "Eventos com qualidade e segurança!",
-            ]}
-          />
         </S.Organizers>
-      </Container>
+      </Container> */}
 
       <Footer />
     </S.Page>

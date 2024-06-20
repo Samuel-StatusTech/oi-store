@@ -1,5 +1,6 @@
 import { TEventData, TEventMin } from "../data/event"
 import { TProduct } from "../data/product"
+import { TQrPaymentData } from "../data/qrCode"
 
 type TDefaultRes<T> =
   | {
@@ -13,6 +14,7 @@ type TDefaultRes<T> =
 
 type TResponses = {
   get: {
+    qrcode: Promise<TDefaultRes<TQrPaymentData>>
     events: Promise<TDefaultRes<TEventMin[]>>
     eventInfo: Promise<TDefaultRes<TEventData>>
     products: Promise<
