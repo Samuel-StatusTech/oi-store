@@ -1,9 +1,8 @@
 import axios from "axios"
 import { TApi } from "../utils/@types/api"
-import Cookies from "js-cookie"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
-axios.defaults.headers.common.Authorization = `Bearer ${Cookies.get("dtoken")}`
+axios.defaults.headers.common.Authorization = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZqTFpROEQyOVBmQ3dJMlNiS3dQZ0I3cjdnRDMiLCJkYXRhYmFzZSI6IkRCNGI5MzEzZTNjZWUwOGQ5YWMzZDE0NGUxODg3MGJjMGRiMjA4MTNjZCIsImNsaWVudEtleSI6Ii1OYWxaenZiMndhc1VfNmR1R2NuIiwiaWF0IjoxNzE3NDk1MzQzLCJleHAiOjE5NzQxMDMzNDN9.50knxx6WtR8TBD0byCCPo7Qaxe6SV6MXvHujZYYd4rI`
 
 /*
  * Getters
@@ -12,12 +11,13 @@ axios.defaults.headers.common.Authorization = `Bearer ${Cookies.get("dtoken")}`
 const getQrCode: TApi["get"]["qrcode"] = async ({ order }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const pbToken = Cookies.get("pbtoken")
+      const pbToken =
+        "Bearer f4e9071a-4bb9-4060-8757-759cf8b0b20564cdec3640fb9ac8453dbc67a15adebfde6e-2625-4e23-950c-4f5956856ce7"
 
       await axios
         .post(`https://sandbox.api.pagseguro.com/orders`, order, {
           headers: {
-            Authorization: `Bearer ${pbToken}`,
+            Authorization: pbToken,
           },
         })
         .then((res) => {

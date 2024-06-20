@@ -73,6 +73,8 @@ const Payment = () => {
           setQrCode(req.data.qr_codes[0].text)
 
           runTimer()
+        } else {
+          alert(req.error)
         }
       }
     }
