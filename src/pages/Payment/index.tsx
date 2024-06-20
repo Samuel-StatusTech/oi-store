@@ -184,6 +184,7 @@ const Payment = () => {
                 ...t,
                 person: {
                   name: form.buyer.name,
+                  phone: form.buyer.phone,
                 },
               }
         ),
@@ -324,15 +325,14 @@ const Payment = () => {
   }
 
   const getIniHour = () => {
-    // let str = ""
+    let str = ""
 
-    // const iniDate = new Date(event?.date_ini as string)
+    const iniDate = new Date(event?.date_ini as string)
 
-    // str = `${String(iniDate.getUTCHours()).padStart(2, "0")}:`
-    // str += `${String(iniDate.getMinutes()).padStart(2, "0")}`
+    str = `${String(iniDate.getUTCHours()).padStart(2, "0")}:`
+    str += `${String(iniDate.getMinutes()).padStart(2, "0")}`
 
-    // return str
-    return "17:00"
+    return str
   }
 
   const checkErrors = () => {
@@ -344,7 +344,8 @@ const Payment = () => {
     const errors = checkErrors()
 
     if (!errors) {
-      if (method === "pix") navigate("/payment/pix", { state: { tickets } })
+      if (method === "pix")
+        navigate("/payment/pix", { state: { tickets, buyer: form.buyer } })
       else if (method === "credit") return
     }
   }
@@ -354,7 +355,7 @@ const Payment = () => {
       ...form,
       tickets: tickets.map((t) => ({
         ...t,
-        person: { name: "", surname: "" },
+        person: { name: "", phone: "" },
       })),
     })
 

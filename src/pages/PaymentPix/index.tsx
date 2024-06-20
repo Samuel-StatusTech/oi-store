@@ -33,9 +33,15 @@ const Payment = () => {
 
   const getOrderData = useCallback(() => {
     const tickets = (lctn.state.tickets as TTicket[]) ?? null
+    const buyer = lctn.state.buyer ?? null
 
     if (tickets) {
       const obj = {
+        customer: {
+          name: buyer.name,
+          email: "null@null.null",
+          tax_id: "00000000000",
+        },
         items: tickets.map((t) => ({
           name: t.name,
           quantity: 1,
@@ -55,7 +61,7 @@ const Payment = () => {
 
       return obj
     } else return null
-  }, [lctn.state.tickets])
+  }, [lctn.state.buyer, lctn.state.tickets])
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const returnPage = () => {
