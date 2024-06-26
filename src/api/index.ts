@@ -11,22 +11,15 @@ axios.defaults.headers.common.Authorization = `Bearer eyJhbGciOiJIUzI1NiIsInR5cC
 const getQrCode: TApi["get"]["qrcode"] = async ({ order }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const pbToken =
-        "Bearer f4e9071a-4bb9-4060-8757-759cf8b0b20564cdec3640fb9ac8453dbc67a15adebfde6e-2625-4e23-950c-4f5956856ce7"
-
       await axios
-        .post(`https://sandbox.api.pagseguro.com/orders`, order, {
-          headers: {
-            Authorization: pbToken,
-          },
-        })
+        .post(`https://back-moreira.vercel.app/api/orders/qrcode`, order)
         .then((res) => {
           const info = res.data
 
           if (info) {
             resolve({
               ok: true,
-              data: info,
+              data: info.data,
             })
           } else {
             reject({
@@ -157,6 +150,43 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
  * Create
  */
 
+const login: TApi["post"]["login"] = async ({ username, password }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await axios
+        .post("/ecommerce/authenticate", {
+          data: JSON.stringify({
+            username,
+            password,
+            database: "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd",
+          }),
+        })
+        .then((res) => {
+          const uObj = {
+            ...res.data.user,
+            cpf: res.data.roleData.cpf,
+            fone: res.data.roleData.fone,
+          }
+
+          resolve({
+            ok: true,
+            data: uObj,
+          })
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Erro ao conectar na loja. Tente novamente mais tarde",
+          })
+        })
+    } catch (error) {
+      reject({
+        error: "Erro ao conectar na loja. Tente novamente mais tarde",
+      })
+    }
+  })
+}
+
 export const Api: TApi = {
   get: {
     qrcode: getQrCode,
@@ -164,7 +194,7 @@ export const Api: TApi = {
     eventInfo: getEventInfo,
     products: getProducts,
   },
-  // create: {
-  //   product: newProduct,
-  // },
+  post: {
+    login: login,
+  },
 }

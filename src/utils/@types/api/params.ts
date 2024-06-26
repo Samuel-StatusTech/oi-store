@@ -1,5 +1,3 @@
-import { TProduct } from "../data/product"
-
 type TParams = {
   get: {
     qrcode: {
@@ -24,10 +22,10 @@ type TParams = {
       eventId: string
     }
   }
-  create: {
-    product: {
-      eventId: string
-      prod: Partial<TProduct>
+  post: {
+    login: {
+      username: string
+      password: string
     }
   }
 }

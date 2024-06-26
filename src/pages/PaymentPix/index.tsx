@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import * as S from "./styled"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
@@ -36,34 +37,29 @@ const Payment = () => {
     const buyer = lctn.state.buyer ?? null
 
     if (tickets) {
+      const paymentValue = tickets.reduce(
+        (sum, ticket) => sum + +(ticket.price_sell ?? "0"),
+        0
+      )
+
       const obj = {
         customer: {
-          name: buyer.name,
+          name: buyer.name ?? "Lorem ipsum",
           email: "null@null.null",
-          tax_id: "00000000000",
+          tax_id: "12345678909",
         },
         items: tickets.map((t) => ({
           name: t.name,
           quantity: 1,
           unit_amount: +(t.price_sell ?? "0"),
         })),
-        qr_codes: [
-          {
-            amount: {
-              value: tickets.reduce(
-                (sum, ticket) => sum + +(ticket.price_sell ?? "0"),
-                0
-              ),
-            },
-          },
-        ],
+        qr_codes: [{ amount: { value: paymentValue } }],
       }
 
       return obj
     } else return null
   }, [lctn.state.buyer, lctn.state.tickets])
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   const returnPage = () => {
     navigate(-1)
   }
@@ -73,6 +69,7 @@ const Payment = () => {
     else {
       const orderData = getOrderData()
       if (orderData) {
+        console.log("orderData", orderData)
         const req = await Api.get.qrcode({ order: orderData })
 
         if (req.ok) {
@@ -80,11 +77,11 @@ const Payment = () => {
 
           runTimer()
         } else {
-          alert(req.error)
+          // alert(req.error)
         }
       }
     }
-  }, [getOrderData, lctn.state.tickets, returnPage])
+  }, [])
 
   const runTimer = () => {
     const timer = temporizadorDeCincoMinutos()
@@ -122,7 +119,7 @@ const Payment = () => {
                       event?.date_ini as string,
                       event?.date_end as string
                     ),
-                    "17:00",
+                    event?.time_ini ? event.time_ini.slice(0, 5) : "Dia todo",
                   ]}
                 />
                 <BlockInfo
@@ -149,7 +146,7 @@ const Payment = () => {
                 </span>
               </S.PixInstructions>
               <S.QR>
-                {qrCode && <QRCode value={qrCode} />}
+                {qrCode && <QRCode value={qrCode} renderAs="svg" />}
 
                 <S.Button onClick={copyQRToClipboard}>Copiar código</S.Button>
               </S.QR>

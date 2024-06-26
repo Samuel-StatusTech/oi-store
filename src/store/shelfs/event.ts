@@ -1,7 +1,7 @@
 import { TEventShelf } from "../../utils/@types/store"
 
-const userShelf = (): TEventShelf => {
+const eventShelf = (): TEventShelf => {
   return null
 }
 
-export default userShelf
+export default eventShelf

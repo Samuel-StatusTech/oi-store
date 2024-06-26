@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import * as S from "./styled"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
@@ -19,7 +19,6 @@ import OrderResume from "../../components/OrderResume"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { TForm, TTicketForm, initialForm } from "../../utils/placeData/form"
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import { Api } from "../../api"
 import { formatCpf } from "../../utils/masks/cpf"
 import { formatPhone } from "../../utils/masks/phone"
 import { getDatePeriod } from "../../utils/tb/getDatePeriod"
@@ -139,22 +138,6 @@ const Payment = () => {
 
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
 
-  const loadData = useCallback(async () => {
-    if (store.event) {
-      const req = await Api.get.eventInfo({ eventId: store.event?.id })
-
-      if (req.ok) {
-        store.controllers.event.setData({
-          ...req.data,
-          eCommerce: {
-            ...req.data.eCommerce,
-            nominal: true, // to remove
-          },
-        })
-      }
-    }
-  }, [store.controllers.event, store.event])
-
   const handleSelect = (newMethod: "pix" | "credit") => {
     if (method === newMethod) setMethod("")
     else setMethod(newMethod)
@@ -178,15 +161,16 @@ const Payment = () => {
       setForm({
         ...form,
         tickets: form.tickets.map((t) =>
-          t.id !== ticket.id
-            ? t
-            : {
+          // @ts-ignore
+          t.id === ticket.id && t.oid === ticket.oid
+            ? {
                 ...t,
                 person: {
                   name: form.buyer.name,
                   phone: form.buyer.phone,
                 },
               }
+            : t
         ),
       })
     }
@@ -325,13 +309,7 @@ const Payment = () => {
   }
 
   const getIniHour = () => {
-    let str = ""
-
-    const iniDate = new Date(event?.date_ini as string)
-
-    str = `${String(iniDate.getUTCHours()).padStart(2, "0")}:`
-    str += `${String(iniDate.getMinutes()).padStart(2, "0")}`
-
+    let str = event?.time_ini ? event.time_ini.slice(0, 5) : "Dia todo"
     return str
   }
 
@@ -345,18 +323,25 @@ const Payment = () => {
 
     if (!errors) {
       if (method === "pix")
-        navigate("/payment/pix", { state: { tickets, buyer: form.buyer } })
+        navigate("/payment/pix", {
+          state: { tickets: form.tickets, buyer: form.buyer },
+        })
       else if (method === "credit") return
     }
   }
 
   useEffect(() => {
+    let ticketsList: any[] = []
+
+    tickets.forEach((t) => {
+      for (let k = 0; k <= t.qnt - 1; k++) {
+        ticketsList.push({ ...t, oid: k, person: { name: "" } })
+      }
+    })
+
     setForm({
       ...form,
-      tickets: tickets.map((t) => ({
-        ...t,
-        person: { name: "", phone: "" },
-      })),
+      tickets: ticketsList,
     })
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -370,7 +355,7 @@ const Payment = () => {
         setTickets(pickedTickets)
       } else navigate("/")
     } else navigate("/")
-  }, [lctn.state, loadData, navigate])
+  }, [lctn.state, navigate])
 
   useEffect(() => {
     setFieldsOk(!!form.buyer.name && !!form.buyer.phone)
@@ -452,7 +437,7 @@ const Payment = () => {
                   </S.FormLines>
                 </S.FormBlock>
 
-                {event?.eCommerce.nominal && (
+                {Boolean(event?.nominal) && (
                   <S.FormBlock>
                     <span>Informações dos participantes</span>
 

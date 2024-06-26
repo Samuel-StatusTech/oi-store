@@ -51,6 +51,8 @@ export const Tickets = styled.div`
   display: flex;
   flex-direction: column;
   gap: 6px;
+
+  padding-top: 12px;
 `
 
 export const Bottom = styled.div`

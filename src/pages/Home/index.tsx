@@ -62,7 +62,7 @@ const Home = () => {
                     event?.date_ini as string,
                     event?.date_end as string
                   ),
-                  "17:00",
+                  event?.time_ini ? event.time_ini.slice(0, 5) : "Dia todo",
                 ]}
                 icon={<img src={calendar} alt={""} width={84} />}
               />

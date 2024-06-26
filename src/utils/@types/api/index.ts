@@ -16,11 +16,11 @@ type TApiGetters = {
  * Create
  */
 
-// type TApiCreates = {
-//     product: (p: TParams['create']['product']) => TResponses['create']['product']
-// }
+type TApiPosters = {
+    login: (p: TParams['post']['login']) => TResponses['post']['login']
+}
 
 export type TApi = {
   get: TApiGetters
-  // create: TApiCreates
+  post: TApiPosters
 }

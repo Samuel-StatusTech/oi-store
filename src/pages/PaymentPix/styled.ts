@@ -140,8 +140,11 @@ export const QR = styled.div`
   align-items: center;
   max-width: 280px;
 
-  img {
+  img,
+  svg {
     max-width: 100%;
+    width: 256px;
+    height: 256px;
   }
 `
 

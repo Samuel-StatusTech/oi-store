@@ -56,7 +56,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
     if (hasTax) {
       if (isTaxAbsolute) total = +event?.eCommerce.adminTaxValue
       else {
-        const taxMin = event?.eCommerce.adminTaxMinimum
+        const taxMin = +event?.eCommerce.adminTaxMinimum
         const calculedTax =
           ticketsTotal * (+event.eCommerce.adminTaxPercentage / 100 / 100)
 
