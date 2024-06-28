@@ -385,8 +385,8 @@ const Payment = () => {
                 small={true}
                 icon={<img src={location} alt={""} width={40} />}
                 description={[
-                  `${event?.city} - ${event?.uf} - Rua Aubé, nº 895`,
-                  "89205-00",
+                  `${event?.city} - ${event?.uf}`,
+                  `${event?.address}`,
                 ]}
               />
             </S.EventData>

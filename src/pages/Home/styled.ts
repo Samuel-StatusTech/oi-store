@@ -104,21 +104,30 @@ export const DescTexts = styled.div`
   flex-direction: column;
   gap: 12px;
   flex: 5;
-`
 
-export const DescText = styled.div<{ $bold?: boolean }>`
-  padding-right: 48px;
-  max-width: calc(((100% / 5) * 3) - 48px);
-  white-space: newline;
-  font-weight: ${({ $bold }) => ($bold ? 500 : "normal")};
-  margin-top: 6px;
+  p {
+    margin: 0;
+    padding-right: 48px;
+    max-width: calc(((100% / 5) * 3) - 48px);
+    white-space: newline;
+    margin-top: 6px;
+
+    b,
+    strong {
+      font-weight: 500;
+    }
+  }
 
   @media (max-width: ${({ theme }) => theme.bp.medium}px) {
-    max-width: 100%;
-    padding-right: 0;
-    text-align: justify;
+    p {
+      max-width: 100%;
+      padding-right: 0;
+      text-align: justify;
+    }
   }
 `
+
+export const DescText = styled.p<{ $bold?: boolean }>``
 
 export const DescSubText = styled.span`
   color: ${({ theme }) => theme.colors.black.secondary};

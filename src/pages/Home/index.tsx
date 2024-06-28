@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from "react"
 import Header from "../../components/Header"
 import * as S from "./styled"
@@ -17,8 +18,23 @@ import getStore from "../../store"
 import { getDatePeriod } from "../../utils/tb/getDatePeriod"
 
 const Home = () => {
-  const { event } = getStore()
+  const { event, controllers } = getStore()
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
+
+  const loadEventData = useCallback(async () => {
+    if (event) {
+      try {
+        const req = await Api.get.eventInfo({ eventId: event?.id })
+
+        if (req.ok) {
+          const data = req.data
+          controllers.event.setData(data)
+        }
+      } catch (error) {
+        alert("Erro ao carregar os tickets")
+      }
+    }
+  }, [])
 
   const fetchTickets = useCallback(async () => {
     if (event) {
@@ -33,12 +49,12 @@ const Home = () => {
         alert("Erro ao carregar os tickets")
       }
     }
-  }, [event])
+  }, [])
 
   useEffect(() => {
-    // loadData()
+    loadEventData()
     fetchTickets()
-  }, [fetchTickets])
+  }, [loadEventData, fetchTickets])
 
   return (
     <S.Page>
@@ -69,9 +85,8 @@ const Home = () => {
               <BlockInfo
                 title="Localização"
                 description={[
-                  "Rua Aubé, nº 895",
+                  `${event?.address}`,
                   `${event?.city} - ${event?.uf}`,
-                  "89205-00",
                 ]}
                 icon={<img src={location} alt={""} width={84} />}
               />
@@ -86,28 +101,16 @@ const Home = () => {
         <Container>
           <S.DescriptionSection>
             <S.DescTitle>Descrição</S.DescTitle>
-            <S.DescTexts>
-              <S.DescText>
-                {`Parango Beach acontece dia 3 de dezembro e traz Parangolé e Xandy Harmonia juntos, na Pipa Beach Club
-                A vibe do verão vai invadir, mais uma vez, a barraca Pipa - tradicional clube de praia localizado na Praia do Flamengo.
-                E dessa vez a Pipa levará o pagode do Parangolé, liderado por Tony Salles e o inconfundível som de Xandy Harmonia para animar a galera.`}
-              </S.DescText>
-              <S.DescText>
-                {`Depois de levar nomes como Léo Santana, Timbalada e Thiago Aquino para a beira da praia, a Pipa aposta agora em duas atrações de peso para embalar ainda mais o clima de verão que o clube de praia tem.
-                Com um repertório repleto de maiores sucessos de suas carreiras, Tony e Xandy não escondem a alegria de estarem juntos, em mais um projeto.`}
-              </S.DescText>
-              <S.DescText>
-                {`E para quem curte o som do Parango e de Xandy, a oportunidade de curtir dois super shows é essa! Ad vendas iniciam hoje, às 12h no site do Sympla e no site da Bora Tickets, ou na loja do Bora, localizada no 2° piso do Shopping da Bahia.
-                Não fique de fora e venha curtir a vibe que só a Pipa tem! Animação, música boa e astral único!`}
-              </S.DescText>
-            </S.DescTexts>
+            <S.DescTexts
+              dangerouslySetInnerHTML={{ __html: event?.description ?? "" }}
+            />
           </S.DescriptionSection>
           <S.DescriptionSection>
             <S.DescTitle>Local</S.DescTitle>
             <S.DescText>{`Centro de Eventos X`}</S.DescText>
             <S.DescText $bold={true}>Endereço</S.DescText>
-            <S.DescSubText>{`Rua Aubé, 895 - ${event?.city} - ${event?.uf},`}</S.DescSubText>
-            <S.DescSubText>{`89205-000`}</S.DescSubText>
+            <S.DescSubText>{`${event?.address}`}</S.DescSubText>
+            <S.DescSubText>{`${event?.city} - ${event?.uf}`}</S.DescSubText>
             <S.DescText $bold={true}>Telefone</S.DescText>
             <S.DescSubText>{`(47) 3207-3009`}</S.DescSubText>
           </S.DescriptionSection>

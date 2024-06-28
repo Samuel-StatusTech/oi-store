@@ -61,7 +61,7 @@ const Login = () => {
 
         <S.Inputs>
           <Input label="Email" value={email} onChange={setEmail} />
-          <Input label="Senha" value={pass} onChange={setPass} type="pass" />
+          <Input label="Senha" value={pass} onChange={setPass} type="password" />
         </S.Inputs>
 
         <S.Button onClick={handleClick}>Entrar</S.Button>

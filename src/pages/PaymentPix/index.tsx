@@ -126,9 +126,8 @@ const Payment = () => {
                   small={true}
                   icon={<img src={location} alt={""} width={40} />}
                   description={[
-                    "Rua Aubé, nº 895",
+                    `${event?.address}`,
                     `${event?.city} - ${event?.uf}`,
-                    "89205-00",
                   ]}
                 />
               </div>

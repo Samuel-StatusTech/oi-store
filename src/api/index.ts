@@ -155,11 +155,9 @@ const login: TApi["post"]["login"] = async ({ username, password }) => {
     try {
       await axios
         .post("/ecommerce/authenticate", {
-          data: JSON.stringify({
-            username,
-            password,
-            database: "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd",
-          }),
+          username,
+          password,
+          database: "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd",
         })
         .then((res) => {
           const uObj = {
@@ -176,7 +174,8 @@ const login: TApi["post"]["login"] = async ({ username, password }) => {
         .catch(() => {
           resolve({
             ok: false,
-            error: "Erro ao conectar na loja. Tente novamente mais tarde",
+            error:
+              "Algo deu errado. Verifique o email e a senha e tente novamente.",
           })
         })
     } catch (error) {
