@@ -1,4 +1,4 @@
-import exemplo from "../../assets/images/exemplo.png"
+import exemplo from "../../assets/images/exemplo.jpg"
 import { TTicket } from "../../utils/@types/data/ticket"
 
 export const placeList: TTicket[] = [

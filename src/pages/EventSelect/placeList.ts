@@ -1,4 +1,4 @@
-import exemplo from "../../assets/images/exemplo.png"
+import exemplo from "../../assets/images/exemplo.jpg"
 import { TCardEvent } from "../../utils/@types/data/eventCard"
 
 export const placeList: TCardEvent[] = [

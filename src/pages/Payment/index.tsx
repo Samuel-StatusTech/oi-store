@@ -356,7 +356,7 @@ const Payment = () => {
       } catch (error) {
         alert("Erro ao carregar os tickets")
       }
-    }
+    } else navigate("/")
   }, [])
 
   useEffect(() => {

@@ -26,6 +26,8 @@ export const ImageContainer = styled.div`
   width: 100%;
   aspect-ratio: 2;
   overflow: hidden;
+  display: flex;
+  align-items: center;
 
   img {
     max-width: 100%;

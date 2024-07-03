@@ -5,7 +5,7 @@ import Footer from "../../components/Footer"
 import Container from "../../components/Container"
 import BlockInfo from "../../components/BlockInfo"
 
-import example from "../../assets/images/exemplo.png"
+import example from "../../assets/images/exemplo.jpg"
 import calendar from "../../assets/icons/calendar.png"
 import location from "../../assets/icons/pin.png"
 import { useCallback, useEffect, useState } from "react"
@@ -21,7 +21,7 @@ const Payment = () => {
   const lctn = useLocation()
   const navigate = useNavigate()
 
-  const { event } = getStore()
+  const { event, controllers } = getStore()
 
   const [time, setTime] = useState("05:00")
   const [qrCode, setQrCode] = useState("")
@@ -97,9 +97,29 @@ const Payment = () => {
     }, 1000)
   }
 
+  const loadEventData = useCallback(async () => {
+    if (event) {
+      try {
+        const req = await Api.get.eventInfo({ eventId: event?.id })
+
+        if (req.ok) {
+          const data = req.data
+          controllers.event.setData(data)
+        } else {
+          alert("Erro ao carregar as informações do evento")
+          navigate("/")
+        }
+      } catch (error) {
+        alert("Erro ao carregar as informações do evento")
+        navigate("/")
+      }
+    } else navigate("/")
+  }, [])
+
   useEffect(() => {
+    loadEventData()
     getPBcode()
-  }, [getPBcode])
+  }, [loadEventData, getPBcode])
 
   return (
     <S.Page>
@@ -119,19 +139,25 @@ const Payment = () => {
                   small={true}
                   icon={<img src={calendar} alt={""} width={40} />}
                   description={[
-                    getDatePeriod(
-                      event?.date_ini as string,
-                      event?.date_end as string
-                    ),
-                    event?.time_ini ? event.time_ini.slice(0, 5) : "Dia todo",
+                    event?.date_ini && event?.date_end
+                      ? getDatePeriod(
+                          event?.date_ini as string,
+                          event?.date_end as string
+                        )
+                      : "",
+                    event?.time_ini
+                      ? event.time_ini.slice(0, 5)
+                      : event?.date_ini && event?.date_end
+                      ? "Dia todo"
+                      : "",
                   ]}
                 />
                 <BlockInfo
                   small={true}
                   icon={<img src={location} alt={""} width={40} />}
                   description={[
-                    `${event?.address}`,
-                    `${event?.city} - ${event?.uf}`,
+                    `${event?.address ?? ""}`,
+                    `${event?.city ?? ""}${event?.uf ? ` - ${event?.uf}` : ""}`,
                   ]}
                 />
               </div>

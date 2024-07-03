@@ -20,8 +20,11 @@ export const ImageContainer = styled.div`
   width: 100%;
   aspect-ratio: 2;
   overflow: hidden;
+  display: flex;
+  align-items: center;
 
   img {
+    min-height: 100%;
     width: 100%;
   }
 `

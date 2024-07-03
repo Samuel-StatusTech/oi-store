@@ -3,7 +3,7 @@ import { useEffect, useCallback } from "react"
 import { formatMoney } from "../../utils/tb/formatMoney"
 import * as S from "./styled"
 
-import eventLogo from "../../assets/images/exemplo.png"
+import eventLogo from "../../assets/images/exemplo.jpg"
 import clockIcon from "../../assets/icons/time.png"
 
 import Ticket from "../Ticket"

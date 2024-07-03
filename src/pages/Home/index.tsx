@@ -6,7 +6,7 @@ import * as S from "./styled"
 import Container from "../../components/Container"
 import BlockInfo from "../../components/BlockInfo"
 
-import example from "../../assets/images/exemplo.png"
+import example from "../../assets/images/exemplo.jpg"
 import calendar from "../../assets/icons/calendar.png"
 import location from "../../assets/icons/pin.png"
 import TicketsControl from "../../components/TicketsControl"
@@ -16,8 +16,11 @@ import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { parseDisposalTickets } from "../../utils/tb/ticketsToDisposal"
 import getStore from "../../store"
 import { getDatePeriod } from "../../utils/tb/getDatePeriod"
+import { useNavigate } from "react-router-dom"
 
 const Home = () => {
+  const navigate = useNavigate()
+
   const { event, controllers } = getStore()
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
 
@@ -33,7 +36,7 @@ const Home = () => {
       } catch (error) {
         alert("Erro ao carregar os tickets")
       }
-    }
+    } else navigate("/")
   }, [])
 
   const fetchTickets = useCallback(async () => {
@@ -70,7 +73,9 @@ const Home = () => {
       <S.Hero>
         <img src={example} alt={""} className={"blured"} />
         <Container>
-          <img src={example} alt={""} />
+          <S.ImageContainer>
+            <img src={example} alt={""} />
+          </S.ImageContainer>
         </Container>
       </S.Hero>
 

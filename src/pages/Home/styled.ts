@@ -9,14 +9,6 @@ export const Page = styled.div`
 export const Hero = styled.div`
   position: relative;
 
-  img {
-    max-width: 100%;
-  }
-
-  img:not(.blured) {
-    border-radius: 12px;
-  }
-
   img.blured {
     width: 100vw;
     height: calc(100%);
@@ -26,6 +18,20 @@ export const Hero = styled.div`
     right: 0;
     z-index: -50;
     filter: blur(60px);
+  }
+`
+
+export const ImageContainer = styled.div`
+  max-height: 540px;
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  border-radius: 12px;
+
+  img {
+    width: 100%;
+    max-width: 100%;
+    max-height: 100%;
   }
 `
 
