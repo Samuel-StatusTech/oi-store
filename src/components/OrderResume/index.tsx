@@ -3,7 +3,7 @@ import { useEffect, useCallback } from "react"
 import { formatMoney } from "../../utils/tb/formatMoney"
 import * as S from "./styled"
 
-// import eventLogo from "../../assets/images/exemplo.png"
+import eventLogo from "../../assets/images/exemplo.png"
 import clockIcon from "../../assets/icons/time.png"
 
 import Ticket from "../Ticket"
@@ -27,7 +27,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
 
         if (req.ok) {
           const data = req.data
-          controllers.event.setData(data)
+          controllers.event.setData({ ...data, event_banner: eventLogo })
         }
       } catch (error) {
         alert("Erro ao carregar os tickets")
