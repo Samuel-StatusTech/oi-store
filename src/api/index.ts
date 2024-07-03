@@ -146,6 +146,39 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
   })
 }
 
+const getMyTickets: TApi["get"]["myTickets"] = async () => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await axios
+        .get(`/ecommerce/getMyTickets`)
+        .then(({ data }) => {
+          if (data.success) {
+            const list = Array.isArray(data.shoppings) ? data.shoppings : []
+            resolve({
+              ok: true,
+              data: { list },
+            })
+          } else {
+            resolve({
+              ok: false,
+              error: "Erro ao listar produtos. Tente novamente mais tarde",
+            })
+          }
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Erro ao listar produtos. Tente novamente mais tarde",
+          })
+        })
+    } catch (error) {
+      reject({
+        error: "Erro ao listar produtos. Tente novamente mais tarde",
+      })
+    }
+  })
+}
+
 /*
  * Create
  */
@@ -192,6 +225,7 @@ export const Api: TApi = {
     events: getEvents,
     eventInfo: getEventInfo,
     products: getProducts,
+    myTickets: getMyTickets,
   },
   post: {
     login: login,

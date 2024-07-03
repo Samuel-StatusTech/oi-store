@@ -1,16 +1,15 @@
-import { useEffect, useState } from "react"
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useCallback } from "react"
 import { formatMoney } from "../../utils/tb/formatMoney"
 import * as S from "./styled"
 
-import eventLogo from "../../assets/images/exemplo.png"
+// import eventLogo from "../../assets/images/exemplo.png"
 import clockIcon from "../../assets/icons/time.png"
 
 import Ticket from "../Ticket"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { Api } from "../../api"
-import { TEventData } from "../../utils/@types/data/event"
-
-const eventId = "216fb5ab4ddf"
+import getStore from "../../store"
 
 type Props = {
   datePeriod: string
@@ -19,22 +18,26 @@ type Props = {
 }
 
 const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
-  const [event, setEvent] = useState<null | TEventData>(null)
+  const { event, controllers } = getStore()
 
-  const loadEventInfo = async () => {
-    const data = await Api.get.eventInfo({ eventId }).then((res) => {
-      return res.ok ? res.data : null
-    })
+  const loadEventData = useCallback(async () => {
+    if (event) {
+      try {
+        const req = await Api.get.eventInfo({ eventId: event?.id })
 
-    // @ts-ignore
-    if (data) setEvent({ ...data, image: eventLogo })
-    // @ts-ignore
-    else setEvent({ image: eventLogo })
-  }
+        if (req.ok) {
+          const data = req.data
+          controllers.event.setData(data)
+        }
+      } catch (error) {
+        alert("Erro ao carregar os tickets")
+      }
+    }
+  }, [])
 
   useEffect(() => {
-    loadEventInfo()
-  }, [])
+    loadEventData()
+  }, [loadEventData])
 
   const sumTickets = () => {
     let total = 0
@@ -103,15 +106,16 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
 
   return (
     <S.Component>
-      <S.ImageContainer>
-        {/* @ts-ignore */}
-        <img src={event?.image} alt={""} />
-      </S.ImageContainer>
+      {event?.event_banner && (
+        <S.ImageContainer>
+          <img src={event?.event_banner} alt={""} />
+        </S.ImageContainer>
+      )}
 
       <S.Info>
         <S.EventResume>
           <S.ResumeText>Resumo do pedido</S.ResumeText>
-          <div style={{ display: "flex" }}>
+          <div>
             <S.DateText>Data</S.DateText>
             <S.DateText>{datePeriod}</S.DateText>
           </div>

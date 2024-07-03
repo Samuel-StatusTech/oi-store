@@ -51,6 +51,14 @@ const Home = () => {
     }
   }, [])
 
+  const getPhone = () => {
+    let str = ""
+
+    str = event?.phone.replace(/(\d{2})(\d{4,5})(\d{4})/g, "($1) $2-$3") ?? ""
+
+    return str
+  }
+
   useEffect(() => {
     loadEventData()
     fetchTickets()
@@ -107,12 +115,12 @@ const Home = () => {
           </S.DescriptionSection>
           <S.DescriptionSection>
             <S.DescTitle>Local</S.DescTitle>
-            <S.DescText>{`Centro de Eventos X`}</S.DescText>
+            <S.DescText>{event?.local}</S.DescText>
             <S.DescText $bold={true}>Endereço</S.DescText>
             <S.DescSubText>{`${event?.address}`}</S.DescSubText>
             <S.DescSubText>{`${event?.city} - ${event?.uf}`}</S.DescSubText>
             <S.DescText $bold={true}>Telefone</S.DescText>
-            <S.DescSubText>{`(47) 3207-3009`}</S.DescSubText>
+            <S.DescSubText>{getPhone()}</S.DescSubText>
           </S.DescriptionSection>
         </Container>
       </S.DescriptionWrapper>

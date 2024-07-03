@@ -9,6 +9,11 @@ export const Component = styled.div`
   overflow: hidden;
   box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
   height: fit-content;
+  min-width: 380px;
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    min-width: unset;
+  }
 `
 
 export const ImageContainer = styled.div`
@@ -25,7 +30,7 @@ export const Info = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
-  padding: 0px 24px 24px;
+  padding: 24px;
 `
 
 export const EventResume = styled.div`
@@ -34,6 +39,19 @@ export const EventResume = styled.div`
   flex-direction: column;
   border-bottom: 1px solid #ccc;
   padding: 0 0 12px;
+
+  div {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  @media (max-width: 440px) {
+    div {
+      flex-direction: column;
+      gap: 6px;
+    }
+  }
 `
 
 export const ResumeText = styled.span`
@@ -47,6 +65,14 @@ export const DateText = styled.span`
   flex: 1;
   white-space: nowrap;
   text-transform: uppercase;
+
+  &:nth-child(2) {
+    text-align: right;
+  }
+
+  @media (max-width: 440px) {
+    white-space: pre-line;
+  }
 `
 
 export const TicketsList = styled.div``
@@ -65,6 +91,16 @@ export const TotalItem = styled.div<{ $main?: boolean }>`
   span {
     flex: 1;
   }
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    span:nth-child(1) {
+      flex: 3;
+    }
+
+    span:nth-child(2) {
+      flex: 2;
+    }
+  }
 `
 
 export const ReleaseBlock = styled.div`
@@ -72,6 +108,7 @@ export const ReleaseBlock = styled.div`
   background-color: #222;
   padding: 24px;
   color: #fff;
+  gap: 24px;
 `
 
 export const RLeft = styled.div`

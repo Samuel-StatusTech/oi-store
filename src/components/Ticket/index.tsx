@@ -15,6 +15,9 @@ type Props = {
 }
 
 const Ticket = ({ ticket, changeQnt, hasControl = true }: Props) => {
+
+  const saledOut = ticket.quantity === 0
+  
   return (
     <S.Component>
       <S.TicketInfo>
@@ -23,20 +26,33 @@ const Ticket = ({ ticket, changeQnt, hasControl = true }: Props) => {
           <S.TicketPrice>{formatMoney(ticket.price_sell)}</S.TicketPrice>
         )}
       </S.TicketInfo>
-      <S.Quantity>
-        <S.QntControl>
-          {hasControl && changeQnt && (
-            <S.Control onClick={() => changeQnt(ticket.id, "decrease")}>
-              <img src={minus} alt={""} />
-            </S.Control>
-          )}
-          <span>{ticket.qnt}</span>
-          {hasControl && changeQnt && (
-            <S.Control onClick={() => changeQnt(ticket.id, "increase")}>
-              <img src={plus} alt={""} />
-            </S.Control>
-          )}
-        </S.QntControl>
+      <S.Quantity $saledOut={saledOut}>
+        {saledOut ? (
+          <span style={{ width: "100%", maxWidth: 120, textAlign: "center" }}>
+            <strong>Esgotado</strong>
+          </span>
+        ) : (
+          <S.QntControl>
+            {hasControl && changeQnt && (
+              <S.Control onClick={() => changeQnt(ticket.id, "decrease")}>
+                <img src={minus} alt={""} />
+              </S.Control>
+            )}
+            <span>{ticket.qnt}</span>
+            {hasControl && changeQnt && (
+              <S.Control
+                $disabled={ticket.quantity - ticket.qnt < 1}
+                onClick={
+                  ticket.quantity - ticket.qnt < 1
+                    ? () => {}
+                    : () => changeQnt(ticket.id, "increase")
+                }
+              >
+                <img src={plus} alt={""} />
+              </S.Control>
+            )}
+          </S.QntControl>
+        )}
       </S.Quantity>
     </S.Component>
   )

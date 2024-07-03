@@ -11,6 +11,10 @@ export const Main = styled.div`
   gap: 24px;
   margin: 24px 0;
   padding: 0 0 64px 0;
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    flex-direction: column-reverse;
+  }
 `
 
 export const EventResume = styled.div`
@@ -64,7 +68,9 @@ export const Method = styled.div<{ $checked: boolean }>`
   align-items: center;
   justify-items: center;
   gap: 24px;
-  flex: 1;
+  width: 100%;
+  max-width: 300px;
+  // flex: 1;
   border: 1px solid
     ${({ $checked, theme }) => ($checked ? theme.colors.blue.main : "#ccc")};
   border-radius: 6px;
@@ -140,6 +146,10 @@ export const FormLines = styled.div`
 export const FormLine = styled.div`
   display: flex;
   gap: 24px;
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    flex-direction: column;
+  }
 `
 
 export const Label = styled.label`
@@ -222,9 +232,10 @@ export const TicketBlock = styled.div`
 
 export const TicketName = styled.div``
 
-export const Button = styled.button<{$disabled: boolean}>`
+export const Button = styled.button<{ $disabled: boolean }>`
   outline: none;
-  background-color: ${({ $disabled, theme }) => !$disabled ? theme.colors.blue.main : "#CCC"};
+  background-color: ${({ $disabled, theme }) =>
+    !$disabled ? theme.colors.blue.main : "#CCC"};
   border: none;
   cursor: pointer;
   padding: 0.6rem 1.4rem;

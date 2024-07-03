@@ -19,6 +19,7 @@ type TResponses = {
     events: Promise<TDefaultRes<TEventMin[]>>
     eventInfo: Promise<TDefaultRes<TEventData>>
     products: Promise<TDefaultRes<{ list: TProduct[] }>>
+    myTickets: Promise<TDefaultRes<{ list: any[] }>>
   }
   post: {
     login: Promise<TDefaultRes<TUser>>

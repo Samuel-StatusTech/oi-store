@@ -38,6 +38,14 @@ export const EventInfo = styled.div`
     gap: 12px;
     height: fit-content;
   }
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    flex-direction: column;
+
+    img {
+      max-width: 100%;
+    }
+  }
 `
 
 export const BlockTitle = styled.span`
@@ -152,13 +160,17 @@ export const PixTime = styled.div`
   display: flex;
   gap: 4px;
 
-  span:not(:nth-child(2)) {
+  span {
+    white-space: pre-line;
     color: #999;
   }
 
-  span:nth-child(2) {
+  strong {
+    color: ${({ theme }) => theme.colors.black.secondary};
     font-weight: bold;
-    width: 44px;
+  }
+
+  @media (max-width: 480px) {
     text-align: center;
   }
 `

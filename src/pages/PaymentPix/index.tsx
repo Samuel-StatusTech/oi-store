@@ -46,14 +46,18 @@ const Payment = () => {
         customer: {
           name: buyer.name ?? "Lorem ipsum",
           email: "null@null.null",
-          tax_id: "12345678909",
+          tax_id: !!buyer.phone
+            ? buyer.phone.replace(/\D/g, "")
+            : "12345678909",
         },
         items: tickets.map((t) => ({
           name: t.name,
           quantity: 1,
           unit_amount: +(t.price_sell ?? "0"),
         })),
-        qr_codes: [{ amount: { value: paymentValue } }],
+        qr_codes: [
+          { amount: { value: paymentValue, arrangements: "PAGBANK" } },
+        ],
       }
 
       return obj
@@ -150,9 +154,9 @@ const Payment = () => {
                 <S.Button onClick={copyQRToClipboard}>Copiar código</S.Button>
               </S.QR>
               <S.PixTime>
-                <span>Você tem</span>
-                <span>{time} </span>
-                <span>para realizar o pagamento</span>
+                <span>
+                  Você tem <strong>{time}</strong> para realizar o pagamento
+                </span>
               </S.PixTime>
             </S.PixArea>
           </S.Block>

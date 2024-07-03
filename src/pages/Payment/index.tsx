@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react"
+/* eslint-disable react-hooks/exhaustive-deps */
+import { useEffect, useState, useCallback } from "react"
 import * as S from "./styled"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
@@ -25,6 +26,7 @@ import { getDatePeriod } from "../../utils/tb/getDatePeriod"
 import getStore from "../../store"
 import { formatCardDate } from "../../utils/masks/date"
 import { formatCardCode } from "../../utils/masks/cardcode"
+import { Api } from "../../api"
 
 type MProps = {
   checked: boolean
@@ -127,7 +129,7 @@ const Payment = () => {
   const navigate = useNavigate()
 
   const store = getStore()
-  const { event } = store
+  const { event, controllers } = store
 
   const [termsAgreed, setTermsAgreed] = useState(false)
 
@@ -314,8 +316,18 @@ const Payment = () => {
   }
 
   const checkErrors = () => {
-    // ...
-    return null
+    let hasError = false
+
+    if (
+      form.buyer.name.length < 1 ||
+      form.buyer.phone.replace(/\D/g, "").length < 9
+    )
+      hasError = true
+
+    if (event?.nominal && form.tickets.some((t) => t.person.name.length < 1))
+      hasError = true
+
+    return hasError
   }
 
   const handlePay = () => {
@@ -327,8 +339,25 @@ const Payment = () => {
           state: { tickets: form.tickets, buyer: form.buyer },
         })
       else if (method === "credit") return
+    } else {
+      alert("Preencha os campos corretamente e tente novamente.")
     }
   }
+
+  const loadEventData = useCallback(async () => {
+    if (event) {
+      try {
+        const req = await Api.get.eventInfo({ eventId: event?.id })
+
+        if (req.ok) {
+          const data = req.data
+          controllers.event.setData(data)
+        }
+      } catch (error) {
+        alert("Erro ao carregar os tickets")
+      }
+    }
+  }, [])
 
   useEffect(() => {
     let ticketsList: any[] = []
@@ -344,7 +373,7 @@ const Payment = () => {
       tickets: ticketsList,
     })
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line
   }, [tickets])
 
   useEffect(() => {
@@ -359,7 +388,7 @@ const Payment = () => {
 
   useEffect(() => {
     setFieldsOk(!!form.buyer.name && !!form.buyer.phone)
-  }, [form.buyer])
+  }, [loadEventData, form.buyer])
 
   return (
     <S.Page>
@@ -385,8 +414,8 @@ const Payment = () => {
                 small={true}
                 icon={<img src={location} alt={""} width={40} />}
                 description={[
-                  `${event?.city} - ${event?.uf}`,
                   `${event?.address}`,
+                  `${event?.city} - ${event?.uf}`,
                 ]}
               />
             </S.EventData>
@@ -572,7 +601,7 @@ const Payment = () => {
               event?.date_ini as string,
               event?.date_end as string
             )}
-            ticketsList={tickets}
+            ticketsList={tickets.filter((t) => t.qnt > 0)}
             setTickets={setTickets}
           />
         </S.Main>

@@ -1,6 +1,6 @@
 import styled from "styled-components"
 
-export const Component = styled.aside`
+export const Component = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -36,10 +36,12 @@ export const TicketPrice = styled.span`
   opacity: 0.5;
 `
 
-export const Quantity = styled.div`
+export const Quantity = styled.div<{ $saledOut?: boolean }>`
   display: flex;
   flex-direction: column;
   gap: 4px;
+  ${({ $saledOut }) =>
+    $saledOut ? "width: 100%; max-width: 120px; text-align: center;" : ""}
 
   span {
     line-height: 100%;
@@ -54,17 +56,19 @@ export const QntControl = styled.div`
   span {
     min-width: 32px;
     text-align: center;
-    margin: 0 8px;  
+    margin: 0 8px;
   }
 `
 
-export const Control = styled.button`
+export const Control = styled.button<{ $disabled?: boolean }>`
   border: none;
   outline: none;
   display: grid;
   place-items: center;
-  cursor: pointer;
+  cursor: ${({ $disabled }) => ($disabled ? "unset" : "pointer")};
   background: none;
+  opacity: ${({ $disabled }) => ($disabled ? 0.5 : 1)};
+  transition: opacity 0.3s;
 
   img {
     width: 24px;
