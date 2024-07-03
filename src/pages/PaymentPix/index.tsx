@@ -5,7 +5,6 @@ import Footer from "../../components/Footer"
 import Container from "../../components/Container"
 import BlockInfo from "../../components/BlockInfo"
 
-import example from "../../assets/images/exemplo.jpg"
 import calendar from "../../assets/icons/calendar.png"
 import location from "../../assets/icons/pin.png"
 import { useCallback, useEffect, useState } from "react"
@@ -131,7 +130,9 @@ const Payment = () => {
             <S.BlockTitle>Pedido iniciado</S.BlockTitle>
 
             <S.EventInfo>
-              <img src={example} alt={""} />
+              {event?.event_banner && (
+                <img src={event?.event_banner} alt={""} />
+              )}
 
               <div className="eventInfos">
                 <S.BlockTitle>Me encontra no Pagode!</S.BlockTitle>

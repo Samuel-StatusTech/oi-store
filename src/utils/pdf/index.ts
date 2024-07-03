@@ -1,3 +1,5 @@
+import axios from "axios"
+
 import pdfMake from "pdfmake/build/pdfmake"
 import pdfFonts from "pdfmake/build/vfs_fonts"
 import { styles } from "./styles"
@@ -13,17 +15,42 @@ const downloadTickets = async (
 ): Promise<void | File> => {
   pdfMake.vfs = pdfFonts.pdfMake.vfs
 
-  return new Promise((resolve) => {
+  return new Promise(async (resolve) => {
     // Data process
 
     // File
 
     const filename = `Meus Tickets para ${eventData.name}.pdf`
 
+    let logo = ""
+
+    try {
+      if (eventData.logo) {
+        const response = await axios.get(eventData.logo, {
+          responseType: "blob",
+        })
+
+        const blob = new Blob([response.data], { type: response.data.type })
+        const logoUrl = URL.createObjectURL(blob)
+        if (logoUrl) logo = logoUrl
+      }
+
+      console.log(logo)
+    } catch (error) {}
+
     const docDefs: TDocumentDefinitions = {
+      // images: !!eventData.logo ? { logo: { url: eventData.logo } } : undefined,
+      images: {
+        logo: {
+          url: logo,
+        },
+      },
       pageSize: "A4",
       pageMargins: [38, 80, 38, 40],
-      header: [reportTitle] as Content,
+      header:
+        eventData.logo && !!logo
+          ? ([{ ...reportTitle[0], image: "logo" }] as Content)
+          : undefined,
       content: [...content(eventData, tickets)],
       footer: [footer(eventData)] as Content,
       styles: styles,

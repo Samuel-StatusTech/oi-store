@@ -25,8 +25,10 @@ export const ImageContainer = styled.div`
   overflow: hidden;
   display: flex;
   align-items: center;
+  height: 100%;
 
   img {
+    min-height: 100%;
     max-width: 100%;
   }
 `

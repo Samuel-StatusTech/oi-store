@@ -5,7 +5,6 @@ import Header from "../../components/Header"
 import Footer from "../../components/Footer"
 import Container from "../../components/Container"
 
-import { placeList } from "./placeList"
 import { useLocation } from "react-router-dom"
 import EventTicketItem from "../../components/EventTicketItem"
 import { TCardTicket, TTicket } from "../../utils/@types/data/ticket"
@@ -34,12 +33,11 @@ const MyEventTickets = () => {
     // ... get tickets for event
     // await Api... (retiradas)
 
-    const sortedList = sortList(
-      placeList.map((t) => ({ ...t, name: data.name }))
-    )
+    const sortedList = sortList([])
+    // placeList.map((t) => ({ ...t, name: data.name }))
 
     setList(sortedList)
-  }, [data.name])
+  }, [])
 
   const handleExpand = (ticket: TTicket) => {
     setModal({

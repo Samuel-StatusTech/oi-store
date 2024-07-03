@@ -3,11 +3,10 @@ import { TTicket } from "../@types/data/ticket"
 import { formatCNPJ } from "../masks/cnpj"
 import { getDateString } from "../tb/date"
 import { formatMoney } from "../tb/formatMoney"
-import { logo } from "./utils"
 
 export const reportTitle = [
   {
-    image: `data:image/png;base64, ${logo}`,
+    image: "",
     margin: [0, 28, 17, 0],
     width: 170,
     style: { alignment: "right" },

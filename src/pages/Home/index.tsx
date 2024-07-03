@@ -6,7 +6,6 @@ import * as S from "./styled"
 import Container from "../../components/Container"
 import BlockInfo from "../../components/BlockInfo"
 
-import example from "../../assets/images/exemplo.jpg"
 import calendar from "../../assets/icons/calendar.png"
 import location from "../../assets/icons/pin.png"
 import TicketsControl from "../../components/TicketsControl"
@@ -71,10 +70,10 @@ const Home = () => {
     <S.Page>
       <Header />
       <S.Hero>
-        <img src={example} alt={""} className={"blured"} />
+        <img src={event?.event_banner} alt={""} className={"blured"} />
         <Container>
           <S.ImageContainer>
-            <img src={example} alt={""} />
+            <img src={event?.event_banner} alt={""} />
           </S.ImageContainer>
         </Container>
       </S.Hero>

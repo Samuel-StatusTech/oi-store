@@ -7,13 +7,21 @@ import Container from "../../components/Container"
 import TicketCard from "../../components/TicketCard"
 
 import { placeList } from "./placeList"
+import getStore from "../../store"
 
 const MyTickets = () => {
+  const { event } = getStore()
+
   const [list, setList] = useState<any[]>([])
 
   const getData = useCallback(() => {
-    setList(placeList)
-  }, [])
+    setList(
+      placeList.map((i) => ({
+        ...i,
+        eventBanner: event?.event_banner as string,
+      }))
+    )
+  }, [event?.event_banner])
 
   useEffect(() => {
     getData()
