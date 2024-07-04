@@ -41,13 +41,23 @@ const Payment = () => {
         0
       )
 
+      const phone = !!buyer.phone ? buyer.phone.replace(/\D/g, "") : null
+
       const obj = {
         customer: {
           name: buyer.name ?? "Lorem ipsum",
           email: "null@null.null",
-          tax_id: !!buyer.phone
-            ? buyer.phone.replace(/\D/g, "")
-            : "12345678909",
+          phones: phone
+            ? [
+                {
+                  country: "55",
+                  area: phone.slice(0, 2),
+                  number: phone.slice(2),
+                  type: "MOBILE",
+                },
+              ]
+            : undefined,
+          tax_id: "12345678909",
         },
         items: tickets.map((t) => ({
           name: t.name,
