@@ -22,6 +22,7 @@ import getStore from "../../store"
 import { Api } from "../../api"
 import io from "socket.io-client"
 import Popup from "../../components/PopUp"
+import { getOrderData } from "../../utils/tb/order"
 
 const Payment = () => {
   const lctn = useLocation()
@@ -87,51 +88,6 @@ const Payment = () => {
     } catch (error) {}
   }
 
-  const getOrderData = useCallback(() => {
-    const tickets = (lctn.state.tickets as TTicket[]) ?? null
-    const buyer = lctn.state.buyer ?? null
-
-    if (tickets) {
-      const paymentValue = tickets.reduce(
-        (sum, ticket) => sum + +(ticket.price_sell ?? "0"),
-        0
-      )
-
-      const phone = !!buyer.phone ? buyer.phone.replace(/\D/g, "") : null
-
-      const obj = {
-        customer: {
-          name: buyer.name ?? "Lorem ipsum",
-          email: "null@null.null",
-          phones: phone
-            ? [
-                {
-                  country: "55",
-                  area: phone.slice(0, 2),
-                  number: phone.slice(2),
-                  type: "MOBILE",
-                },
-              ]
-            : undefined,
-          tax_id: "12345678909",
-        },
-        items: tickets.map((t) => ({
-          name: t.name,
-          quantity: 1,
-          unit_amount: +(t.price_sell ?? "0"),
-        })),
-        qr_codes: [
-          { amount: { value: paymentValue, arrangements: "PAGBANK" } },
-        ],
-        notification_urls: [
-          "https://back-moreira.vercel.app/api/orders/orderUpdate",
-        ],
-      }
-
-      return obj
-    } else return null
-  }, [lctn.state.buyer, lctn.state.tickets])
-
   const returnPage = () => {
     navigate(-1)
   }
@@ -194,9 +150,13 @@ const Payment = () => {
   }
 
   const getPBcode = useCallback(async () => {
-    if (!lctn.state.tickets) return returnPage()
+    if (!lctn.state.tickets || !lctn.state.buyer) return returnPage()
     else {
-      const orderData = getOrderData()
+      const orderData = getOrderData({
+        tickets: lctn.state.tickets,
+        buyer: lctn.state.buyer,
+      })
+
       if (orderData) {
         const socket = instanceSocket()
 
@@ -206,7 +166,6 @@ const Payment = () => {
 
         if (req.ok) {
           setQrCode(req.data.qr_codes[0].text)
-
           runTimer()
         } else {
           alert(req.error)
