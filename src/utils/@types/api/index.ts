@@ -10,9 +10,7 @@ type TApiGetters = {
   events: (p: TParams["get"]["events"]) => TResponses["get"]["events"]
   eventInfo: (p: TParams["get"]["eventInfo"]) => TResponses["get"]["eventInfo"]
   products: (p: TParams["get"]["products"]) => TResponses["get"]["products"]
-  myTickets: (
-    p: TParams["get"]["myTickets"]
-  ) => TResponses["get"]["myTickets"]
+  myTickets: (p: TParams["get"]["myTickets"]) => TResponses["get"]["myTickets"]
 }
 
 /*

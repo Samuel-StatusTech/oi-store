@@ -4,9 +4,9 @@ import { TApi } from "../utils/@types/api"
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 axios.defaults.headers.common.Authorization = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZqTFpROEQyOVBmQ3dJMlNiS3dQZ0I3cjdnRDMiLCJkYXRhYmFzZSI6IkRCNGI5MzEzZTNjZWUwOGQ5YWMzZDE0NGUxODg3MGJjMGRiMjA4MTNjZCIsImNsaWVudEtleSI6Ii1OYWxaenZiMndhc1VfNmR1R2NuIiwiaWF0IjoxNzE3NDk1MzQzLCJleHAiOjE5NzQxMDMzNDN9.50knxx6WtR8TBD0byCCPo7Qaxe6SV6MXvHujZYYd4rI`
 
-const backUrl = 
-// 'http://localhost:8080'
-'https://back-moreira.vercel.app'
+const backUrl =
+  // 'http://localhost:8080'
+  "https://back-moreira.vercel.app"
 
 /*
  * Getters

@@ -143,7 +143,6 @@ const Payment = () => {
     // )
 
     const socket = io("https://back-moreira.vercel.app", {
-      // const socket = io("http://localhost:8080", {
       autoConnect: true,
       reconnectionAttempts: 3,
     })
@@ -185,7 +184,7 @@ const Payment = () => {
           setPayed(true)
         }, 400)
       }, 3500)
-    }, 2500)
+    }, 4000)
     // }
 
     // monitor minors payments ?
@@ -210,7 +209,7 @@ const Payment = () => {
 
           runTimer()
         } else {
-          // alert(req.error)
+          alert(req.error)
         }
       }
     }
