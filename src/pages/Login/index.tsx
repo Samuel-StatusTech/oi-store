@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import * as S from "./styled"
 import { useLocation, useNavigate } from "react-router-dom"
 import getStore from "../../store"
@@ -31,6 +31,8 @@ const Login = () => {
 
   const store = getStore()
 
+  const [client] = useState<any>(null)
+
   const [email, setEmail] = useState("")
   const [pass, setPass] = useState("")
 
@@ -54,14 +56,30 @@ const Login = () => {
     }
   }
 
+  const loadData = useCallback(async () => {
+    // ...
+    // {
+    //   const events = await Api.get.eventInfo({})
+    // } catch (error) {}
+  }, [])
+
+  useEffect(() => {}, [loadData])
+
   return (
     <S.Page>
+      {client?.logoFixed && <img src="" alt="" />}
+
       <S.FormArea>
         <S.FormTitle>Faça seu login</S.FormTitle>
 
         <S.Inputs>
           <Input label="Email" value={email} onChange={setEmail} />
-          <Input label="Senha" value={pass} onChange={setPass} type="password" />
+          <Input
+            label="Senha"
+            value={pass}
+            onChange={setPass}
+            type="password"
+          />
         </S.Inputs>
 
         <S.Button onClick={handleClick}>Entrar</S.Button>

@@ -16,6 +16,7 @@ export const Main = styled.div`
 
   img {
     max-width: 124px;
+    max-height: 124px;
     margin: auto;
   }
 `
@@ -38,7 +39,7 @@ export const ColsArea = styled.div`
 export const Col = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 6px
+  gap: 6px;
 `
 
 export const ColTitle = styled.div`

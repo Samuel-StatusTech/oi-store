@@ -140,6 +140,12 @@ export const DescSubText = styled.span`
   opacity: 0.5;
 `
 
+export const MapEvent = styled.img`
+  max-width: 100%;
+  height: auto;
+  max-height: 480px;
+`
+
 // Organizers
 export const Organizers = styled.div`
   display: flex;

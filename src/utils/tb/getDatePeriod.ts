@@ -30,3 +30,13 @@ export const getDatePeriod = (date_ini: string, date_end: string) => {
 
   return str
 }
+
+export const getHours = (date: Date) => {
+  let str = ""
+
+  str += String(date.getHours()).padStart(2, "0")
+  str += ":"
+  str += String(date.getMinutes()).padStart(2, "0")
+
+  return str
+}

@@ -175,7 +175,7 @@ export const PixTime = styled.div`
   }
 `
 
-export const Button = styled.button`
+export const Button = styled.button<{ $content?: boolean }>`
   outline: none;
   background-color: ${({ theme }) => theme.colors.blue.main};
   border: none;
@@ -184,8 +184,9 @@ export const Button = styled.button`
   border-radius: 4px;
   color: #fff;
   text-align: center;
-  width: 100%;
+  width: ${({ $content }) => ($content ? "fit-content" : "100%")};
   transition: box-shadow 0.3s;
+  margin: ${({ $content }) => ($content ? "auto" : "unset")};
 
   &:hover {
     box-shadow: 0 2px 8px 2px rgba(0, 0, 0, 0.24);

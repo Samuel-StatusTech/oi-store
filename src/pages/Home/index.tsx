@@ -14,7 +14,7 @@ import { Api } from "../../api"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { parseDisposalTickets } from "../../utils/tb/ticketsToDisposal"
 import getStore from "../../store"
-import { getDatePeriod } from "../../utils/tb/getDatePeriod"
+import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
 import { useNavigate } from "react-router-dom"
 
 const Home = () => {
@@ -45,7 +45,7 @@ const Home = () => {
 
         if (req.ok) {
           const list = req.data.list
-          setTickets(parseDisposalTickets(list))
+          setTickets(parseDisposalTickets(list.filter((t) => t.active)))
         }
       } catch (error) {
         alert("Erro ao carregar os tickets")
@@ -90,7 +90,21 @@ const Home = () => {
                     event?.date_ini as string,
                     event?.date_end as string
                   ),
-                  event?.time_ini ? event.time_ini.slice(0, 5) : "Dia todo",
+                  event?.date_ini
+                    ? getHours(
+                        new Date(
+                          event?.date_ini.slice(
+                            0,
+                            event?.date_ini.indexOf("T")
+                          ) +
+                            "T" +
+                            event?.time_ini +
+                            ".000Z"
+                        )
+                      )
+                    : event?.time_ini
+                    ? event.time_ini.slice(0, 5)
+                    : "Dia todo",
                 ]}
                 icon={<img src={calendar} alt={""} width={84} />}
               />
@@ -117,6 +131,16 @@ const Home = () => {
               dangerouslySetInnerHTML={{ __html: event?.description ?? "" }}
             />
           </S.DescriptionSection>
+
+          {event?.event_map ? (
+            <>
+              <S.DescTitle>Mapa do evento</S.DescTitle>
+              <S.MapEvent src={event?.event_map} alt={""} />
+            </>
+          ) : (
+            <></>
+          )}
+
           <S.DescriptionSection>
             <S.DescTitle>Local</S.DescTitle>
             <S.DescText>{event?.local}</S.DescText>
@@ -128,22 +152,6 @@ const Home = () => {
           </S.DescriptionSection>
         </Container>
       </S.DescriptionWrapper>
-      {/* 
-      <Container>
-        <S.Organizers>
-          <Organizer
-            icon={
-              "https://static.vecteezy.com/system/resources/previews/012/871/371/original/google-search-icon-google-product-illustration-free-png.png"
-            }
-            name={"GR Produções, Shows e Eventos!"}
-            phone={"(38) 99221-6176"}
-            description={[
-              "GR Produções, Shows e Eventos!",
-              "Eventos com qualidade e segurança!",
-            ]}
-          />
-        </S.Organizers>
-      </Container> */}
 
       <Footer />
     </S.Page>

@@ -1,14 +1,20 @@
 import * as S from "./styled"
-import logo from "../../assets/images/oi-tickets.png"
+
 import Container from "../Container"
 import { Link } from "react-router-dom"
+import getStore from "../../store"
 
 const Footer = () => {
+  const { event } = getStore()
+
   return (
     <S.Component>
       <Container>
         <S.Main>
-          <img src={logo} alt={""} />
+          {event?.logoFixed && (
+            <img src={event?.logoFixed} alt={event?.corporateName} />
+          )}
+
           <S.ColsArea>
             <div />
             <S.Col>

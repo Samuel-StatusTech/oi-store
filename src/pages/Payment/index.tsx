@@ -22,7 +22,7 @@ import { TForm, TTicketForm, initialForm } from "../../utils/placeData/form"
 import { Link, useLocation, useNavigate } from "react-router-dom"
 import { formatCpf } from "../../utils/masks/cpf"
 import { formatPhone } from "../../utils/masks/phone"
-import { getDatePeriod } from "../../utils/tb/getDatePeriod"
+import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
 import getStore from "../../store"
 import { formatCardDate } from "../../utils/masks/date"
 import { formatCardCode } from "../../utils/masks/cardcode"
@@ -311,7 +311,19 @@ const Payment = () => {
   }
 
   const getIniHour = () => {
-    let str = event?.time_ini ? event.time_ini.slice(0, 5) : "Dia todo"
+    let str = event?.date_ini
+      ? getHours(
+          new Date(
+            event?.date_ini.slice(0, event?.date_ini.indexOf("T")) +
+              "T" +
+              event?.time_ini +
+              ".000Z"
+          )
+        )
+      : event?.time_ini
+      ? event.time_ini.slice(0, 5)
+      : "Dia todo"
+
     return str
   }
 
