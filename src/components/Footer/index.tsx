@@ -3,6 +3,7 @@ import * as S from "./styled"
 import Container from "../Container"
 import { Link } from "react-router-dom"
 import getStore from "../../store"
+import { formatCNPJ } from "../../utils/masks/cnpj"
 
 const Footer = () => {
   const { event } = getStore()
@@ -36,10 +37,14 @@ const Footer = () => {
         </S.Main>
       </Container>
       <S.CopyArea>
-        <S.CopyItem>© Oi Tickets. Todos os direitos reservados. </S.CopyItem>
-        <S.CopyItem>Avenida Rolf Wiest, 277 </S.CopyItem>
-        <S.CopyItem>- Bom Retiro, Joinville - SC, 89223-005 - </S.CopyItem>
-        <S.CopyItem>CNPJ 27.503.375/0001-20</S.CopyItem>
+        <S.CopyItem>
+          © {event?.corporateName}. Todos os direitos reservados.{" "}
+        </S.CopyItem>
+        <S.CopyItem>{event?.address}</S.CopyItem>
+        <S.CopyItem>
+          - {event?.city} - {event?.uf} -
+        </S.CopyItem>
+        <S.CopyItem>CNPJ {formatCNPJ(event?.CNPJ ?? "")}</S.CopyItem>
       </S.CopyArea>
     </S.Component>
   )

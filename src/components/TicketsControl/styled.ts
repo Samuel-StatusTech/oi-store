@@ -127,9 +127,14 @@ export const BuyBtn = styled.button`
   border-radius: 4px;
   color: ${({ theme }) => theme.colors.white.main};
   font-weight: 500;
+  transition: filter 0.3s;
 
   @media (max-width: 340px) {
     width: 100%;
+  }
+
+  &:disabled {
+    filter: saturate(0);
   }
 
   opacity: 0;

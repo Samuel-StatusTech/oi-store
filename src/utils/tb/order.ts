@@ -21,12 +21,12 @@ export const getOrderData = ({ tickets, buyer }: Props) => {
       customer: {
         name: buyer?.name ?? "Lorem ipsum",
         email: "null@null.null",
-        phones: {
+        phones: [{
           country: "55",
           area: phone.slice(0, 2),
           number: phone.slice(2),
           type: "MOBILE",
-        },
+        }],
         tax_id: "12345678909",
       },
       items: tickets.map((t) => ({

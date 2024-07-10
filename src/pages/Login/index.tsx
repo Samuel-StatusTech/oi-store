@@ -6,35 +6,9 @@ import { formatPhone } from "../../utils/masks/phone"
 import getStore from "../../store"
 import { Api } from "../../api"
 
-type IProps = {
-  label: string
-  value: string
-  onChange: (str: string) => void
-  type?: string
-  k: number
-}
-
 const constCODE = "ab12"
 
 const codeLength = 4
-
-const Input = ({ label, value, onChange, type, k }: IProps) => {
-  return (
-    <S.Label $k={k}>
-      <S.Input
-        id={"phoneInput"}
-        type={type ?? "text"}
-        value={value}
-        onKeyDown={(e) => {
-          if (e.key === "Tab") e.preventDefault()
-        }}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={""}
-      />
-      <span>{label}</span>
-    </S.Label>
-  )
-}
 
 const Login = () => {
   const location = useLocation()
@@ -60,6 +34,7 @@ const Login = () => {
 
   useEffect(() => {
     setPhase("phone")
+    store.controllers.user.clear()
   }, [])
 
   const fadePhases = () => {
@@ -154,7 +129,7 @@ const Login = () => {
         code4.current?.focus()
         break
       case 3:
-        code4.current?.blur()
+        if (window.innerWidth < 800) code4.current?.blur()
         break
       default:
         break
@@ -178,6 +153,7 @@ const Login = () => {
           placeholder={""}
           $small={true}
           disabled={failedCODE}
+          autoCapitalize="none"
         />
       )
     }
@@ -199,12 +175,21 @@ const Login = () => {
         <S.Phases>
           <S.Phase $changing={changing} $phase={phase}>
             <S.Inputs>
-              <Input
-                k={3}
-                label="Informe seu celular"
-                value={phone}
-                onChange={handlePhone}
-              />
+              <S.Label $k={3}>
+                <S.Input
+                  id={"phoneInput"}
+                  type={"text"}
+                  value={phone}
+                  onKeyDown={(e) => {
+                    if (e.key === "Tab") e.preventDefault()
+                  }}
+                  onChange={(e) => handlePhone(e.target.value)}
+                  placeholder={""}
+                  inputMode="numeric"
+                  enterKeyHint="enter"
+                />
+                <span>Informe seu celular</span>
+              </S.Label>
             </S.Inputs>
           </S.Phase>
           <S.Phase $changing={changing}>

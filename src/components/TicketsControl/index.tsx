@@ -1,18 +1,13 @@
-import { useState } from "react"
 import * as S from "./styled"
 import Ticket from "../Ticket"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { formatMoney } from "../../utils/tb/formatMoney"
 import { useNavigate } from "react-router-dom"
 
-import { DatePicker } from "@mui/x-date-pickers"
-
 type Props = {
   tickets: TTicketDisposal[]
   setTickets: (list: TTicketDisposal[]) => void
 }
-
-const daysRelation = ["D", "S", "T", "Q", "Q", "S", "S"]
 
 const TicketsControl = ({ tickets, setTickets }: Props) => {
   const navigate = useNavigate()
@@ -62,6 +57,7 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
     navigate("/payment", {
       state: { tickets },
     })
+    window.scrollTo({ top: 0 })
   }
 
   return (
@@ -69,20 +65,6 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
       <S.Top>
         <span>Ingressos</span>
       </S.Top>
-      <S.DateArea>
-        <span>Selecione uma data</span>
-        <DatePicker
-          dayOfWeekFormatter={(d) => {
-            return daysRelation[d.getDay()]
-          }}
-          disablePast={true}
-          sx={{
-            ".MuiInputBase-root > input": {
-              padding: ".6rem .8rem",
-            },
-          }}
-        />
-      </S.DateArea>
       <S.Tickets>
         {tickets.map((t, k) => (
           <Ticket k={k} key={k} ticket={t} changeQnt={changeQnt} />
@@ -92,7 +74,12 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
         <S.Resume>
           <S.Total>{`Total ${calcTotal()}`}</S.Total>
         </S.Resume>
-        <S.BuyBtn onClick={handleBuy}>Comprar</S.BuyBtn>
+        <S.BuyBtn
+          onClick={tickets.every((t) => t.qnt === 0) ? undefined : handleBuy}
+          disabled={tickets.every((t) => t.qnt === 0)}
+        >
+          Comprar
+        </S.BuyBtn>
       </S.Bottom>
     </S.Component>
   )

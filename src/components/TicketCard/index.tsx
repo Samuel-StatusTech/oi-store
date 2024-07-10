@@ -118,7 +118,7 @@ const TicketCard = ({ k, data }: Props) => {
               <button onClick={handleDownload}>
                 <DownloadIcon width={24} height={24} />
               </button>
-              {window.navigator.canShare() && (
+              {navigator.canShare && navigator.canShare() && (
                 <button onClick={handleShare}>
                   <ShareIcon width={24} height={24} />
                 </button>

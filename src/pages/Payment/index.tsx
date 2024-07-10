@@ -76,9 +76,11 @@ type IProps = {
   label: string
   value: string
   onChange: (v: string) => void
+  inputMode?: string
+  enterKeyHint?: string
 }
 
-const Input = ({ label, value, onChange }: IProps) => {
+const Input = ({ label, value, onChange, inputMode, enterKeyHint }: IProps) => {
   return (
     <S.Label>
       <span>{label}</span>
@@ -86,6 +88,8 @@ const Input = ({ label, value, onChange }: IProps) => {
         value={value}
         onChange={(e) => onChange(e.target.value)}
         placeholder={""}
+        inputMode={inputMode as any}
+        enterKeyHint={enterKeyHint as any}
       />
     </S.Label>
   )
@@ -468,6 +472,8 @@ const Payment = () => {
                         label={"Telefone"}
                         value={form.buyer.phone}
                         onChange={(v: string) => handleForm("phone", v)}
+                        inputMode="numeric"
+                        enterKeyHint={"done"}
                       />
                     </S.FormLine>
                     {method === "credit" && (

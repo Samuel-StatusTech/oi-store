@@ -6,6 +6,7 @@ export const Area = styled.div<{ $showing: boolean }>`
   flex-direction: column;
   gap: 24px;
   position: fixed;
+  z-index: 40;
   padding: 24px;
   border-radius: 24px;
   box-shadow: 0 0 24px rgba(0, 0, 0, 0.25);
@@ -15,8 +16,6 @@ export const Area = styled.div<{ $showing: boolean }>`
   background-color: ${({ theme }) => theme.colors.white.main};
 
   width: 240px;
-  //   width: 100%;
-  //   max-width: calc(1180px - 248px);
   margin: auto;
 
   @media (max-width: 1240px) {

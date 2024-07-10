@@ -5,6 +5,7 @@ export const Box = styled.div<{
   $color: "green" | "orange" | "red"
 }>`
   position: fixed;
+  z-index: 50;
   top: 100px;
   left: 50%;
   display: flex;
