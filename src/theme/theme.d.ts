@@ -28,5 +28,24 @@ declare module "styled-components" {
       small: number
       xsmall: number
     }
+    animations: {
+      types: {
+        fade: string
+        fadeTop: string
+        fadeRight: string
+        fadeBottom: string
+        fadeLeft: string
+      }
+      durations: {
+        main: string
+        slow: string
+        fast: string
+      }
+      delays: {
+        main: (x?: number) => string
+        slow: (x?: number) => string
+        slower: (x?: number) => string
+      }
+    }
   }
 }
