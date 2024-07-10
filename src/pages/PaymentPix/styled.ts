@@ -13,13 +13,19 @@ export const Main = styled.div`
   padding: 0 0 64px 0;
 `
 
-export const Block = styled.div`
+export const Block = styled.div<{ $k: number }>`
   display: flex;
   flex-direction: column;
   gap: 24px;
   box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
   padding: 24px;
   border-radius: 12px;
+
+  opacity: 0;
+  ${({ $k, theme }) =>
+    theme.animations.types.fade +
+    theme.animations.durations.main +
+    theme.animations.delays.main($k)}
 `
 
 export const EventInfo = styled.div`
@@ -29,6 +35,12 @@ export const EventInfo = styled.div`
   img {
     max-width: 420px;
     border-radius: 12px;
+
+    opacity: 0;
+    ${({ theme }) =>
+      theme.animations.types.fadeLeft +
+      theme.animations.durations.main +
+      theme.animations.delays.main(4)}
   }
 
   & > div.eventInfos {
@@ -48,10 +60,16 @@ export const EventInfo = styled.div`
   }
 `
 
-export const BlockTitle = styled.span`
+export const BlockTitle = styled.span<{ $k: number }>`
   font-size: 24px;
   font-weight: bold;
   color: #000;
+
+  opacity: 0;
+  ${({ $k, theme }) =>
+    theme.animations.types.fadeTop +
+    theme.animations.durations.main +
+    theme.animations.delays.main($k)}
 `
 
 export const PaymentData = styled.div`
@@ -139,6 +157,12 @@ export const PixInstructions = styled.div`
   text-align: center;
   color: #999;
   max-width: 300px;
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeLeft +
+    theme.animations.durations.main +
+    theme.animations.delays.main(5)}
 `
 
 export const QR = styled.div`

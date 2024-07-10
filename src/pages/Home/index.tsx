@@ -84,6 +84,7 @@ const Home = () => {
             <S.EventName>{event?.name}</S.EventName>
             <S.Blocks>
               <BlockInfo
+                k={3}
                 title="Data e Hora"
                 description={[
                   getDatePeriod(
@@ -109,6 +110,7 @@ const Home = () => {
                 icon={<img src={calendar} alt={""} width={84} />}
               />
               <BlockInfo
+                k={4}
                 title="Localização"
                 description={[
                   `${event?.address}`,

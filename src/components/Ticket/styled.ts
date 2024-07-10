@@ -1,6 +1,6 @@
 import styled from "styled-components"
 
-export const Component = styled.div`
+export const Component = styled.div<{ $k?: number }>`
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -12,6 +12,12 @@ export const Component = styled.div`
     flex-direction: column;
     padding-bottom: 24px;
   }
+
+  opacity: 0;
+  ${({ $k, theme }) =>
+    theme.animations.types.fadeLeft +
+    theme.animations.durations.main +
+    theme.animations.delays.main($k)}
 `
 
 export const TicketInfo = styled.div`

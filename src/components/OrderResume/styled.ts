@@ -14,6 +14,12 @@ export const Component = styled.div`
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
     min-width: unset;
   }
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fade +
+    theme.animations.durations.main +
+    theme.animations.delays.main(0)}
 `
 
 export const ImageContainer = styled.div`
@@ -27,6 +33,12 @@ export const ImageContainer = styled.div`
     min-height: 100%;
     width: 100%;
   }
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fade +
+    theme.animations.durations.main +
+    theme.animations.delays.main()}
 `
 
 export const Info = styled.div`
@@ -60,6 +72,12 @@ export const EventResume = styled.div`
 export const ResumeText = styled.span`
   font-weight: bold;
   font-size: 20px;
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeLeft +
+    theme.animations.durations.main +
+    theme.animations.delays.main(2)}
 `
 
 export const DateText = styled.span`
@@ -69,8 +87,15 @@ export const DateText = styled.span`
   white-space: nowrap;
   text-transform: uppercase;
 
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeLeft +
+    theme.animations.durations.main +
+    theme.animations.delays.main(3)}
+
   &:nth-child(2) {
     text-align: right;
+    ${({ theme }) => theme.animations.delays.main(4)}
   }
 
   @media (max-width: 440px) {
@@ -104,6 +129,22 @@ export const TotalItem = styled.div<{ $main?: boolean }>`
       flex: 2;
     }
   }
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeTop + theme.animations.durations.main}
+
+  &:nth-child(1) {
+    ${({ theme }) => theme.animations.delays.main(5)}
+  }
+
+  &:nth-child(2) {
+    ${({ theme }) => theme.animations.delays.main(6)}
+  }
+
+  &:nth-child(3) {
+    ${({ theme }) => theme.animations.delays.main(7)}
+  }
 `
 
 export const ReleaseBlock = styled.div`
@@ -129,6 +170,12 @@ export const RLeft = styled.div`
     font-size: 24px;
     font-weight: bold;
   }
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeLeft +
+    theme.animations.durations.main +
+    theme.animations.delays.main(2)}
 `
 
 export const RRight = styled.div`
@@ -136,4 +183,10 @@ export const RRight = styled.div`
   font-size: 14px;
   padding-left: 24px;
   border-left: 4px solid #888;
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeLeft +
+    theme.animations.durations.main +
+    theme.animations.delays.main(3)}
 `

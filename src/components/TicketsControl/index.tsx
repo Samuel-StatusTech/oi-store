@@ -17,8 +17,6 @@ const daysRelation = ["D", "S", "T", "Q", "Q", "S", "S"]
 const TicketsControl = ({ tickets, setTickets }: Props) => {
   const navigate = useNavigate()
 
-  const [installment] = useState(10)
-
   const calcTotal = () => {
     let val = tickets.reduce((qnt, tk) => qnt + tk.price_sell * tk.qnt, 0)
 
@@ -87,13 +85,12 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
       </S.DateArea>
       <S.Tickets>
         {tickets.map((t, k) => (
-          <Ticket key={k} ticket={t} changeQnt={changeQnt} />
+          <Ticket k={k} key={k} ticket={t} changeQnt={changeQnt} />
         ))}
       </S.Tickets>
       <S.Bottom>
         <S.Resume>
           <S.Total>{`Total ${calcTotal()}`}</S.Total>
-          <S.Installments>{`Pague em até ${installment}x`}</S.Installments>
         </S.Resume>
         <S.BuyBtn onClick={handleBuy}>Comprar</S.BuyBtn>
       </S.Bottom>

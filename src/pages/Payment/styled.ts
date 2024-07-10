@@ -31,12 +31,24 @@ export const EventData = styled.div`
   box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
   padding: 24px;
   border-radius: 12px;
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeTop +
+    theme.animations.durations.main +
+    theme.animations.delays.main()}
 `
 
 export const EventName = styled.span`
   font-size: 24px;
   font-weight: bold;
   color: #000;
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeLeft +
+    theme.animations.durations.main +
+    theme.animations.delays.main(2)}
 `
 
 export const PaymentData = styled.div`
@@ -51,7 +63,19 @@ export const PaymentData = styled.div`
     font-size: 24px;
     font-weight: bold;
     color: #000;
+
+    opacity: 0;
+    ${({ theme }) =>
+      theme.animations.types.fadeLeft +
+      theme.animations.durations.main +
+      theme.animations.delays.main(3)}
   }
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeTop +
+    theme.animations.durations.main +
+    theme.animations.delays.main(2)}
 `
 
 export const Methods = styled.div`
@@ -78,6 +102,12 @@ export const Method = styled.div<{ $checked: boolean }>`
   cursor: pointer;
   transition: border-color 0.3s;
   overflow: hidden;
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeLeft +
+    theme.animations.durations.main +
+    theme.animations.delays.main(4)}
 `
 
 export const MTitle = styled.div``
@@ -122,9 +152,15 @@ export const Form = styled.div`
   box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
   padding: 24px;
   border-radius: 12px;
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeTop +
+    theme.animations.durations.main +
+    theme.animations.delays.main(3)}
 `
 
-export const FormBlock = styled.div`
+export const FormBlock = styled.div<{ $k: number }>`
   display: flex;
   flex-direction: column;
   gap: 36px;
@@ -134,6 +170,12 @@ export const FormBlock = styled.div`
     font-weight: bold;
     color: #000;
   }
+
+  opacity: 0;
+  ${({ $k, theme }) =>
+    theme.animations.types.fadeLeft +
+    theme.animations.durations.main +
+    theme.animations.delays.main($k + 4)}
 `
 
 export const FormLines = styled.div`

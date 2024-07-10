@@ -1,6 +1,6 @@
 import styled from "styled-components"
 
-export const Component = styled.div`
+export const Component = styled.div<{ $k: number }>`
   border-radius: 8px;
   overflow: hidden;
   transition: box-shadow 0.3s;
@@ -20,6 +20,12 @@ export const Component = styled.div`
   &:hover .iconsArea {
     opacity: 1;
   }
+
+  opacity: 0;
+  ${({ $k, theme }) =>
+    theme.animations.types.fadeLeft +
+    theme.animations.durations.main +
+    theme.animations.delays.main($k)}
 `
 
 export const ImageContainer = styled.div`

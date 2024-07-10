@@ -41,7 +41,7 @@ const EventSelect = () => {
 
           <S.List>
             {list.map((ticket, k) => (
-              <EventCard key={k} data={ticket} />
+              <EventCard k={k} key={k} data={ticket} />
             ))}
           </S.List>
         </S.Main>

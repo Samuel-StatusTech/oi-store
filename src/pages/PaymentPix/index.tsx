@@ -24,7 +24,7 @@ import io from "socket.io-client"
 import Popup from "../../components/PopUp"
 import { getOrderData } from "../../utils/tb/order"
 
-const Payment = () => {
+const PaymentPix = () => {
   const lctn = useLocation()
   const navigate = useNavigate()
 
@@ -169,6 +169,7 @@ const Payment = () => {
           runTimer()
         } else {
           alert(req.error)
+          navigate(-1)
         }
       }
     }
@@ -221,8 +222,8 @@ const Payment = () => {
 
       <Container>
         <S.Main>
-          <S.Block>
-            <S.BlockTitle>Pedido iniciado</S.BlockTitle>
+          <S.Block $k={1}>
+            <S.BlockTitle $k={3}>Pedido iniciado</S.BlockTitle>
 
             <S.EventInfo>
               {event?.event_banner && (
@@ -230,8 +231,9 @@ const Payment = () => {
               )}
 
               <div className="eventInfos">
-                <S.BlockTitle>{event?.name}</S.BlockTitle>
+                <S.BlockTitle $k={4.5}>{event?.name}</S.BlockTitle>
                 <BlockInfo
+                  k={5}
                   small={true}
                   icon={<img src={calendar} alt={""} width={40} />}
                   description={[
@@ -263,6 +265,7 @@ const Payment = () => {
                   ]}
                 />
                 <BlockInfo
+                  k={6}
                   small={true}
                   icon={<img src={location} alt={""} width={40} />}
                   description={[
@@ -274,8 +277,8 @@ const Payment = () => {
             </S.EventInfo>
           </S.Block>
 
-          <S.Block>
-            <S.BlockTitle>
+          <S.Block $k={2}>
+            <S.BlockTitle $k={4}>
               {payed
                 ? "Veja os detalhes do seu pedido:"
                 : "Agora só falta concluir o seu Pix."}
@@ -329,4 +332,4 @@ const Payment = () => {
   )
 }
 
-export default Payment
+export default PaymentPix

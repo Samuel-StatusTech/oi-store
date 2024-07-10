@@ -25,8 +25,6 @@ export const LogoArea = styled.div`
     overflow: hidden;
 
     img {
-      // width: auto;
-      // height: 40px;
       width: 120px;
     }
   }

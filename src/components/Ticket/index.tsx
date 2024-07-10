@@ -6,6 +6,7 @@ import { formatMoney } from "../../utils/tb/formatMoney"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 
 type Props = {
+  k?: number
   ticket: TTicketDisposal
   changeQnt?: (
     ticketId: number | string,
@@ -14,20 +15,17 @@ type Props = {
   hasControl?: boolean
 }
 
-const Ticket = ({ ticket, changeQnt, hasControl = true }: Props) => {
-
-  const saledOut = ticket.quantity === 0
-  
+const Ticket = ({ k, ticket, changeQnt, hasControl = true }: Props) => {
   return (
-    <S.Component>
+    <S.Component $k={k}>
       <S.TicketInfo>
         <S.TicketName>{ticket.name}</S.TicketName>
         {ticket.price_sell && (
           <S.TicketPrice>{formatMoney(ticket.price_sell)}</S.TicketPrice>
         )}
       </S.TicketInfo>
-      <S.Quantity $saledOut={saledOut}>
-        {saledOut ? (
+      <S.Quantity $saledOut={ticket.quantity === 0}>
+        {ticket.quantity === 0 ? (
           <span style={{ width: "100%", maxWidth: 120, textAlign: "center" }}>
             <strong>Esgotado</strong>
           </span>

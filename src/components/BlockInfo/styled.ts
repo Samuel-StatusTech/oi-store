@@ -1,10 +1,17 @@
 import styled from "styled-components"
 
-export const Component = styled.div`
+export const Component = styled.div<{ $k?: number }>`
   display: flex;
   gap: 24px;
   flex: 1;
   align-items: flex-start;
+  opacity: ${({ theme, $k }) => ($k ? 0 : 1)};
+  ${({ theme, $k }) =>
+    $k
+      ? theme.animations.types.fadeRight +
+        theme.animations.durations.main +
+        theme.animations.delays.main($k)
+      : ""}
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
     flex-direction: column;

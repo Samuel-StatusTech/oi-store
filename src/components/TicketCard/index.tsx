@@ -11,9 +11,10 @@ import { useCallback, useEffect, useState } from "react"
 
 type Props = {
   data: TCardTicket
+  k: number
 }
 
-const TicketCard = ({ data }: Props) => {
+const TicketCard = ({ k, data }: Props) => {
   const { event } = getStore()
 
   const [tickets, setTickets] = useState<TTicket[]>([])
@@ -99,7 +100,7 @@ const TicketCard = ({ data }: Props) => {
   }, [loadTickets])
 
   return (
-    <S.Component>
+    <S.Component $k={k}>
       <Link
         onClick={handleCardClick}
         to={data.name.toLowerCase().replace(/\s+/g, "-")}

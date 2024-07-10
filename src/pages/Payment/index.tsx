@@ -129,12 +129,19 @@ const Payment = () => {
   const navigate = useNavigate()
 
   const store = getStore()
-  const { event, controllers } = store
+  const { user, event, controllers } = store
 
   const [termsAgreed, setTermsAgreed] = useState(false)
 
   const [method, setMethod] = useState<"" | "pix" | "credit">("pix")
-  const [form, setForm] = useState<TForm>(initialForm)
+  const [form, setForm] = useState<TForm>({
+    ...initialForm,
+    buyer: {
+      cpf: "",
+      name: user?.name ?? "",
+      phone: user?.fone ? formatPhone(user?.fone) : "",
+    },
+  })
   const [flag, setFlag] = useState<TCardFlag>(null)
   const [fieldsOk, setFieldsOk] = useState(false)
 
@@ -412,6 +419,7 @@ const Payment = () => {
             <S.EventData>
               <S.EventName>{event?.name}</S.EventName>
               <BlockInfo
+                k={3}
                 small={true}
                 icon={<img src={calendar} alt={""} width={40} />}
                 description={[
@@ -423,6 +431,7 @@ const Payment = () => {
                 ]}
               />
               <BlockInfo
+                k={4}
                 small={true}
                 icon={<img src={location} alt={""} width={40} />}
                 description={[
@@ -440,17 +449,12 @@ const Payment = () => {
                   type={"pix"}
                   onSelect={handleSelect}
                 />
-                {/* <Method
-                  checked={method === "credit"}
-                  type={"credit"}
-                  onSelect={handleSelect}
-                /> */}
               </S.Methods>
             </S.PaymentData>
 
             {method && (
               <S.Form>
-                <S.FormBlock>
+                <S.FormBlock $k={1}>
                   <span>Informações do(a) comprador(a)</span>
 
                   <S.FormLines>
@@ -479,7 +483,7 @@ const Payment = () => {
                 </S.FormBlock>
 
                 {Boolean(event?.nominal) && (
-                  <S.FormBlock>
+                  <S.FormBlock $k={2}>
                     <span>Informações dos participantes</span>
 
                     {form.tickets.map((ticket, k) => (
@@ -528,7 +532,7 @@ const Payment = () => {
                 )}
 
                 {method === "credit" && (
-                  <S.FormBlock>
+                  <S.FormBlock $k={3}>
                     <span>Informações do pagamento</span>
 
                     {renderFlag()}
@@ -566,7 +570,7 @@ const Payment = () => {
                 )}
 
                 {method === "credit" && (
-                  <S.FormBlock>
+                  <S.FormBlock $k={4}>
                     <span>Endereço de faturamento</span>
 
                     <S.FormLines>

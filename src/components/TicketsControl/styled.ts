@@ -23,6 +23,12 @@ export const Component = styled.aside`
     z-index: unset;
     max-width: unset;
   }
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeBottom +
+    theme.animations.durations.main +
+    theme.animations.delays.main(1)}
 `
 
 export const Top = styled.div`
@@ -32,6 +38,11 @@ export const Top = styled.div`
 
   span {
     font-size: 20px;
+    opacity: 0;
+    ${({ theme }) =>
+      theme.animations.types.fadeLeft +
+      theme.animations.durations.main +
+      theme.animations.delays.main(2)}
   }
 `
 
@@ -44,6 +55,19 @@ export const DateArea = styled.div`
 
   span {
     white-space: nowrap;
+    opacity: 0;
+    ${({ theme }) =>
+      theme.animations.types.fadeLeft +
+      theme.animations.durations.main +
+      theme.animations.delays.main(2)}
+  }
+
+  & > div {
+    opacity: 0;
+    ${({ theme }) =>
+      theme.animations.types.fadeLeft +
+      theme.animations.durations.main +
+      theme.animations.delays.main(3)}
   }
 `
 
@@ -72,6 +96,14 @@ export const Resume = styled.div`
   display: flex;
   flex-direction: column;
   gap: 4px;
+
+  span {
+    opacity: 0;
+    ${({ theme }) =>
+      theme.animations.types.fadeLeft +
+      theme.animations.durations.main +
+      theme.animations.delays.main(2)}
+  }
 `
 
 export const Total = styled.span`
@@ -99,4 +131,10 @@ export const BuyBtn = styled.button`
   @media (max-width: 340px) {
     width: 100%;
   }
+
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fade +
+    theme.animations.durations.main +
+    theme.animations.delays.main(3)}
 `

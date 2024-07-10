@@ -37,7 +37,7 @@ const MyTickets = () => {
 
           <S.List>
             {list.map((ticket, k) => (
-              <TicketCard key={k} data={ticket} />
+              <TicketCard k={k} key={k} data={ticket} />
             ))}
           </S.List>
         </S.Main>

@@ -8,6 +8,11 @@ export const Page = styled.div`
 
 export const Hero = styled.div`
   position: relative;
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeTop +
+    theme.animations.durations.main +
+    theme.animations.delays.main(0.5)}
 
   img.blured {
     width: 100vw;
@@ -18,6 +23,11 @@ export const Hero = styled.div`
     right: 0;
     z-index: -50;
     filter: blur(60px);
+    opacity: 0;
+    ${({ theme }) =>
+      theme.animations.types.fade +
+      theme.animations.durations.main +
+      theme.animations.delays.main(0)}
   }
 `
 
@@ -68,6 +78,11 @@ export const EventName = styled.h1`
   font-size: 36px;
   font-weight: 600;
   color: ${({ theme }) => theme.colors.black.secondary};
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeRight +
+    theme.animations.durations.main +
+    theme.animations.delays.main(1)}
 
   @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
     margin: 0;
@@ -103,6 +118,17 @@ export const DescTitle = styled.h3`
   color: ${({ theme }) => theme.colors.black.secondary};
   padding: 0;
   margin: 32px 0 24px 0;
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeRight + theme.animations.durations.main}
+
+  &:nth-child(1) {
+    ${({ theme }) => theme.animations.delays.main(2)}
+  }
+
+  &:nth-child(2) {
+    ${({ theme }) => theme.animations.delays.main(3)}
+  }
 `
 
 export const DescTexts = styled.div`
@@ -123,6 +149,11 @@ export const DescTexts = styled.div`
       font-weight: 500;
     }
   }
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeRight +
+    theme.animations.durations.main +
+    theme.animations.delays.main(4)}
 
   @media (max-width: ${({ theme }) => theme.bp.medium}px) {
     p {
@@ -133,29 +164,30 @@ export const DescTexts = styled.div`
   }
 `
 
-export const DescText = styled.p<{ $bold?: boolean }>``
+export const DescText = styled.p<{ $bold?: boolean }>`
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeRight +
+    theme.animations.durations.main +
+    theme.animations.delays.main(3)}
+`
 
 export const DescSubText = styled.span`
-  color: ${({ theme }) => theme.colors.black.secondary};
-  opacity: 0.5;
+  color: #6f6f6f;
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeRight +
+    theme.animations.durations.main +
+    theme.animations.delays.main(4)}
 `
 
 export const MapEvent = styled.img`
   max-width: 100%;
   height: auto;
   max-height: 480px;
-`
-
-// Organizers
-export const Organizers = styled.div`
-  display: flex;
-  gap: 64px;
-  flex-wrap: wrap;
-
-  @media (max-width: ${({ theme }) => theme.bp.small}px) {
-    img {
-      width: 100%;
-      height: auto;
-    }
-  }
+  opacity: 0;
+  ${({ theme }) =>
+    theme.animations.types.fadeRight +
+    theme.animations.durations.main +
+    theme.animations.delays.main(4)}
 `

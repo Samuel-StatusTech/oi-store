@@ -7,9 +7,10 @@ import { Link, useNavigate } from "react-router-dom"
 
 type Props = {
   data: TCardEvent
+  k: number
 }
 
-const EventCard = ({ data }: Props) => {
+const EventCard = ({ k, data }: Props) => {
   const store = getStore()
   const navigate = useNavigate()
 
@@ -37,7 +38,7 @@ const EventCard = ({ data }: Props) => {
   }
 
   return (
-    <S.Component>
+    <S.Component $k={k}>
       <Link onClick={setEvent} to={finalUrl} state={{ eventId: data.id }}>
         <S.ImageContainer>
           <img src={data.banner ?? ""} alt={""} />

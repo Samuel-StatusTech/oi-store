@@ -5,11 +5,12 @@ type Props = {
   title?: string
   description: string | string[]
   small?: boolean
+  k?: number
 }
 
-const BlockInfo = ({ icon, title, description, small }: Props) => {
+const BlockInfo = ({ k, icon, title, description, small }: Props) => {
   return (
-    <S.Component>
+    <S.Component $k={k}>
       <S.IconArea>{icon}</S.IconArea>
       <S.Info>
         {!small && <S.Title>{title}</S.Title>}
