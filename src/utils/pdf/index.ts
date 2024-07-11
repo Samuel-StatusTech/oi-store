@@ -1,16 +1,14 @@
-import axios from "axios"
-
 import pdfMake from "pdfmake/build/pdfmake"
 import pdfFonts from "pdfmake/build/vfs_fonts"
 import { styles } from "./styles"
 import { reportTitle, footer, content } from "./contents"
 import { Content, TDocumentDefinitions } from "pdfmake/interfaces"
 import { TEventData } from "../@types/data/event"
-import { TTicket } from "../@types/data/ticket"
+import { TShoppingTicket } from "../@types/data/ticket"
 
 const downloadTickets = async (
   eventData: TEventData,
-  tickets: TTicket[],
+  tickets: TShoppingTicket[],
   shouldDownload?: boolean
 ): Promise<void | File> => {
   pdfMake.vfs = pdfFonts.pdfMake.vfs
@@ -23,20 +21,6 @@ const downloadTickets = async (
     const filename = `Meus Tickets para ${eventData.name}.pdf`
 
     let logo = ""
-
-    try {
-      if (eventData.logo) {
-        const response = await axios.get(eventData.logo, {
-          responseType: "blob",
-        })
-
-        const blob = new Blob([response.data], { type: response.data.type })
-        const logoUrl = URL.createObjectURL(blob)
-        if (logoUrl) logo = logoUrl
-      }
-
-      console.log(logo)
-    } catch (error) {}
 
     const docDefs: TDocumentDefinitions = {
       // images: !!eventData.logo ? { logo: { url: eventData.logo } } : undefined,

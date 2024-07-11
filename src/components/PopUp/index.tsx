@@ -3,11 +3,10 @@ import * as S from "./styled"
 import Container from "../Container"
 import downloadTickets from "../../utils/pdf"
 import getStore from "../../store"
-import { TTicket } from "../../utils/@types/data/ticket"
-import { useCallback, useEffect, useState } from "react"
+import { TShoppingTicket } from "../../utils/@types/data/ticket"
 
 type Props = {
-  tickets: TTicket[]
+  tickets: TShoppingTicket[]
   showing: boolean
   closeFn: () => void
 }
@@ -15,17 +14,12 @@ type Props = {
 const Popup = ({ tickets, showing, closeFn }: Props) => {
   const { event } = getStore()
 
-  const [base64Image, setBase64Image] = useState<any>(null)
-
   const handleShare = async (e?: any) => {
     e?.preventDefault()
 
     if (navigator.canShare() && event) {
       try {
-        const file = await downloadTickets(
-          { ...event, logoFixed: base64Image ?? event?.logoFixed },
-          tickets
-        )
+        const file = await downloadTickets(event, tickets)
 
         if (file instanceof File) {
           navigator.share({
@@ -46,50 +40,17 @@ const Popup = ({ tickets, showing, closeFn }: Props) => {
         handleShare()
         break
       case "download":
-        if (event)
-          await downloadTickets(
-            { ...event, logoFixed: base64Image ?? event?.logoFixed },
-            tickets,
-            true
-          )
+        if (event) await downloadTickets(event, tickets, true)
         break
       default:
         break
     }
   }
 
-  const fetchImage = useCallback(async () => {
-    try {
-      if (event?.logoFixed) {
-        const imageUrl = event?.logoFixed
-        const response = await fetch(imageUrl)
-        const blob = await response.blob()
-
-        const reader = new FileReader()
-        reader.onloadend = () => {
-          const base64data = reader.result?.toString() || ""
-          console.log("BASE64: ", base64data)
-          setBase64Image(base64data)
-        }
-
-        reader.readAsDataURL(blob)
-      }
-    } catch (error) {}
-  }, [])
-
-  useEffect(() => {
-    fetchImage()
-  }, [fetchImage])
-
   return (
     <S.Area $showing={showing}>
       <Container>
         <S.Title>Sua compra</S.Title>
-        <S.TicketsArea>
-          {tickets.map((t) => (
-            <S.TicketCard></S.TicketCard>
-          ))}
-        </S.TicketsArea>
         <S.Footer>
           <S.Button onClick={() => handleButton("download")} $color="blue">
             Baixar

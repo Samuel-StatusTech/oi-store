@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { TTicket } from "../../utils/@types/data/ticket"
+import { TShoppingTicket } from "../../utils/@types/data/ticket"
 import { temporizadorDeCincoMinutos } from "../../utils/tb/timer"
 import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
 import * as S from "./styled"
@@ -31,45 +31,9 @@ const PaymentPix = () => {
   const { event, controllers } = getStore()
 
   const [time, setTime] = useState("05:00")
+  const [sid, setSid] = useState("")
 
-  const [tickets] = useState<TTicket[]>([
-    {
-      id: "id1",
-      code: "ASF789FSDFS7",
-      bucket: "TRN",
-      group_name: "Ingressos",
-      name: "Ticket teste",
-      price_sell: "3500",
-      status: "purchased",
-    },
-    {
-      id: "id2",
-      code: "Q789DS797HJK",
-      bucket: "TRL",
-      group_name: "Ingressos",
-      name: "Ticket teste",
-      price_sell: "3500",
-      status: "purchased",
-    },
-    {
-      id: "id3",
-      code: "S9DASK09WQDK",
-      bucket: "OPK",
-      group_name: "Ingressos",
-      name: "Ticket teste",
-      price_sell: "3500",
-      status: "purchased",
-    },
-    {
-      id: "id4",
-      code: "D909D90D90D9",
-      bucket: "ABC",
-      group_name: "Ingressos",
-      name: "Ticket teste",
-      price_sell: "3500",
-      status: "purchased",
-    },
-  ])
+  const [buyedTickets, setBuyedTickets] = useState<TShoppingTicket[]>([])
 
   const [qrCode, setQrCode] = useState("")
   const [showing, setShowing] = useState(false)
@@ -104,7 +68,7 @@ const PaymentPix = () => {
     })
 
     socket.on("connection", (socket) => {
-      console.log("HERE", socket.id)
+      setSid(socket.id)
     })
 
     socket.on("disconnect", () => {
@@ -211,9 +175,52 @@ const PaymentPix = () => {
     } else navigate("/eventSelect")
   }, [])
 
+  const signPurchase = useCallback(() => {
+    /*
+      await Api.post.signPurchase({ ... })
+    */
+
+    // place data
+
+    let pdfTickets: TShoppingTicket[] = []
+
+    const tickets = (lctn.state.tickets ?? []) as any[]
+
+    tickets.forEach((t) => {
+      pdfTickets.push({
+        id: t.id,
+        name: t.name,
+        batch_name: "Nome do lote",
+        event_name: event?.name as string,
+        qr_data: (t.id as string).toUpperCase(),
+        order_id: sid,
+        date: new Date().toISOString(),
+        image: null,
+        quantity: t.qnt,
+        price_unit: t.price_sell,
+      })
+    })
+
+    setBuyedTickets(pdfTickets)
+  }, [])
+
+  const confirmPurchase = useCallback(() => {
+    /*
+      await Api.post.confirmPurchase({ ... })
+    */
+  }, [])
+
   useEffect(() => {
-    loadEventData()
-    getPBcode()
+    try {
+      loadEventData()
+
+      // sign purchase
+      signPurchase()
+      // get qr_code
+      getPBcode()
+      // confirm purchase
+      confirmPurchase()
+    } catch (error) {}
   }, [loadEventData, getPBcode])
 
   return (
@@ -221,7 +228,11 @@ const PaymentPix = () => {
       <Feedback data={feedback} />
       <Header />
 
-      <Popup tickets={tickets} showing={showing} closeFn={handleClosePopup} />
+      <Popup
+        tickets={buyedTickets}
+        showing={showing}
+        closeFn={handleClosePopup}
+      />
 
       <Container>
         <S.Main>

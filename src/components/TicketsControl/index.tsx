@@ -170,7 +170,10 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
         )}
         <S.BottomFinal>
           <S.Resume>
-            <S.Total>{`Total ${formatMoney(total, true)}`}</S.Total>
+            <S.Total>{`Total ${formatMoney(
+              user ? total : ticketsTotal,
+              true
+            )}`}</S.Total>
           </S.Resume>
           <S.BuyBtn
             onClick={tickets.every((t) => t.qnt === 0) ? undefined : handleBuy}

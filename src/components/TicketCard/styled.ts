@@ -4,9 +4,10 @@ export const Component = styled.div<{ $k: number }>`
   border-radius: 8px;
   overflow: hidden;
   transition: box-shadow 0.3s;
+  cursor: pointer;
   box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.08);
 
-  a {
+  & > div {
     display: flex;
     flex-direction: column;
     text-decoration: none;

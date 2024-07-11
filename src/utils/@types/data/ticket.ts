@@ -13,7 +13,7 @@ export type TCardTicket = {
 }
 
 export type TTicket = {
-  id: number | string
+  id: string
   name: string
   code: string
   bucket?: string
@@ -26,3 +26,17 @@ export type TTicket = {
 }
 
 export type TTicketStatus = "purchased" | "validated" | "expired"
+
+export interface TShoppingTicket {
+  user?: any
+  id: number | string
+  name: string
+  batch_name: string
+  event_name: string
+  qr_data: string
+  order_id: string
+  date: string
+  image: null | string
+  quantity: number
+  price_unit: number
+}

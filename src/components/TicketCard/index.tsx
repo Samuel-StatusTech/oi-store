@@ -1,95 +1,75 @@
-import { TCardTicket, TTicket } from "../../utils/@types/data/ticket"
+import { TCardTicket, TShoppingTicket } from "../../utils/@types/data/ticket"
 import * as S from "./styled"
 
-import { Link } from "react-router-dom"
-import { ReactComponent as DownloadIcon } from "../../assets/icons/download.svg"
-import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
-import downloadTickets from "../../utils/pdf"
-import getStore from "../../store"
 import { useCallback, useEffect, useState } from "react"
-// import { Api } from "../../api"
 
 type Props = {
   data: TCardTicket
   k: number
+  togglePopup: (tickets: TShoppingTicket[]) => void
 }
 
-const TicketCard = ({ k, data }: Props) => {
-  const { event } = getStore()
+const falseTicketsList: TShoppingTicket[] = [
+  {
+    id: "id1",
+    name: "Ticket teste",
+    batch_name: "Mesas VIP",
+    event_name: "Show Roberto Carlos",
+    qr_data: "ASF789FSDFS7",
+    order_id: "AHJW918-FJSJ453-SAJS229",
+    date: new Date().toISOString(),
+    image: null,
+    quantity: 2,
+    price_unit: 4900,
+  },
+  {
+    id: "id2",
+    name: "Ticket teste",
+    batch_name: "Mesas VIP",
+    event_name: "Show Roberto Carlos",
+    qr_data: "ASF789FSDFS7",
+    order_id: "AHJW918-FJSJ453-SAJS229",
+    date: new Date().toISOString(),
+    image: null,
+    quantity: 2,
+    price_unit: 4900,
+  },
+  {
+    id: "id3",
+    name: "Ticket teste",
+    batch_name: "Mesas VIP",
+    event_name: "Show Roberto Carlos",
+    qr_data: "Q789DS797HJK",
+    order_id: "AHJW918-FJSJ453-SAJS229",
+    date: new Date().toISOString(),
+    image: null,
+    quantity: 2,
+    price_unit: 4900,
+  },
+  {
+    id: "id4",
+    name: "Ticket teste",
+    batch_name: "Mesas VIP",
+    event_name: "Show Roberto Carlos",
+    qr_data: "S9DASK09WQDK",
+    order_id: "AHJW918-FJSJ453-SAJS229",
+    date: new Date().toISOString(),
+    image: null,
+    quantity: 2,
+    price_unit: 4900,
+  },
+]
 
-  const [tickets, setTickets] = useState<TTicket[]>([])
+const TicketCard = ({ k, data, togglePopup }: Props) => {
+  const [tickets, setTickets] = useState<TShoppingTicket[]>([])
 
-  const handleCardClick = (e: any) => {
-    e.preventDefault()
-  }
-
-  const handleDownload = async (e: any) => {
-    e.preventDefault()
-
-    if (event) {
-      await downloadTickets(event, tickets, true)
-    }
-  }
-
-  const handleShare = async (e: any) => {
-    e.preventDefault()
-
-    if (navigator.canShare() && event) {
-      try {
-        const file = await downloadTickets(event, tickets)
-
-        if (file instanceof File) {
-          navigator.share({
-            title: `Meus Tickets para ${event.name}`,
-            files: [file],
-          })
-        }
-      } catch (error) {}
-    }
+  const handleCardClick = () => {
+    togglePopup(tickets)
   }
 
   const loadTickets = useCallback(async () => {
     try {
       // const req = await Api.get.ticketsById(data.ticketId)
-
-      const falseTicketsList: TTicket[] = [
-        {
-          id: "id1",
-          code: "ASF789FSDFS7",
-          bucket: "TRN",
-          group_name: "Ingressos",
-          name: "Ticket teste",
-          price_sell: "3500",
-          status: "purchased",
-        },
-        {
-          id: "id2",
-          code: "Q789DS797HJK",
-          bucket: "TRL",
-          group_name: "Ingressos",
-          name: "Ticket teste",
-          price_sell: "3500",
-          status: "purchased",
-        },
-        {
-          id: "id3",
-          code: "S9DASK09WQDK",
-          bucket: "OPK",
-          group_name: "Ingressos",
-          name: "Ticket teste",
-          price_sell: "3500",
-          status: "purchased",
-        },
-        {
-          id: "id4",
-          code: "D909D90D90D9",
-          bucket: "ABC",
-          group_name: "Ingressos",
-          name: "Ticket teste",
-          price_sell: "3500",
-          status: "purchased",
-        },
-      ]
 
       setTickets(falseTicketsList)
     } catch (error) {}
@@ -101,36 +81,20 @@ const TicketCard = ({ k, data }: Props) => {
 
   return (
     <S.Component $k={k}>
-      <Link
-        onClick={handleCardClick}
-        to={data.name.toLowerCase().replace(/\s+/g, "-")}
-        state={{
-          data,
-        }}
-      >
+      <div onClick={handleCardClick}>
         <S.ImageContainer>
           <img src={data.eventBanner} alt={""} />
         </S.ImageContainer>
         <S.EventInfo>
           <S.CardBottom>
             <S.EventName>{data.name}</S.EventName>
-            <S.Icons className="iconsArea">
-              <button onClick={handleDownload}>
-                <DownloadIcon width={24} height={24} />
-              </button>
-              {navigator.canShare && navigator.canShare() && (
-                <button onClick={handleShare}>
-                  <ShareIcon width={24} height={24} />
-                </button>
-              )}
-            </S.Icons>
           </S.CardBottom>
           <S.CardBottom>
             <S.EventDate>{data.price_sell}</S.EventDate>
             <S.TicketsQnt>Tickets: {data.ticketsQnt}</S.TicketsQnt>
           </S.CardBottom>
         </S.EventInfo>
-      </Link>
+      </div>
     </S.Component>
   )
 }
