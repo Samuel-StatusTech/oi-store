@@ -1,4 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom"
+
+import * as jwt from "jwt-decode"
 
 // Pages
 import EventSelect from "../pages/EventSelect"
@@ -7,8 +10,36 @@ import Login from "../pages/Login"
 import MyTickets from "../pages/MyTickets"
 import Payment from "../pages/Payment"
 import PaymentPix from "../pages/PaymentPix"
+import { useEffect } from "react"
+import getStore from "../store"
 
 const Router = () => {
+  const { user } = getStore()
+
+  const checkTokenTime = async () => {
+    if (user) {
+      try {
+        const token = localStorage.getItem("token")
+
+        if (token) {
+          const decoded = jwt.jwtDecode(token)
+
+          if (decoded.exp) {
+            const limit = decoded.exp * 1000
+            const nowTime = new Date().getTime()
+            if (nowTime > limit) {
+              localStorage.removeItem("token")
+            }
+          } else localStorage.removeItem("token")
+        }
+      } catch (error) {}
+    }
+  }
+
+  useEffect(() => {
+    checkTokenTime()
+  }, [])
+
   return (
     <BrowserRouter>
       <Routes>

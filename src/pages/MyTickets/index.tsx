@@ -8,9 +8,12 @@ import TicketCard from "../../components/TicketCard"
 
 import { placeList } from "./placeList"
 import getStore from "../../store"
+import { useNavigate } from "react-router-dom"
 
 const MyTickets = () => {
   const { event } = getStore()
+
+  const navigate = useNavigate()
 
   const [list, setList] = useState<any[]>([])
 
@@ -24,8 +27,10 @@ const MyTickets = () => {
   }, [event?.event_banner])
 
   useEffect(() => {
-    getData()
-  }, [getData])
+    if (!event) navigate("/eventSelect")
+    else getData()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [getData, event])
 
   return (
     <S.Page>

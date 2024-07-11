@@ -44,6 +44,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
 
   const sumValues = () => {
     try {
+      console.log(ticketsList)
       const ticketsTotal = sumTickets(ticketsList)
       const taxesTotal = sumTaxes({
         ticketsTotal,
@@ -63,8 +64,11 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
 
   useEffect(() => {
     loadEventData()
-    sumValues()
   }, [loadEventData])
+
+  useEffect(() => {
+    sumValues()
+  }, [ticketsList])
 
   const getRefreshHour = () => {
     const today = new Date()

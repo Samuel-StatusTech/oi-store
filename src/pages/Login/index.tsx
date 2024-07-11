@@ -35,6 +35,7 @@ const Login = () => {
   useEffect(() => {
     setPhase("phone")
     store.controllers.user.clear()
+    localStorage.removeItem("token")
   }, [])
 
   const fadePhases = () => {

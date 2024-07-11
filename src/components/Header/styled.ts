@@ -23,9 +23,21 @@ export const LogoArea = styled.div`
     align-items: center;
     height: 40px;
     overflow: hidden;
+    text-decoration: none;
 
     img {
       width: 120px;
+    }
+
+    span {
+      color: ${({ theme }) => theme.colors.black.secondary};
+      text-transform: uppercase;
+      font-size: 16px;
+      font-weight: 700;
+
+      &:hover {
+        text-decoration: underline;
+      }
     }
   }
 

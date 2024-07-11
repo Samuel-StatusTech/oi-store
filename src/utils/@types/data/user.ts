@@ -1,4 +1,5 @@
 export type TUser = {
+  token: string
   user_id: string
   dt_nascimento: string | null
   cpf: string

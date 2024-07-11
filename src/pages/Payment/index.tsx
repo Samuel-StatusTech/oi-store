@@ -420,6 +420,7 @@ const Payment = () => {
 
   useEffect(() => {
     setFieldsOk(!!form.buyer.name && !!form.buyer.phone)
+    loadEventData()
   }, [loadEventData, form.buyer])
 
   return (

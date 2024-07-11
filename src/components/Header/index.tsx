@@ -26,22 +26,22 @@ const Header = () => {
       <Container>
         <S.Component>
           <S.LogoArea>
-            {event?.logoFixed && (
-              <Link to={"/eventSelect"}>
+            <Link to={"/eventSelect"}>
+              {event?.logoFixed ? (
                 <img src={event?.logoFixed} alt={event?.corporateName} />
-              </Link>
-            )}
+              ) : (
+                <span>Início</span>
+              )}
+            </Link>
           </S.LogoArea>
           <S.UserArea>
-            {event && (
-              <Link
-                to={user ? "/mytickets" : "/login"}
-                className="myTickets"
-                onClick={(e) => handleBtn(e, user ? "/mytickets" : "/login")}
-              >
-                {user ? "Meus Ingressos" : "Fazer login"}
-              </Link>
-            )}
+            <Link
+              to={user ? "/mytickets" : "/login"}
+              className="myTickets"
+              onClick={(e) => handleBtn(e, user ? "/mytickets" : "/login")}
+            >
+              {user ? "Meus Ingressos" : "Fazer login"}
+            </Link>
           </S.UserArea>
         </S.Component>
       </Container>
