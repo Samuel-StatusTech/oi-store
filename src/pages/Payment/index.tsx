@@ -27,6 +27,7 @@ import getStore from "../../store"
 import { formatCardDate } from "../../utils/masks/date"
 import { formatCardCode } from "../../utils/masks/cardcode"
 import { Api } from "../../api"
+import { sumTaxes, sumTickets } from "../../utils/tb/taxes"
 
 type MProps = {
   checked: boolean
@@ -357,9 +358,17 @@ const Payment = () => {
     const errors = checkErrors()
 
     if (!errors) {
+      const taxes = sumTaxes({
+        ticketsTotal: sumTickets(tickets),
+        adminTax: event?.eCommerce.adminTax,
+        adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
+        adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
+        adminTaxValue: event?.eCommerce.adminTaxValue,
+      })
+
       if (method === "pix")
         navigate("/payment/pix", {
-          state: { tickets: form.tickets, buyer: form.buyer },
+          state: { tickets: form.tickets, buyer: form.buyer, taxTotal: taxes },
         })
       else if (method === "credit") return
     } else {
@@ -379,7 +388,7 @@ const Payment = () => {
       } catch (error) {
         alert("Erro ao carregar os tickets")
       }
-    } else navigate("/")
+    } else navigate("/eventSelect")
   }, [])
 
   useEffect(() => {

@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useCallback } from "react"
+import { useEffect, useCallback, useState } from "react"
 import { formatMoney } from "../../utils/tb/formatMoney"
 import * as S from "./styled"
 
@@ -9,6 +9,8 @@ import Ticket from "../Ticket"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { Api } from "../../api"
 import getStore from "../../store"
+import { sumTaxes, sumTickets } from "../../utils/tb/taxes"
+import { useNavigate } from "react-router-dom"
 
 type Props = {
   datePeriod: string
@@ -17,7 +19,12 @@ type Props = {
 }
 
 const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
+  const navigate = useNavigate()
+
   const { event, controllers } = getStore()
+
+  const [taxes, setTaxes] = useState(0)
+  const [ticketsTotal, setTicketsTotal] = useState(0)
 
   const loadEventData = useCallback(async () => {
     if (event) {
@@ -30,52 +37,34 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
         }
       } catch (error) {
         alert("Erro ao carregar os tickets")
+        navigate("/")
       }
-    }
+    } else navigate("/")
   }, [])
+
+  const sumValues = () => {
+    try {
+      const ticketsTotal = sumTickets(ticketsList)
+      const taxesTotal = sumTaxes({
+        ticketsTotal,
+        adminTax: event?.eCommerce.adminTax,
+        adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
+        adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
+        adminTaxValue: event?.eCommerce.adminTaxValue,
+      })
+
+      setTaxes(taxesTotal)
+      setTicketsTotal(ticketsTotal)
+    } catch (error) {
+      alert("Erro ao carregar os tickets")
+      navigate("/")
+    }
+  }
 
   useEffect(() => {
     loadEventData()
+    sumValues()
   }, [loadEventData])
-
-  const sumTickets = () => {
-    let total = 0
-
-    ticketsList.forEach((t) => {
-      total += t.price_sell * t.qnt
-    })
-
-    return total
-  }
-
-  const sumTaxes = () => {
-    let total = 0
-    const hasTax = event?.eCommerce.adminTax
-    const isTaxAbsolute = event?.eCommerce.adminTaxValue !== 0
-
-    const ticketsTotal = sumTickets()
-
-    if (hasTax) {
-      if (isTaxAbsolute) total = +event?.eCommerce.adminTaxValue
-      else {
-        const percentage = +event?.eCommerce.adminTaxPercentage / 100 / 100
-        const taxMin = +event?.eCommerce.adminTaxMinimum
-        const calculedTax = Math.round(ticketsTotal * percentage)
-
-        const min = Math.max(taxMin, calculedTax)
-        total = min
-      }
-    }
-
-    return total
-  }
-
-  const sumTotal = () => {
-    const ticketsTotal = sumTickets()
-    const taxesTotal = sumTaxes()
-
-    return ticketsTotal + taxesTotal
-  }
 
   const getRefreshHour = () => {
     const today = new Date()
@@ -92,7 +81,14 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
 
     if (event) {
       const minValue = +event.eCommerce.adminTaxMinimum ?? 0
-      const percentTax = sumTaxes()
+      const ticketsTotal = sumTickets(ticketsList)
+      const percentTax = sumTaxes({
+        ticketsTotal,
+        adminTax: event?.eCommerce.adminTax,
+        adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
+        adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
+        adminTaxValue: event?.eCommerce.adminTaxValue,
+      })
 
       str =
         percentTax > minValue
@@ -127,15 +123,15 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
         <S.Total>
           <S.TotalItem>
             <span>Subtotal</span>
-            <span>{formatMoney(sumTickets(), true)}</span>
+            <span>{formatMoney(ticketsTotal, true)}</span>
           </S.TotalItem>
           <S.TotalItem>
             <span>Taxas {renderTaxResume()}</span>
-            <span>{formatMoney(sumTaxes(), true)}</span>
+            <span>{formatMoney(taxes, true)}</span>
           </S.TotalItem>
           <S.TotalItem $main={true}>
             <span>TOTAL</span>
-            <span>{formatMoney(sumTotal(), true)}</span>
+            <span>{formatMoney(ticketsTotal + taxes, true)}</span>
           </S.TotalItem>
         </S.Total>
       </S.Info>

@@ -81,14 +81,55 @@ export const Tickets = styled.div`
 
 export const Bottom = styled.div`
   display: flex;
+  flex-direction: column;
+  padding: 12px;
+  gap: 12px;
+`
+
+export const BottomFinal = styled.div`
+  display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px;
 
   @media (max-width: 340px) {
     flex-direction: column;
     align-items: flex-start;
     gap: 24px;
+  }
+`
+
+export const TaxesResume = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  span {
+    opacity: 0;
+    ${({ theme }) =>
+      theme.animations.types.fadeLeft +
+      theme.animations.durations.main +
+      theme.animations.delays.main(2)}
+  }
+`
+
+export const TaxResume = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+
+  span {
+    opacity: 0;
+    font-size: 16px;
+    color: ${({ theme }) => theme.colors.blue.darker};
+    ${({ theme }) =>
+      theme.animations.types.fadeLeft +
+      theme.animations.durations.main +
+      theme.animations.delays.main(2)}
+
+    &:nth-child(2) {
+      width: 120px;
+    }
   }
 `
 
@@ -123,7 +164,7 @@ export const BuyBtn = styled.button`
   background: ${({ theme }) => theme.colors.green.main};
   border: none;
   outline: none;
-  padding: 0.6rem 1.4rem;
+  padding: 0.6rem 2.1rem;
   border-radius: 4px;
   color: ${({ theme }) => theme.colors.white.main};
   font-weight: 500;

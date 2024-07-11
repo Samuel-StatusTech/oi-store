@@ -114,11 +114,6 @@ const PaymentPix = () => {
     })
 
     // let f = { ...feedback }
-    let f = {
-      state: "PAID",
-      visible: true,
-      message: "Pagamento recebido. Você já pode ver sua compra",
-    }
 
     // socket.on("orderUpdate", (data) => {
     // console.log("Here", data, paymentValue)
@@ -130,17 +125,6 @@ const PaymentPix = () => {
     //   getOrderData()
     //   instanceSocket()
     // }
-
-    setTimeout(() => {
-      setFeedback(f)
-
-      setTimeout(() => {
-        setFeedback({ ...f, visible: false })
-        setTimeout(() => {
-          setPayed(true)
-        }, 400)
-      }, 3500)
-    }, 4000)
     // }
 
     // monitor minors payments ?
@@ -155,6 +139,7 @@ const PaymentPix = () => {
       const orderData = getOrderData({
         tickets: lctn.state.tickets,
         buyer: lctn.state.buyer,
+        taxTotal: lctn.state.taxTotal ?? 0,
       })
 
       if (orderData) {
@@ -183,6 +168,28 @@ const PaymentPix = () => {
     setInterval(() => {
       setTime(timer.tempoAtualFormatado())
     }, 1000)
+
+    let f = {
+      state: "PAID",
+      visible: true,
+      message: "Pagamento recebido. Você já pode ver sua compra",
+    }
+
+    setTimeout(() => {
+      setFeedback(f)
+
+      setTimeout(() => {
+        setFeedback({ ...f, visible: false })
+        setTimeout(() => {
+          setPayed(true)
+        }, 400)
+      }, 3500)
+    }, 4000)
+  }
+
+  const handleClosePopup = () => {
+    setShowing(false)
+    navigate("/")
   }
 
   const loadEventData = useCallback(async () => {
@@ -195,13 +202,13 @@ const PaymentPix = () => {
           controllers.event.setData(data)
         } else {
           alert("Erro ao carregar as informações do evento")
-          navigate("/")
+          navigate("/eventSelect")
         }
       } catch (error) {
         alert("Erro ao carregar as informações do evento")
-        navigate("/")
+        navigate("/eventSelect")
       }
-    } else navigate("/")
+    } else navigate("/eventSelect")
   }, [])
 
   useEffect(() => {
@@ -214,11 +221,7 @@ const PaymentPix = () => {
       <Feedback data={feedback} />
       <Header />
 
-      <Popup
-        tickets={tickets}
-        showing={showing}
-        closeFn={() => setShowing(false)}
-      />
+      <Popup tickets={tickets} showing={showing} closeFn={handleClosePopup} />
 
       <Container>
         <S.Main>

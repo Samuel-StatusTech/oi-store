@@ -13,12 +13,9 @@ const Router = () => {
     <BrowserRouter>
       <Routes>
         <Route path="/">
-          <Route path="" element={<EventSelect />} />
+          <Route path="" element={<Home />} />
           <Route path="login" element={<Login />} />
-          {/* <Route element={<AuthRoute />}> */}
-          <Route path="event">
-            <Route path=":eventId" element={<Home />} />
-          </Route>
+          <Route path="eventSelect" element={<EventSelect />} />
           <Route path="mytickets">
             <Route path="" element={<MyTickets />} />
           </Route>
@@ -26,7 +23,6 @@ const Router = () => {
             <Route path="" element={<Payment />} />
             <Route path="pix" element={<PaymentPix />} />
           </Route>
-          {/* </Route> */}
           <Route path="*" element={<Navigate to={"/"} />} />
         </Route>
       </Routes>

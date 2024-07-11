@@ -35,7 +35,7 @@ const Home = () => {
       } catch (error) {
         alert("Erro ao carregar os tickets")
       }
-    } else navigate("/")
+    } else navigate("/eventSelect")
   }, [])
 
   const fetchTickets = useCallback(async () => {

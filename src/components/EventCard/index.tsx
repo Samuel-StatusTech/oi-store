@@ -14,8 +14,6 @@ const EventCard = ({ k, data }: Props) => {
   const store = getStore()
   const navigate = useNavigate()
 
-  const finalUrl = `/event/${data.name.toLowerCase().replace(/\s+/g, "-")}`
-
   const setEvent = async (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>
   ) => {
@@ -26,7 +24,7 @@ const EventCard = ({ k, data }: Props) => {
 
       if (req.ok) {
         store.controllers.event.setData(req.data)
-        navigate(finalUrl)
+        navigate("/")
       } else {
         alert(
           "Houve um erro ao selecionar o evento. Tente novamente mais tarde"
@@ -39,7 +37,7 @@ const EventCard = ({ k, data }: Props) => {
 
   return (
     <S.Component $k={k}>
-      <Link onClick={setEvent} to={finalUrl} state={{ eventId: data.id }}>
+      <Link onClick={setEvent} to={"/"}>
         <S.ImageContainer>
           <img src={data.banner ?? ""} alt={""} />
         </S.ImageContainer>
