@@ -27,7 +27,7 @@ const Header = () => {
         <S.Component>
           <S.LogoArea>
             {event?.logoFixed && (
-              <Link to={"/"}>
+              <Link to={"/eventSelect"}>
                 <img src={event?.logoFixed} alt={event?.corporateName} />
               </Link>
             )}

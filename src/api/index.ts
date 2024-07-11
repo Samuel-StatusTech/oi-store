@@ -48,13 +48,31 @@ const getEvents: TApi["get"]["events"] = async () => {
     try {
       await axios
         .get(`event/getSelect?status=ativo`)
-        .then((res) => {
+        .then(async (res) => {
           const info = res.data.events
+
+          let eventsWithImages: any[] = []
+          let promises: Promise<any>[] = []
+
+          info.forEach(async (ev: any) => {
+            promises.push(
+              getEventInfo({ eventId: ev.id }).then((res) => {
+                if (res.ok) {
+                  eventsWithImages.push({
+                    ...ev,
+                    logo: res.data.event_banner ?? ev.logo,
+                  })
+                }
+              })
+            )
+          })
+
+          await Promise.all(promises)
 
           if (info) {
             resolve({
               ok: true,
-              data: info,
+              data: eventsWithImages,
             })
           } else {
             reject({
