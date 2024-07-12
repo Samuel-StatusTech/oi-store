@@ -234,18 +234,26 @@ const PaymentPix = () => {
   }
 
   const handleShare = async () => {
-    if (navigator.canShare && navigator.canShare() && event) {
-      try {
+    try {
+      if (event) {
         const file = await downloadTickets(event, buyedTickets)
 
         if (file instanceof File) {
-          navigator.share({
-            title: `Meus Tickets para ${event.name}`,
-            files: [file],
-          })
+          if (
+            navigator.canShare &&
+            navigator.canShare({
+              title: `Meus Tickets para ${event.name}`,
+              files: [file],
+            })
+          ) {
+            navigator.share({
+              title: `Meus Tickets para ${event.name}`,
+              files: [file],
+            })
+          }
         }
-      } catch (error) {}
-    }
+      }
+    } catch (error) {}
   }
 
   const keepShopping = () => {

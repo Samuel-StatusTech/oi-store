@@ -17,18 +17,26 @@ const Popup = ({ tickets, showing, closeFn }: Props) => {
   const handleShare = async (e?: any) => {
     e?.preventDefault()
 
-    if (navigator.canShare && navigator.canShare() && event) {
-      try {
+    try {
+      if (event) {
         const file = await downloadTickets(event, tickets)
 
         if (file instanceof File) {
-          navigator.share({
-            title: `Meus Tickets para ${event.name}`,
-            files: [file],
-          })
+          if (
+            navigator.canShare &&
+            navigator.canShare({
+              title: `Meus Tickets para ${event.name}`,
+              files: [file],
+            })
+          ) {
+            navigator.share({
+              title: `Meus Tickets para ${event.name}`,
+              files: [file],
+            })
+          }
         }
-      } catch (error) {}
-    }
+      }
+    } catch (error) {}
   }
 
   const handleButton = async (role: "download" | "share" | "close") => {
