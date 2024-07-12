@@ -10,16 +10,18 @@ export const Page = styled.div`
 `
 
 export const LogoContainer = styled.div`
-  display: grid;
-  place-items: center;
+  display: flex;
+  align-items: center;
   max-width: 360px;
-  max-height: 180px;
+  height: fit-content;
   overflow: hidden;
+  max-height: 180px;
   margin: -140px 24px 0;
 
   img {
     width: 100%;
     opacity: 0;
+    object-fit: cover;
     ${({ theme }) =>
       theme.animations.types.fadeTop +
       theme.animations.durations.main +
@@ -27,7 +29,7 @@ export const LogoContainer = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
-    max-width: unset;
+    max-width: calc(100% - 48px);
     width: 100%;
   }
 `

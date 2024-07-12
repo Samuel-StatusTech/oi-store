@@ -14,45 +14,38 @@ const downloadTickets = async (
   pdfMake.vfs = pdfFonts.pdfMake.vfs
 
   return new Promise(async (resolve) => {
-    const filename = `Meus Tickets para ${eventData.name.trim()}.pdf`
+    try {
+      const filename = `Meus Tickets para ${eventData.name.trim()}.pdf`
 
-    let logo = ""
+      let logo = ""
 
-    const docDefs: TDocumentDefinitions = {
-      images: {
-        logo: {
-          url: logo,
+      const docDefs: TDocumentDefinitions = {
+        images: {
+          logo: {
+            url: logo,
+          },
         },
-      },
-      pageSize: "A4",
-      pageMargins: [38, 80, 38, 40],
-      header:
-        eventData.logo && !!logo
-          ? ([{ ...reportTitle[0], image: "logo" }] as Content)
-          : undefined,
-      content: [...content(eventData, tickets)],
-      footer: [footer(eventData)] as Content,
-      styles: styles,
-    }
-
-    const pdf = pdfMake.createPdf(docDefs)
-
-    if (shouldDownload) pdf.download(filename)
-    else {
-      let blobInfo: any = undefined
-
-      pdf.getBlob((blobData) => (blobInfo = blobData))
-
-      if (blobInfo instanceof Blob) {
-        let blob: Blob = blobInfo
-
-        const file = new File([blob], filename, { type: "application/pdf" })
-
-        console.log(file)
-
-        resolve(file)
+        pageSize: "A4",
+        pageMargins: [38, 80, 38, 40],
+        header:
+          eventData.logo && !!logo
+            ? ([{ ...reportTitle[0], image: "logo" }] as Content)
+            : undefined,
+        content: [...content(eventData, tickets)],
+        footer: [footer(eventData)] as Content,
+        styles: styles,
       }
-    }
+
+      const pdf = pdfMake.createPdf(docDefs)
+
+      if (shouldDownload) pdf.download(filename)
+      else {
+        pdf.getBlob((blob) => {
+          const file = new File([blob], filename, { type: "application/pdf" })
+          resolve(file)
+        })
+      }
+    } catch (error) {}
   })
 }
 

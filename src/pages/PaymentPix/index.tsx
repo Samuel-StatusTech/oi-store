@@ -24,7 +24,6 @@ import location from "../../assets/icons/pin.png"
 import getStore from "../../store"
 import { Api } from "../../api"
 import io from "socket.io-client"
-import Popup from "../../components/PopUp"
 import { getOrderData } from "../../utils/tb/order"
 import downloadTickets from "../../utils/pdf"
 
@@ -40,7 +39,6 @@ const PaymentPix = () => {
   const [buyedTickets, setBuyedTickets] = useState<TShoppingTicket[]>([])
 
   const [qrCode, setQrCode] = useState("")
-  const [showing, setShowing] = useState(false)
   const [feedback, setFeedback] = useState<any>({
     visible: false,
     message: "",
@@ -155,11 +153,6 @@ const PaymentPix = () => {
     }, 4000)
   }
 
-  const handleClosePopup = () => {
-    setShowing(false)
-    navigate("/")
-  }
-
   const loadEventData = useCallback(async () => {
     if (event) {
       try {
@@ -239,17 +232,13 @@ const PaymentPix = () => {
         const file = await downloadTickets(event, buyedTickets)
 
         if (file instanceof File) {
-          if (
-            navigator.canShare &&
-            navigator.canShare({
-              title: `Meus Tickets para ${event.name}`,
-              files: [file],
-            })
-          ) {
-            navigator.share({
-              title: `Meus Tickets para ${event.name}`,
-              files: [file],
-            })
+          const data = {
+            title: `Meus Tickets para ${event.name}`,
+            files: [file],
+          }
+
+          if (navigator.canShare && navigator.canShare(data)) {
+            navigator.share(data)
           }
         }
       }
@@ -264,12 +253,6 @@ const PaymentPix = () => {
     <S.Page>
       <Feedback data={feedback} />
       <Header />
-
-      <Popup
-        tickets={buyedTickets}
-        showing={showing}
-        closeFn={handleClosePopup}
-      />
 
       <Container>
         <S.Main>
