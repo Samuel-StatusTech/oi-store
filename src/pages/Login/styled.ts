@@ -17,11 +17,11 @@ export const Page = styled.div`
 export const LogoContainer = styled.div`
   display: flex;
   align-items: center;
-  max-width: 360px;
+  max-width: 320px;
   height: fit-content;
   overflow: hidden;
   max-height: 180px;
-  margin: 0 24px;
+  margin: 0 32px;
 
   img {
     width: 80%;
@@ -35,7 +35,7 @@ export const LogoContainer = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
-    max-width: calc(100% - 48px);
+    max-width: calc(100% - 64px);
     width: 100%;
   }
 `
@@ -48,7 +48,7 @@ export const FormArea = styled.div`
   border-radius: 16px;
   box-shadow: 0 4px 16px 4px rgba(0, 0, 0, 0.1);
   background-color: #fff;
-  max-width: 360px;
+  max-width: 320px;
   width: 100%;
   opacity: 0;
   ${({ theme }) =>
@@ -60,9 +60,9 @@ export const FormArea = styled.div`
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
     box-shadow: unset;
-    margin: 24px;
+    margin: 0 32px;
     border: 2px solid rgb(200, 200, 200, 0.5);
-    max-width: calc(100% - 48px);
+    max-width: calc(100% - 64px);
     box-sizing: border-box;
   }
 `
@@ -71,6 +71,7 @@ export const FormTitle = styled.h1`
   text-align: left;
   font-size: 20px;
   font-weight: 600;
+  color: #001e27;
   opacity: 0;
   ${({ theme }) =>
     theme.animations.types.fadeRight +
@@ -165,7 +166,7 @@ export const Label = styled.label<{ $k?: number }>`
 export const CodeArea = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 36px;
+  gap: 42px;
 
   & > label > span {
     font-weight: 600;
@@ -208,7 +209,7 @@ export const Button = styled.button`
   cursor: pointer;
   outline: none;
   border: none;
-  background-color: ${({ theme }) => theme.colors.blue.main};
+  background-color: #001e27;
   box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0);
   transition: opacity 0.3s, box-shadow 0.3s, background-color 0.3s,
     background-color 0.3s, filter 0.3s;
@@ -221,12 +222,11 @@ export const Button = styled.button`
     theme.animations.delays.main(5)}
 
   &:hover {
-    background-color: #003bdc;
     box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.24);
   }
 
   &:disabled {
-    filter: saturate(0);
+    background-color: #ccc;
     cursor: unset;
   }
 `

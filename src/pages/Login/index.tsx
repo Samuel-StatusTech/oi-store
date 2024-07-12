@@ -197,15 +197,14 @@ const Login = () => {
           <S.Phase $changing={changing}>
             <S.MessageArea>
               <S.Message $failed={failedCODE}>
-                Caso o telefone ({phone}) esteja cadastro em nossa base você vai
-                receber um SMS. Digite abaixo o código recebido
+                Digite abaixo o código enviado para o seu celular
               </S.Message>
               <S.Message $error={true} $failed={failedCODE}>
                 Numero de telefone ou código invalidos
               </S.Message>
             </S.MessageArea>
             <S.CodeArea>
-              <S.Label>
+              <S.Label className="code">
                 <span>Código</span>
               </S.Label>
               <S.MultipleInputs>{renderCodeFields()}</S.MultipleInputs>
