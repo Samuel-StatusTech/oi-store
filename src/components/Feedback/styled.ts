@@ -25,5 +25,15 @@ export const Box = styled.div<{
   span {
     font-size: 12px;
     color: ${({ theme }) => theme.colors.white.main};
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
+    padding: 6px 32px;
+
+    span {
+      white-space: pre-line;
+    }
   }
 `

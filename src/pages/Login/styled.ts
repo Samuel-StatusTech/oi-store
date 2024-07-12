@@ -10,12 +10,12 @@ export const Page = styled.div`
 `
 
 export const LogoContainer = styled.div`
-  margin-top: -140px;
   display: grid;
   place-items: center;
   max-width: 360px;
   max-height: 180px;
   overflow: hidden;
+  margin: -140px 24px 0;
 
   img {
     width: 100%;
@@ -43,6 +43,12 @@ export const FormArea = styled.div`
     theme.animations.delays.main()}
   height: fit-content;
   transition: height 0.3s;
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    box-shadow: unset;
+    margin: 24px;
+    border: 2px solid rgb(200, 200, 200, 0.5);
+  }
 `
 
 export const FormTitle = styled.h1`
@@ -120,14 +126,15 @@ export const Label = styled.label<{ $k?: number }>`
   span {
     position: absolute;
     left: 6px;
-    top: 4px;
+    top: 10px;
     font-size: 16px;
     transition: transform 0.3s, font-size 0.3s;
+    color: rgb(150, 150, 150);
   }
 
   input:focus + span,
   input:not(:placeholder-shown) + span {
-    transform: translateY(-24px);
+    transform: translateY(-34px);
     font-size: 14px;
   }
 `
@@ -151,7 +158,7 @@ export const MultipleInputs = styled.div`
 export const Input = styled.input<{ $small?: boolean }>`
   border: 1px solid #ccc;
   outline: none;
-  padding: 6px;
+  padding: 12px 6px;
   font-size: 16px;
   color: ${({ theme }) => theme.colors.black.secondary};
   border-radius: 4px;
@@ -172,7 +179,7 @@ export const Input = styled.input<{ $small?: boolean }>`
 
 export const Button = styled.button`
   border-radius: 4px;
-  padding: 0.6rem 2.2rem;
+  padding: 1rem 2.4rem;
   width: fit-content;
   margin: auto;
   cursor: pointer;
@@ -183,6 +190,7 @@ export const Button = styled.button`
   transition: opacity 0.3s, box-shadow 0.3s, background-color 0.3s,
     background-color 0.3s, filter 0.3s;
   color: #fff;
+  font-size: 16px;
   opacity: 0;
   ${({ theme }) =>
     theme.animations.types.fadeRight +
@@ -197,8 +205,5 @@ export const Button = styled.button`
   &:disabled {
     filter: saturate(0);
     cursor: unset;
-
-    &:hover {
-    }
   }
 `

@@ -199,20 +199,82 @@ export const PixTime = styled.div`
   }
 `
 
-export const Button = styled.button<{ $content?: boolean }>`
+export const Button = styled.button<{
+  $outlined?: boolean
+  $content?: boolean
+}>`
   outline: none;
-  background-color: ${({ theme }) => theme.colors.blue.main};
-  border: none;
+  background-color: ${({ $outlined, theme }) =>
+    !$outlined ? theme.colors.blue.main : "transparent"};
+  border: ${({ $outlined, theme }) =>
+    $outlined ? `1px solid ${theme.colors.blue.main}` : "none"};
   cursor: pointer;
   padding: 0.6rem 1.4rem;
   border-radius: 4px;
-  color: #fff;
+  color: ${({ $outlined, theme }) =>
+    $outlined ? theme.colors.blue.main : theme.colors.white.main};
+  font-size: ${({ $outlined }) => ($outlined ? 16 : 14)}px;
   text-align: center;
   width: ${({ $content }) => ($content ? "fit-content" : "100%")};
-  transition: box-shadow 0.3s;
+  transition: box-shadow 0.3s, background-color 0.3s;
   margin: ${({ $content }) => ($content ? "auto" : "unset")};
 
-  &:hover {
-    box-shadow: 0 2px 8px 2px rgba(0, 0, 0, 0.24);
+  &:hover,
+  &:active {
+    ${({ $outlined, theme }) =>
+      !$outlined
+        ? "box-shadow: 0 2px 8px 2px rgba(0, 0, 0, 0.24);"
+        : `background-color: ${theme.colors.blue.main};`}
   }
+`
+
+export const Icons = styled.div`
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+  opacity: 0;
+  transition: opacity 0.3s;
+
+  div {
+    background: none;
+    border: none;
+    outline: none;
+    padding: 4px;
+    border-radius: 4px;
+    transition: background-color 0.3s;
+    cursor: pointer;
+    width: fit-content;
+    min-width: 42px;
+    min-height: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+
+    svg {
+      width: 36px;
+      height: 36px;
+    }
+
+    span {
+      font-size: 14px;
+      color: ${({ theme }) => theme.colors.blue.main};
+    }
+
+    &:hover {
+      background-color: #eee;
+    }
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    opacity: 1;
+  }
+`
+
+export const PayedArea = styled.div`
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
 `

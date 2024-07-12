@@ -12,6 +12,9 @@ import Container from "../../components/Container"
 import BlockInfo from "../../components/BlockInfo"
 import Feedback from "../../components/Feedback"
 
+import { ReactComponent as DownloadIcon } from "../../assets/icons/download.svg"
+import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
+
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import QRCode from "qrcode.react"
 import loadingAnimation from "../../assets/animations/loading"
@@ -23,6 +26,7 @@ import { Api } from "../../api"
 import io from "socket.io-client"
 import Popup from "../../components/PopUp"
 import { getOrderData } from "../../utils/tb/order"
+import downloadTickets from "../../utils/pdf"
 
 const PaymentPix = () => {
   const lctn = useLocation()
@@ -136,7 +140,7 @@ const PaymentPix = () => {
     let f = {
       state: "PAID",
       visible: true,
-      message: "Pagamento recebido. Você já pode ver sua compra",
+      message: "Pagamento recebido.\nVocê já pode ver sua compra",
     }
 
     setTimeout(() => {
@@ -211,6 +215,8 @@ const PaymentPix = () => {
   }, [])
 
   useEffect(() => {
+    window.scrollTo({ top: 0 })
+
     try {
       loadEventData()
 
@@ -222,6 +228,29 @@ const PaymentPix = () => {
       confirmPurchase()
     } catch (error) {}
   }, [loadEventData, getPBcode])
+
+  const handleDownload = async () => {
+    if (event) await downloadTickets(event, buyedTickets, true)
+  }
+
+  const handleShare = async () => {
+    if (navigator.canShare() && event) {
+      try {
+        const file = await downloadTickets(event, buyedTickets)
+
+        if (file instanceof File) {
+          navigator.share({
+            title: `Meus Tickets para ${event.name}`,
+            files: [file],
+          })
+        }
+      } catch (error) {}
+    }
+  }
+
+  const keepShopping = () => {
+    navigate("/")
+  }
 
   return (
     <S.Page>
@@ -237,7 +266,9 @@ const PaymentPix = () => {
       <Container>
         <S.Main>
           <S.Block $k={1}>
-            <S.BlockTitle $k={3}>Pedido iniciado</S.BlockTitle>
+            <S.BlockTitle $k={3}>
+              Pedido {payed ? "realizado" : "iniciado"}
+            </S.BlockTitle>
 
             <S.EventInfo>
               {event?.event_banner && (
@@ -299,9 +330,25 @@ const PaymentPix = () => {
             </S.BlockTitle>
 
             {payed ? (
-              <S.Button $content={true} onClick={() => setShowing(true)}>
-                Abrir pedido
-              </S.Button>
+              <S.PayedArea>
+                <S.Icons className="iconsArea">
+                  <div onClick={handleDownload}>
+                    <DownloadIcon />
+                    <span>Baixar</span>
+                  </div>
+                  <div onClick={handleShare}>
+                    <ShareIcon />
+                    <span>Enviar</span>
+                  </div>
+                </S.Icons>
+                <S.Button
+                  $outlined={true}
+                  $content={true}
+                  onClick={keepShopping}
+                >
+                  Comprar mais
+                </S.Button>
+              </S.PayedArea>
             ) : (
               <S.PixArea>
                 <S.PixInstructions>

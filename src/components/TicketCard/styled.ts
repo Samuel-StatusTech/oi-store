@@ -1,13 +1,15 @@
 import styled from "styled-components"
 
 export const Component = styled.div<{ $k: number }>`
+  display: flex;
+  flex-direction: column;
   border-radius: 8px;
   overflow: hidden;
   transition: box-shadow 0.3s;
-  cursor: pointer;
   box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.08);
 
   & > div {
+    flex: 1;
     display: flex;
     flex-direction: column;
     text-decoration: none;
@@ -35,7 +37,6 @@ export const ImageContainer = styled.div`
   overflow: hidden;
   display: flex;
   align-items: center;
-  height: 100%;
 
   img {
     min-height: 100%;
@@ -44,8 +45,10 @@ export const ImageContainer = styled.div`
 `
 
 export const EventInfo = styled.div`
+  flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   gap: 24px;
   padding: 12px;
 `
@@ -61,6 +64,12 @@ export const CardBottom = styled.div`
   justify-content: space-between;
   align-items: center;
 
+  &:nth-child(1) {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+
   @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
     flex-direction: column;
     align-items: flex-start;
@@ -75,14 +84,31 @@ export const Icons = styled.div`
   opacity: 0;
   transition: opacity 0.3s;
 
-  button {
+  div {
     background: none;
     border: none;
     outline: none;
     padding: 4px;
-    border-radius: 2px;
+    border-radius: 4px;
     transition: background-color 0.3s;
     cursor: pointer;
+    width: fit-content;
+    min-width: 42px;
+    min-height: 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+
+    svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    span {
+      font-size: 11px;
+      color: ${({ theme }) => theme.colors.blue.main};
+    }
 
     &:hover {
       background-color: #eee;
@@ -90,6 +116,8 @@ export const Icons = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    opacity: 1;
+
     button {
       opacity: 1;
     }
@@ -99,6 +127,7 @@ export const Icons = styled.div`
 export const EventDate = styled.span`
   font-size: 14px;
   color: #bbb;
+  white-space: nowrap;
 `
 
 export const TicketsQnt = styled.span`

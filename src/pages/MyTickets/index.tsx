@@ -9,8 +9,6 @@ import TicketCard from "../../components/TicketCard"
 import { placeList } from "./placeList"
 import getStore from "../../store"
 import { useNavigate } from "react-router-dom"
-import Popup from "../../components/PopUp"
-import { TShoppingTicket } from "../../utils/@types/data/ticket"
 
 const MyTickets = () => {
   const { event } = getStore()
@@ -18,8 +16,6 @@ const MyTickets = () => {
   const navigate = useNavigate()
 
   const [list, setList] = useState<any[]>([])
-  const [popupList, setTicketPopup] = useState<TShoppingTicket[]>([])
-  const [showing, setShowing] = useState(false)
 
   const getData = useCallback(() => {
     setList(
@@ -39,11 +35,6 @@ const MyTickets = () => {
   return (
     <S.Page>
       <Header />
-      <Popup
-        tickets={popupList}
-        showing={showing}
-        closeFn={() => setShowing(false)}
-      />
 
       <Container fullHeight={true}>
         <S.Main>
@@ -51,15 +42,7 @@ const MyTickets = () => {
 
           <S.List>
             {list.map((ticket, k) => (
-              <TicketCard
-                k={k}
-                key={k}
-                data={ticket}
-                togglePopup={(list) => {
-                  setTicketPopup(list)
-                  setShowing(true)
-                }}
-              />
+              <TicketCard k={k} key={k} data={ticket} />
             ))}
           </S.List>
         </S.Main>

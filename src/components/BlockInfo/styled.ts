@@ -13,7 +13,7 @@ export const Component = styled.div<{ $k?: number }>`
         theme.animations.delays.main($k)
       : ""}
 
-  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+  @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
     flex-direction: column;
     gap: 12px;
   }

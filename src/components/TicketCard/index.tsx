@@ -1,12 +1,16 @@
+import { useCallback, useEffect, useState } from "react"
 import { TCardTicket, TShoppingTicket } from "../../utils/@types/data/ticket"
 import * as S from "./styled"
 
-import { useCallback, useEffect, useState } from "react"
+import { ReactComponent as DownloadIcon } from "../../assets/icons/download.svg"
+import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
+
+import getStore from "../../store"
+import downloadTickets from "../../utils/pdf"
 
 type Props = {
   data: TCardTicket
   k: number
-  togglePopup: (tickets: TShoppingTicket[]) => void
 }
 
 const falseTicketsList: TShoppingTicket[] = [
@@ -60,12 +64,10 @@ const falseTicketsList: TShoppingTicket[] = [
   },
 ]
 
-const TicketCard = ({ k, data, togglePopup }: Props) => {
-  const [tickets, setTickets] = useState<TShoppingTicket[]>([])
+const TicketCard = ({ k, data }: Props) => {
+  const { event } = getStore()
 
-  const handleCardClick = () => {
-    togglePopup(tickets)
-  }
+  const [tickets, setTickets] = useState<TShoppingTicket[]>([])
 
   const loadTickets = useCallback(async () => {
     try {
@@ -79,18 +81,53 @@ const TicketCard = ({ k, data, togglePopup }: Props) => {
     loadTickets()
   }, [loadTickets])
 
+  const handleDownload = async () => {
+    if (event) await downloadTickets(event, tickets, true)
+  }
+
+  const handleShare = async () => {
+    if (navigator.canShare() && event) {
+      try {
+        const file = await downloadTickets(event, tickets)
+
+        if (file instanceof File) {
+          navigator.share({
+            title: `Meus Tickets para ${event.name}`,
+            files: [file],
+          })
+        }
+      } catch (error) {}
+    }
+  }
+
+  const renderBtns = () => (
+    <S.Icons className="iconsArea">
+      <div onClick={handleDownload}>
+        <DownloadIcon />
+        <span>Baixar</span>
+      </div>
+      <div onClick={handleShare}>
+        <ShareIcon />
+        <span>Enviar</span>
+      </div>
+    </S.Icons>
+  )
+
+  const renderPrice = () => <S.EventDate>{data.price_sell}</S.EventDate>
+
   return (
     <S.Component $k={k}>
-      <div onClick={handleCardClick}>
+      <div>
         <S.ImageContainer>
           <img src={data.eventBanner} alt={""} />
         </S.ImageContainer>
         <S.EventInfo>
           <S.CardBottom>
             <S.EventName>{data.name}</S.EventName>
+            {renderPrice()}
           </S.CardBottom>
           <S.CardBottom>
-            <S.EventDate>{data.price_sell}</S.EventDate>
+            {renderBtns()}
             <S.TicketsQnt>Tickets: {data.ticketsQnt}</S.TicketsQnt>
           </S.CardBottom>
         </S.EventInfo>

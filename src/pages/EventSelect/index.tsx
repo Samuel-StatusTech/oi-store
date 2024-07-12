@@ -9,6 +9,8 @@ import EventCard from "../../components/EventCard"
 import { Api } from "../../api"
 import { parseList } from "../../utils/tb/parseList"
 import getStore from "../../store"
+import { DotLottieReact } from "@lottiefiles/dotlottie-react"
+import loadingAnimation from "../../assets/animations/loading"
 
 const EventSelect = () => {
   const store = getStore()
@@ -39,11 +41,22 @@ const EventSelect = () => {
         <S.Main>
           <S.PageTitle>Eventos</S.PageTitle>
 
-          <S.List>
-            {list.map((ticket, k) => (
-              <EventCard k={k} key={k} data={ticket} />
-            ))}
-          </S.List>
+          {list.length === 0 ? (
+            <div style={{ width: 256, margin: "auto" }}>
+              <DotLottieReact
+                data={loadingAnimation}
+                loop
+                autoplay
+                width={"100%"}
+              />
+            </div>
+          ) : (
+            <S.List>
+              {list.map((ticket, k) => (
+                <EventCard k={k} key={k} data={ticket} />
+              ))}
+            </S.List>
+          )}
         </S.Main>
       </Container>
 

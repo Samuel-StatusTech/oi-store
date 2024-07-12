@@ -179,6 +179,7 @@ const Login = () => {
               <S.Label $k={3}>
                 <S.Input
                   id={"phoneInput"}
+                  className={"phoneInput"}
                   type={"text"}
                   value={phone}
                   onKeyDown={(e) => {
