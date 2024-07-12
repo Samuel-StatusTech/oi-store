@@ -135,7 +135,7 @@ export const Message = styled.span<{ $error?: boolean; $failed: boolean }>`
 
   position: ${({ $error }) => ($error ? "absolute" : "relative")};
   ${({ $error }) =>
-    $error ? "top: 50%; left: 50%; transform: translate(-50%, -100%);" : ""}
+    $error ? "top: 50%; left: 50%; transform: translate(-50%, -50%);" : ""}
 `
 
 export const Label = styled.label<{ $k?: number }>`

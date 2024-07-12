@@ -200,7 +200,7 @@ const Login = () => {
                 Digite abaixo o código enviado para o seu celular
               </S.Message>
               <S.Message $error={true} $failed={failedCODE}>
-                Numero de telefone ou código invalidos
+                Número de telefone ou código invalidos
               </S.Message>
             </S.MessageArea>
             <S.CodeArea>
