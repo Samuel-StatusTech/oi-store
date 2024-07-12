@@ -18,7 +18,7 @@ const downloadTickets = async (
 
     // File
 
-    const filename = `Meus Tickets para ${eventData.name}.pdf`
+    const filename = `Meus Tickets para ${eventData.name.trim()}.pdf`
 
     let logo = ""
 
@@ -47,9 +47,11 @@ const downloadTickets = async (
       let blob: null | Blob = null
       pdf.getBlob((blobData) => (blob = blobData))
 
-      return resolve(new File([blob as unknown as Blob], filename, {
-        type: "application/pdf"
-      }))
+      return resolve(
+        new File([blob as unknown as Blob], filename, {
+          type: (blob as unknown as Blob).type,
+        })
+      )
     }
   })
 }
