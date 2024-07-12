@@ -218,15 +218,21 @@ export const Label = styled.label`
 export const Input = styled.input`
   border: 1px solid #ccc;
   outline: none;
-  padding: 6px;
+  padding: 12px 6px;
   font-size: 16px;
   color: ${({ theme }) => theme.colors.black.secondary};
   border-radius: 4px;
   width: 100%;
   transition: border-color 0.3s;
+  box-sizing: border-box;
 
   &:focus {
     border: 1px solid ${({ theme }) => theme.colors.blue.main};
+  }
+
+  &:disabled {
+    opacity: 0.7;
+    cursor: not-allowed;
   }
 `
 

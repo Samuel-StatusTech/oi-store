@@ -5,8 +5,13 @@ export const Page = styled.div`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  gap: 24px;
+  gap: 12px;
   height: 100vh;
+  background-color: #f1fcfd;
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    margin-top: 0;
+  }
 `
 
 export const LogoContainer = styled.div`
@@ -16,10 +21,11 @@ export const LogoContainer = styled.div`
   height: fit-content;
   overflow: hidden;
   max-height: 180px;
-  margin: -140px 24px 0;
+  margin: 0 24px;
 
   img {
-    width: 100%;
+    width: 80%;
+    margin: auto;
     opacity: 0;
     object-fit: cover;
     ${({ theme }) =>
@@ -37,10 +43,11 @@ export const LogoContainer = styled.div`
 export const FormArea = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 48px;
+  gap: 24px;
   padding: 24px;
   border-radius: 16px;
-  box-shadow: 0 4px 16px 4px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 4px 16px 4px rgba(0, 0, 0, 0.1);
+  background-color: #fff;
   max-width: 360px;
   width: 100%;
   opacity: 0;
@@ -62,7 +69,6 @@ export const FormArea = styled.div`
 
 export const FormTitle = styled.h1`
   text-align: center;
-  // color: ${({ theme }) => theme.colors.blue.main};
   opacity: 0;
   ${({ theme }) =>
     theme.animations.types.fadeRight +
@@ -119,7 +125,7 @@ export const Message = styled.span<{ $error?: boolean; $failed: boolean }>`
   text-align: center;
   color: ${({ $failed, theme }) => ($failed ? "red" : theme.colors.blue.main)};
   transition: background-color 0.3s, height 0.3s, opacity 0.2s;
-  margin-bottom: 48px;
+  margin-bottom: 24px;
   height: auto;
   opacity: ${({ $error, $failed }) =>
     $error ? ($failed ? 1 : 0) : $failed ? 0 : 1};
@@ -194,7 +200,7 @@ export const Input = styled.input<{ $small?: boolean }>`
 
 export const Button = styled.button`
   border-radius: 4px;
-  padding: 1rem 2.4rem;
+  padding: 0.8rem 2.4rem;
   width: fit-content;
   margin: auto;
   cursor: pointer;
