@@ -232,8 +232,6 @@ export const Icons = styled.div`
   display: flex;
   align-items: flex-start;
   gap: 24px;
-  opacity: 0;
-  transition: opacity 0.3s;
 
   div {
     background: none;
@@ -264,10 +262,6 @@ export const Icons = styled.div`
     &:hover {
       background-color: #eee;
     }
-  }
-
-  @media (max-width: ${({ theme }) => theme.bp.small}px) {
-    opacity: 1;
   }
 `
 
