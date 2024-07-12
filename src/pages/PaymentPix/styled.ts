@@ -216,7 +216,7 @@ export const Button = styled.button<{
   font-size: ${({ $outlined }) => ($outlined ? 16 : 14)}px;
   text-align: center;
   width: ${({ $content }) => ($content ? "fit-content" : "100%")};
-  transition: box-shadow 0.3s, background-color 0.3s;
+  transition: box-shadow 0.3s, background-color 0.3s, color 0.3s;
   margin: ${({ $content }) => ($content ? "auto" : "unset")};
 
   &:hover,
@@ -224,7 +224,7 @@ export const Button = styled.button<{
     ${({ $outlined, theme }) =>
       !$outlined
         ? "box-shadow: 0 2px 8px 2px rgba(0, 0, 0, 0.24);"
-        : `background-color: ${theme.colors.blue.main};`}
+        : `background-color: ${theme.colors.blue.main}; color: white;`}
   }
 `
 
