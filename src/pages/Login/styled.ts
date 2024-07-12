@@ -68,7 +68,9 @@ export const FormArea = styled.div`
 `
 
 export const FormTitle = styled.h1`
-  text-align: center;
+  text-align: left;
+  font-size: 20px;
+  font-weight: 600;
   opacity: 0;
   ${({ theme }) =>
     theme.animations.types.fadeRight +
@@ -200,7 +202,7 @@ export const Input = styled.input<{ $small?: boolean }>`
 
 export const Button = styled.button`
   border-radius: 4px;
-  padding: 0.8rem 2.4rem;
+  padding: 0.6rem 2.6rem;
   width: fit-content;
   margin: auto;
   cursor: pointer;
