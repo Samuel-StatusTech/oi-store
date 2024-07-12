@@ -14,7 +14,7 @@ import { useEffect } from "react"
 import getStore from "../store"
 
 const Router = () => {
-  const { user } = getStore()
+  const { event, user } = getStore()
 
   const checkTokenTime = async () => {
     if (user) {
@@ -39,6 +39,10 @@ const Router = () => {
   useEffect(() => {
     checkTokenTime()
   }, [])
+
+  useEffect(() => {
+    window.document.title = event ? event.corporateName : "ListaPix"
+  }, [event])
 
   return (
     <BrowserRouter>

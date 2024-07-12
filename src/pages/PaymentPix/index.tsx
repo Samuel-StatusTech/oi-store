@@ -265,63 +265,6 @@ const PaymentPix = () => {
 
       <Container>
         <S.Main>
-          <S.Block $k={1}>
-            <S.BlockTitle $k={3}>
-              Pedido {payed ? "realizado" : "iniciado"}
-            </S.BlockTitle>
-
-            <S.EventInfo>
-              {event?.event_banner && (
-                <img src={event?.event_banner} alt={""} />
-              )}
-
-              <div className="eventInfos">
-                <S.BlockTitle $k={4.5}>{event?.name}</S.BlockTitle>
-                <BlockInfo
-                  k={5}
-                  small={true}
-                  icon={<img src={calendar} alt={""} width={40} />}
-                  description={[
-                    event?.date_ini && event?.date_end
-                      ? getDatePeriod(
-                          event?.date_ini as string,
-                          event?.date_end as string
-                        )
-                      : "",
-                    event?.time_ini
-                      ? event?.date_ini
-                        ? getHours(
-                            new Date(
-                              event?.date_ini.slice(
-                                0,
-                                event?.date_ini.indexOf("T")
-                              ) +
-                                "T" +
-                                event?.time_ini +
-                                ".000Z"
-                            )
-                          )
-                        : event?.time_ini
-                        ? event.time_ini.slice(0, 5)
-                        : "Dia todo"
-                      : event?.date_ini && event?.date_end
-                      ? "Dia todo"
-                      : "",
-                  ]}
-                />
-                <BlockInfo
-                  k={6}
-                  small={true}
-                  icon={<img src={location} alt={""} width={40} />}
-                  description={[
-                    `${event?.address ?? ""}`,
-                    `${event?.city ?? ""}${event?.uf ? ` - ${event?.uf}` : ""}`,
-                  ]}
-                />
-              </div>
-            </S.EventInfo>
-          </S.Block>
-
           <S.Block $k={2}>
             <S.BlockTitle $k={4}>
               {payed
@@ -384,6 +327,63 @@ const PaymentPix = () => {
                 </S.PixTime>
               </S.PixArea>
             )}
+          </S.Block>
+
+          <S.Block $k={1}>
+            <S.BlockTitle $k={3}>
+              Pedido {payed ? "realizado" : "iniciado"}
+            </S.BlockTitle>
+
+            <S.EventInfo>
+              {event?.event_banner && (
+                <img src={event?.event_banner} alt={""} />
+              )}
+
+              <div className="eventInfos">
+                <S.BlockTitle $k={4.5}>{event?.name}</S.BlockTitle>
+                <BlockInfo
+                  k={5}
+                  small={true}
+                  icon={<img src={calendar} alt={""} width={40} />}
+                  description={[
+                    event?.date_ini && event?.date_end
+                      ? getDatePeriod(
+                          event?.date_ini as string,
+                          event?.date_end as string
+                        )
+                      : "",
+                    event?.time_ini
+                      ? event?.date_ini
+                        ? getHours(
+                            new Date(
+                              event?.date_ini.slice(
+                                0,
+                                event?.date_ini.indexOf("T")
+                              ) +
+                                "T" +
+                                event?.time_ini +
+                                ".000Z"
+                            )
+                          )
+                        : event?.time_ini
+                        ? event.time_ini.slice(0, 5)
+                        : "Dia todo"
+                      : event?.date_ini && event?.date_end
+                      ? "Dia todo"
+                      : "",
+                  ]}
+                />
+                <BlockInfo
+                  k={6}
+                  small={true}
+                  icon={<img src={location} alt={""} width={40} />}
+                  description={[
+                    `${event?.address ?? ""}`,
+                    `${event?.city ?? ""}${event?.uf ? ` - ${event?.uf}` : ""}`,
+                  ]}
+                />
+              </div>
+            </S.EventInfo>
           </S.Block>
         </S.Main>
       </Container>
