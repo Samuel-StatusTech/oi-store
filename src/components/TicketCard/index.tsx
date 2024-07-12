@@ -86,7 +86,7 @@ const TicketCard = ({ k, data }: Props) => {
   }
 
   const handleShare = async () => {
-    if (navigator.canShare() && event) {
+    if (navigator.canShare && navigator.canShare() && event) {
       try {
         const file = await downloadTickets(event, tickets)
 

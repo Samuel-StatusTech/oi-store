@@ -25,6 +25,11 @@ export const LogoContainer = styled.div`
       theme.animations.durations.main +
       theme.animations.delays.main()}
   }
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    max-width: unset;
+    width: 100%;
+  }
 `
 
 export const FormArea = styled.div`
@@ -48,11 +53,14 @@ export const FormArea = styled.div`
     box-shadow: unset;
     margin: 24px;
     border: 2px solid rgb(200, 200, 200, 0.5);
+    max-width: calc(100% - 48px);
+    box-sizing: border-box;
   }
 `
 
 export const FormTitle = styled.h1`
   text-align: center;
+  // color: ${({ theme }) => theme.colors.blue.main};
   opacity: 0;
   ${({ theme }) =>
     theme.animations.types.fadeRight +
@@ -66,6 +74,11 @@ export const Phases = styled.div`
   display: flex;
   align-items: center;
   gap: 48px;
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    max-width: 100%;
+    box-sizing: border-box;
+  }
 `
 
 export const Phase = styled.div<{

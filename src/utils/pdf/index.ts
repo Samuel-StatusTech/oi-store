@@ -47,7 +47,9 @@ const downloadTickets = async (
       let blob: null | Blob = null
       pdf.getBlob((blobData) => (blob = blobData))
 
-      return resolve(new File([blob as unknown as Blob], filename))
+      return resolve(new File([blob as unknown as Blob], filename, {
+        type: "application/pdf"
+      }))
     }
   })
 }

@@ -17,7 +17,7 @@ const Popup = ({ tickets, showing, closeFn }: Props) => {
   const handleShare = async (e?: any) => {
     e?.preventDefault()
 
-    if (navigator.canShare() && event) {
+    if (navigator.canShare && navigator.canShare() && event) {
       try {
         const file = await downloadTickets(event, tickets)
 
