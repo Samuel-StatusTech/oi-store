@@ -91,17 +91,14 @@ const TicketCard = ({ k, data }: Props) => {
         const file = await downloadTickets(event, tickets)
 
         if (file instanceof File) {
-          if (
-            navigator.canShare &&
-            navigator.canShare({
-              title: `Meus Tickets para ${event.name}`,
-              files: [file],
-            })
-          ) {
-            navigator.share({
-              title: `Meus Tickets para ${event.name}`,
-              files: [file],
-            })
+          const data = {
+            title: `Meus Tickets para ${event.name}`,
+            text: `Meus Tickets para ${event.name}`,
+            files: [file],
+          }
+
+          if (navigator.canShare && navigator.canShare(data)) {
+            navigator.share(data)
           }
         }
       }

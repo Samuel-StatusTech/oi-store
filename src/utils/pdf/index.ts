@@ -14,16 +14,11 @@ const downloadTickets = async (
   pdfMake.vfs = pdfFonts.pdfMake.vfs
 
   return new Promise(async (resolve) => {
-    // Data process
-
-    // File
-
     const filename = `Meus Tickets para ${eventData.name.trim()}.pdf`
 
     let logo = ""
 
     const docDefs: TDocumentDefinitions = {
-      // images: !!eventData.logo ? { logo: { url: eventData.logo } } : undefined,
       images: {
         logo: {
           url: logo,
@@ -44,14 +39,19 @@ const downloadTickets = async (
 
     if (shouldDownload) pdf.download(filename)
     else {
-      let blob: null | Blob = null
-      pdf.getBlob((blobData) => (blob = blobData))
+      let blobInfo: any = undefined
 
-      return resolve(
-        new File([blob as unknown as Blob], filename, {
-          type: "application/pdf",
-        })
-      )
+      pdf.getBlob((blobData) => (blobInfo = blobData))
+
+      if (blobInfo instanceof Blob) {
+        let blob: Blob = blobInfo
+
+        const file = new File([blob], filename, { type: "application/pdf" })
+
+        console.log(file)
+
+        resolve(file)
+      }
     }
   })
 }
