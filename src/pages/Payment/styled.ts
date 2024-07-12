@@ -202,15 +202,15 @@ export const Label = styled.label`
   & > span {
     position: absolute;
     left: 6px;
-    top: 4px;
+    top: 10px;
     font-size: 16px;
     transition: transform 0.3s, font-size 0.3s;
-    color: #bbb;
+    color: rgb(150, 150, 150);
   }
 
-  &:has(input:focus) span,
-  &:has(input:not(:placeholder-shown)) span {
-    transform: translateY(-24px);
+  input:focus + span,
+  input:not(:placeholder-shown) + span {
+    transform: translateY(-34px);
     font-size: 14px;
   }
 `
