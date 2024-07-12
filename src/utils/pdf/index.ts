@@ -49,7 +49,7 @@ const downloadTickets = async (
 
       return resolve(
         new File([blob as unknown as Blob], filename, {
-          type: (blob as unknown as Blob).type,
+          type: "application/pdf",
         })
       )
     }
