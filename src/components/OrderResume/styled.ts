@@ -48,21 +48,62 @@ export const Info = styled.div`
   padding: 24px;
 `
 
-export const EventResume = styled.div`
+export const InfoWrapper = styled.div<{ $expanded: boolean }>`
+  display: grid;
+  grid-template-rows: ${({ $expanded }) => ($expanded ? 1 : 0)}fr;
+  overflow: hidden;
+  transition: grid-template-rows 0.6s;
+
+  @media (min-width: ${({ theme }) => theme.bp.small + 1}px) {
+    grid-template-rows: 1fr;
+  }
+`
+
+export const InfoData = styled.div`
+  min-height: 42px;
+`
+
+export const InfoContent = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+`
+
+export const EventResume = styled.div<{ $expanded: boolean }>`
   display: flex;
   gap: 6px;
   flex-direction: column;
   border-bottom: 1px solid #ccc;
   padding: 0 0 12px;
 
-  div {
+  div:nth-child(1) {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    svg {
+      transition: transform 0.4s;
+      transform: rotate(${({ $expanded }) => ($expanded ? -180 : 0)}deg);
+      display: none;
+    }
+  }
+
+  div:nth-child(2) {
     display: flex;
     gap: 12px;
     flex-wrap: wrap;
   }
 
   @media (max-width: 440px) {
-    div {
+    div:nth-child(1) {
+      cursor: pointer;
+
+      svg {
+        display: unset;
+      }
+    }
+
+    div:nth-child(2) {
       flex-direction: column;
       gap: 6px;
     }

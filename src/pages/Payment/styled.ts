@@ -37,6 +37,10 @@ export const EventData = styled.div`
     theme.animations.types.fadeTop +
     theme.animations.durations.main +
     theme.animations.delays.main()}
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    display: none;
+  }
 `
 
 export const EventName = styled.span`

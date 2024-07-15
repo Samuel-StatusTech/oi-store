@@ -4,6 +4,7 @@ import { formatMoney } from "../../utils/tb/formatMoney"
 import * as S from "./styled"
 
 import clockIcon from "../../assets/icons/time.png"
+import { ReactComponent as DropdownIcon } from "../../assets/icons/dropdown.svg"
 
 import Ticket from "../Ticket"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
@@ -22,6 +23,8 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
   const navigate = useNavigate()
 
   const { event, controllers } = getStore()
+
+  const [resumeExpanded, setResumeExpanded] = useState(false)
 
   const [taxes, setTaxes] = useState(0)
   const [ticketsTotal, setTicketsTotal] = useState(0)
@@ -102,6 +105,10 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
     return str
   }
 
+  const handleExpandResume = () => {
+    setResumeExpanded(!resumeExpanded)
+  }
+
   return (
     <S.Component>
       {event?.event_banner && (
@@ -111,18 +118,27 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
       )}
 
       <S.Info>
-        <S.EventResume>
-          <S.ResumeText>Resumo do pedido</S.ResumeText>
-          <div>
-            <S.DateText>Data</S.DateText>
-            <S.DateText>{datePeriod}</S.DateText>
-          </div>
-        </S.EventResume>
-        <S.TicketsList>
-          {ticketsList.map((ticket, k) => (
-            <Ticket ticket={ticket} key={k} />
-          ))}
-        </S.TicketsList>
+        <S.InfoWrapper $expanded={resumeExpanded}>
+          <S.InfoData>
+            <S.InfoContent>
+              <S.EventResume $expanded={resumeExpanded}>
+                <div onClick={handleExpandResume}>
+                  <S.ResumeText>Resumo do pedido</S.ResumeText>
+                  <DropdownIcon />
+                </div>
+                <div>
+                  <S.DateText>Data</S.DateText>
+                  <S.DateText>{datePeriod}</S.DateText>
+                </div>
+              </S.EventResume>
+              <S.TicketsList>
+                {ticketsList.map((ticket, k) => (
+                  <Ticket ticket={ticket} key={k} />
+                ))}
+              </S.TicketsList>
+            </S.InfoContent>
+          </S.InfoData>
+        </S.InfoWrapper>
         <S.Total>
           <S.TotalItem>
             <span>Subtotal</span>
