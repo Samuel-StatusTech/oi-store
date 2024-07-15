@@ -84,7 +84,6 @@ type IProps = {
 const Input = ({ label, value, onChange, inputMode, enterKeyHint }: IProps) => {
   return (
     <S.Label>
-      <span>{label}</span>
       <S.Input
         value={value}
         onChange={(e) => onChange(e.target.value)}
@@ -92,6 +91,7 @@ const Input = ({ label, value, onChange, inputMode, enterKeyHint }: IProps) => {
         inputMode={inputMode as any}
         enterKeyHint={enterKeyHint as any}
       />
+      <span>{label}</span>
     </S.Label>
   )
 }
