@@ -22,7 +22,10 @@ type TResponses = {
     myTickets: Promise<TDefaultRes<{ list: any[] }>>
   }
   post: {
-    login: Promise<TDefaultRes<TUser>>
+    login: {
+      requestCode: Promise<TDefaultRes<{}>>
+      validateCode: Promise<TDefaultRes<TUser>>
+    }
   }
 }
 

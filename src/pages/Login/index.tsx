@@ -6,9 +6,7 @@ import { formatPhone } from "../../utils/masks/phone"
 import getStore from "../../store"
 import { Api } from "../../api"
 
-const constCODE = "ab12"
-
-const codeLength = 4
+const codeLength = 6
 
 const Login = () => {
   const location = useLocation()
@@ -29,8 +27,10 @@ const Login = () => {
   const code2 = useRef<HTMLInputElement | null>(null)
   const code3 = useRef<HTMLInputElement | null>(null)
   const code4 = useRef<HTMLInputElement | null>(null)
+  const code5 = useRef<HTMLInputElement | null>(null)
+  const code6 = useRef<HTMLInputElement | null>(null)
 
-  const refsRelations = [code1, code2, code3, code4]
+  const refsRelations = [code1, code2, code3, code4, code5, code6]
 
   useEffect(() => {
     setPhase("phone")
@@ -48,24 +48,29 @@ const Login = () => {
     }, 400)
   }
 
-  const handleNext = () => {
-    // Api.post.askCode({ phone: phone.replace(...) })
-
-    fadePhases()
+  const handleNext = async () => {
+    try {
+      const request = await Api.post.login.requestCode({
+        phone: phone.replace(/\D/g, ""),
+      })
+      if (request.ok) {
+        setTimeout(() => {
+          fadePhases()
+          code1.current?.focus()
+        }, 400)
+      }
+    } catch (error) {}
   }
 
   const handleCodeSubmit = async () => {
     try {
-      // dev
-      if (code === constCODE) {
-        const login = await Api.post.login({
-          username: "Customert2",
-          password: "123456",
-        })
-        if (login.ok) {
-          store.controllers.user.setData(login.data)
-          navigate("/myTickets")
-        } else setFailedCODE(true)
+      const login = await Api.post.login.validateCode({
+        phone: phone.replace(/\D/g, ""),
+        code,
+      })
+      if (login.ok) {
+        store.controllers.user.setData(login.data)
+        navigate("/myTickets")
       } else setFailedCODE(true)
     } catch (error) {
       setFailedCODE(true)
@@ -77,11 +82,7 @@ const Login = () => {
 
     switch (phase) {
       case "phone":
-        handleNext()
-
-        setTimeout(() => {
-          code1.current?.focus()
-        }, 400)
+        await handleNext()
         break
       case "code":
         if (failedCODE) {
@@ -130,7 +131,13 @@ const Login = () => {
         code4.current?.focus()
         break
       case 3:
-        if (window.innerWidth < 800) code4.current?.blur()
+        code5.current?.focus()
+        break
+      case 4:
+        code6.current?.focus()
+        break
+      case 5:
+        if (window.innerWidth < 800) code6.current?.blur()
         break
       default:
         break

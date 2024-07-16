@@ -39,13 +39,19 @@ const Home = () => {
   }, [])
 
   const fetchTickets = useCallback(async () => {
+    console.log(event)
     if (event) {
       try {
         const req = await Api.get.products({ eventId: event?.id })
 
         if (req.ok) {
           const list = req.data.list
-          setTickets(parseDisposalTickets(list.filter((t) => t.active)))
+          const parsedTickets = parseDisposalTickets(
+            list.filter((t) =>
+              t.active !== undefined ? (Boolean(t.active) ? t : null) : t
+            )
+          )
+          setTickets(parsedTickets)
         }
       } catch (error) {
         alert("Erro ao carregar os tickets")

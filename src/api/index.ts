@@ -213,13 +213,47 @@ const getMyTickets: TApi["get"]["myTickets"] = async () => {
  * Create
  */
 
-const login: TApi["post"]["login"] = async ({ username, password }) => {
+const requestCode: TApi["post"]["login"]["requestCode"] = async ({ phone }) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await axios
+        .post("/ecommerce/requestCode", {
+          fone: phone,
+          database: "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd",
+        })
+        .then((res) => {
+          // const uObj = {
+          //   ...res.data.user,
+          //   cpf: res.data.roleData.cpf,
+          //   fone: res.data.roleData.fone,
+          // }
+
+          // localStorage.setItem("token", res.data.token)
+
+          resolve({ ok: true, data: {} })
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Algo deu errado. Tente novamente mais tarde.",
+          })
+        })
+    } catch (error) {
+      reject({ error: "Erro ao requisitar código. Tente novamente mais tarde" })
+    }
+  })
+}
+
+const validateCode: TApi["post"]["login"]["validateCode"] = async ({
+  phone,
+  code,
+}) => {
   return new Promise(async (resolve, reject) => {
     try {
       await axios
         .post("/ecommerce/authenticate", {
-          username,
-          password,
+          fone: phone,
+          code: code,
           database: "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd",
         })
         .then((res) => {
@@ -231,22 +265,16 @@ const login: TApi["post"]["login"] = async ({ username, password }) => {
 
           localStorage.setItem("token", res.data.token)
 
-          resolve({
-            ok: true,
-            data: uObj,
-          })
+          resolve({ ok: true, data: uObj })
         })
         .catch(() => {
           resolve({
             ok: false,
-            error:
-              "Algo deu errado. Verifique o email e a senha e tente novamente.",
+            error: "Algo deu errado. Tente novamente mais tarde.",
           })
         })
     } catch (error) {
-      reject({
-        error: "Erro ao conectar na loja. Tente novamente mais tarde",
-      })
+      reject({ error: "Erro ao requisitar código. Tente novamente mais tarde" })
     }
   })
 }
@@ -260,6 +288,9 @@ export const Api: TApi = {
     myTickets: getMyTickets,
   },
   post: {
-    login: login,
+    login: {
+      requestCode: requestCode,
+      validateCode: validateCode,
+    },
   },
 }

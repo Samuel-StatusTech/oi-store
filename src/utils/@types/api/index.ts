@@ -18,7 +18,14 @@ type TApiGetters = {
  */
 
 type TApiPosters = {
-  login: (p: TParams["post"]["login"]) => TResponses["post"]["login"]
+  login: {
+    requestCode: (
+      p: TParams["post"]["login"]["requestCode"]
+    ) => TResponses["post"]["login"]["requestCode"]
+    validateCode: (
+      p: TParams["post"]["login"]["validateCode"]
+    ) => TResponses["post"]["login"]["validateCode"]
+  }
 }
 
 export type TApi = {

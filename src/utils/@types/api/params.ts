@@ -26,8 +26,8 @@ type TParams = {
   }
   post: {
     login: {
-      username: string
-      password: string
+      requestCode: { phone: string }
+      validateCode: { phone: string; code: string }
     }
   }
 }
