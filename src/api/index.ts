@@ -12,9 +12,7 @@ try {
 
     return config
   })
-} catch (error) {
-  console.log(error)
-}
+} catch (error) {}
 
 /*
  * Getters
@@ -24,7 +22,7 @@ const getQrCode: TApi["get"]["qrcode"] = async ({ order }) => {
   return new Promise(async (resolve, reject) => {
     try {
       await axios
-        .post(`${backUrl}/api/orders/qrcode`, order)
+        .post(`${backUrl}/orders/qrcode`, order)
         .then((res) => {
           const info = res.data
 
