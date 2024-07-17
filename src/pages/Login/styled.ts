@@ -128,6 +128,7 @@ export const Message = styled.span<{ $error?: boolean; $failed: boolean }>`
   text-align: center;
   color: ${({ $failed, theme }) => ($failed ? "red" : theme.colors.blue.main)};
   transition: background-color 0.3s, height 0.3s, opacity 0.2s;
+  ${({ $error }) => ($error ? "width: 200px;" : "")}
   margin-bottom: 24px;
   height: auto;
   opacity: ${({ $error, $failed }) =>
@@ -201,7 +202,7 @@ export const Input = styled.input<{ $small?: boolean }>`
   }
 `
 
-export const Button = styled.button`
+export const Button = styled.button<{ $noAnimate?: boolean }>`
   border-radius: 4px;
   padding: 0.6rem 2.6rem;
   width: fit-content;
@@ -215,11 +216,13 @@ export const Button = styled.button`
     background-color 0.3s, filter 0.3s;
   color: #fff;
   font-size: 16px;
-  opacity: 0;
-  ${({ theme }) =>
-    theme.animations.types.fadeRight +
-    theme.animations.durations.main +
-    theme.animations.delays.main(5)}
+  opacity: ${({ $noAnimate }) => ($noAnimate ? 1 : 0)};
+  ${({ $noAnimate, theme }) =>
+    $noAnimate
+      ? ""
+      : theme.animations.types.fadeRight +
+        theme.animations.durations.main +
+        theme.animations.delays.main(5)}
 
   &:hover {
     box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.24);

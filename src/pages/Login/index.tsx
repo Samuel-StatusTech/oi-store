@@ -50,15 +50,16 @@ const Login = () => {
 
   const handleNext = async () => {
     try {
-      const request = await Api.post.login.requestCode({
-        phone: phone.replace(/\D/g, ""),
-      })
-      if (request.ok) {
-        setTimeout(() => {
-          fadePhases()
-          code1.current?.focus()
-        }, 400)
-      }
+      await Api.post.login
+        .requestCode({
+          phone: phone.replace(/\D/g, ""),
+        })
+        .then((res) => {
+          setTimeout(() => {
+            fadePhases()
+            code1.current?.focus()
+          }, 400)
+        })
     } catch (error) {}
   }
 
@@ -77,6 +78,19 @@ const Login = () => {
     }
   }
 
+  const handleBack = async () => {
+    // check errors
+    fadePhases()
+    setTimeout(() => {
+      setFailedCODE(false)
+      setCode("")
+
+      setTimeout(() => {
+        document.getElementById("phoneInput")?.focus()
+      }, 400)
+    }, 200)
+  }
+
   const handleClick = async () => {
     // check errors
 
@@ -86,14 +100,10 @@ const Login = () => {
         break
       case "code":
         if (failedCODE) {
-          fadePhases()
+          setFailedCODE(false)
+          setCode("")
           setTimeout(() => {
-            setFailedCODE(false)
-            setCode("")
-
-            setTimeout(() => {
-              document.getElementById("phoneInput")?.focus()
-            }, 400)
+            code1.current?.focus()
           }, 200)
         } else handleCodeSubmit()
         break
@@ -207,7 +217,7 @@ const Login = () => {
                 Digite abaixo o código enviado para o seu celular
               </S.Message>
               <S.Message $error={true} $failed={failedCODE}>
-                Número de telefone ou código invalidos
+                Verifique se seu código e telefone estão corretos
               </S.Message>
             </S.MessageArea>
             <S.CodeArea>
@@ -219,17 +229,35 @@ const Login = () => {
           </S.Phase>
         </S.Phases>
 
-        <S.Button
-          onClick={handleClick}
-          className={"fl ad-1 f"}
-          disabled={
-            phase === "phone"
-              ? phone.replace(/\D/g, "").length < 11
-              : code.length < codeLength
-          }
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 24,
+            justifyContent: "center",
+          }}
         >
-          {phase === "phone" ? "Próximo" : !failedCODE ? "Entrar" : "Ok"}
-        </S.Button>
+          <S.Button
+            onClick={handleClick}
+            className={"fl ad-1 f"}
+            disabled={
+              phase === "phone"
+                ? phone.replace(/\D/g, "").length < 11
+                : code.length < codeLength
+            }
+          >
+            {phase === "phone" ? "Próximo" : !failedCODE ? "Entrar" : "Ok"}
+          </S.Button>
+          {failedCODE && (
+            <S.Button
+              $noAnimate={true}
+              onClick={handleBack}
+              disabled={!failedCODE}
+            >
+              Trocar telefone
+            </S.Button>
+          )}
+        </div>
       </S.FormArea>
     </S.Page>
   )
