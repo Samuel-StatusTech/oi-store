@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
-import { TShoppingTicket } from "../../utils/@types/data/ticket"
+import { TShoppingTicket, TTicket } from "../../utils/@types/data/ticket"
 import { temporizadorDeCincoMinutos } from "../../utils/tb/timer"
 import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
 import * as S from "./styled"
@@ -58,43 +58,66 @@ const PaymentPix = () => {
     navigate(-1)
   }
 
-  const instanceSocket = () => {
-    // const paymentValue = ((lctn.state.tickets as TTicket[]) ?? []).reduce(
-    //   (sum, ticket) => sum + +(ticket.price_sell ?? "0"),
-    //   0
-    // )
+  const instanceSocket = async () => {
+    const paymentValue = ((lctn.state.tickets as TTicket[]) ?? []).reduce(
+      (sum, ticket) => sum + +(ticket.price_sell ?? "0"),
+      0
+    )
 
     const socket = io("https://back-moreira.vercel.app", {
       autoConnect: true,
       reconnectionAttempts: 3,
     })
 
-    socket.on("connection", (socket) => {
+    socket.on("connection", async (socket) => {
       setSid(socket.id)
+      console.log("\nSOCKET ID: ", socket.id, "\n\n")
     })
 
-    socket.on("disconnect", () => {
+    socket.on("disconnect", (err) => {
+      console.log("\nSOCKET error: ", err, "\n\n")
       alert("Ops, houve um erro. Tente novamente mais tarde")
       navigate(-1)
       return
     })
 
-    // let f = { ...feedback }
+    let f = { ...feedback }
 
-    // socket.on("orderUpdate", (data) => {
-    // console.log("Here", data, paymentValue)
+    socket.on("orderUpdate", (data) => {
+      console.log("Here", data, paymentValue)
 
-    // if (data.amount === paymentValue) {
-    // f = { ...data, visible: true }
+      if (data.amount === paymentValue) {
+        f = { ...data, visible: true }
 
-    // if (data.state === 'EXPIRED') {
-    //   getOrderData()
-    //   instanceSocket()
-    // }
-    // }
+        if (data.state === "EXPIRED") {
+          getOrderData({
+            tickets: lctn.state.tickets,
+            buyer: lctn.state.buyer,
+            taxTotal: lctn.state.taxTotal ?? 0,
+          })
+          instanceSocket()
+        } else if (data.state === "PAID") {
+          let f = {
+            state: "PAID",
+            visible: true,
+            message: "Pagamento recebido.\nVocê já pode ver sua compra",
+          }
 
-    // monitor minors payments ?
-    // })
+          setFeedback(f)
+
+          setTimeout(() => {
+            setFeedback({ ...f, visible: false })
+            setTimeout(() => {
+              setPayed(true)
+            }, 400)
+          }, 3500)
+        }
+
+        console.log("f - ", f)
+      }
+
+      // monitor minors payments ?
+    })
 
     return socket
   }
@@ -109,7 +132,14 @@ const PaymentPix = () => {
       })
 
       if (orderData) {
-        const socket = instanceSocket()
+        console.log("Asqui")
+        const socket = await instanceSocket()
+        console.log("socket", socket)
+
+        socket.on("connection", async (socket) => {
+          setSid(socket.id)
+          console.log("\nSOCKET ID: ", socket.id, "\n\n")
+        })
 
         const req = await Api.get.qrcode({
           order: { ...orderData, reference_id: socket.id },
@@ -134,23 +164,6 @@ const PaymentPix = () => {
     setInterval(() => {
       setTime(timer.tempoAtualFormatado())
     }, 1000)
-
-    let f = {
-      state: "PAID",
-      visible: true,
-      message: "Pagamento recebido.\nVocê já pode ver sua compra",
-    }
-
-    setTimeout(() => {
-      setFeedback(f)
-
-      setTimeout(() => {
-        setFeedback({ ...f, visible: false })
-        setTimeout(() => {
-          setPayed(true)
-        }, 400)
-      }, 3500)
-    }, 4000)
   }
 
   const loadEventData = useCallback(async () => {

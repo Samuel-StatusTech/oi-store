@@ -3,7 +3,8 @@ import { TApi } from "../utils/@types/api"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
-const backUrl = "https://back-moreira.vercel.app"
+const backUrl = "https://back-moreira.vercel.app/api"
+// const backUrl = "http://localhost:8080/api"
 
 try {
   axios.interceptors.request.use(function (config) {

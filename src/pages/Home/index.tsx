@@ -39,7 +39,6 @@ const Home = () => {
   }, [])
 
   const fetchTickets = useCallback(async () => {
-    console.log(event)
     if (event) {
       try {
         const req = await Api.get.products({ eventId: event?.id })
