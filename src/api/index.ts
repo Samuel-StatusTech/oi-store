@@ -3,11 +3,14 @@ import { TApi } from "../utils/@types/api"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
-const backUrl = "https://back-moreira.vercel.app/api"
-// const backUrl = "http://localhost:8080/api"
+export const baseBackUrl = process.env.REACT_APP_BACKBASE_URL as string
+const backUrl = `${baseBackUrl}api`
 
 try {
   axios.interceptors.request.use(function (config) {
+    // const localToken = localStorage.getItem('token')
+    // const token = localToken ? `Bearer ${localToken}` : `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZqTFpROEQyOVBmQ3dJMlNiS3dQZ0I3cjdnRDMiLCJkYXRhYmFzZSI6IkRCNGI5MzEzZTNjZWUwOGQ5YWMzZDE0NGUxODg3MGJjMGRiMjA4MTNjZCIsImNsaWVudEtleSI6Ii1OYWxaenZiMndhc1VfNmR1R2NuIiwiaWF0IjoxNzE3NDk1MzQzLCJleHAiOjE5NzQxMDMzNDN9.50knxx6WtR8TBD0byCCPo7Qaxe6SV6MXvHujZYYd4rI`
+
     const token = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZqTFpROEQyOVBmQ3dJMlNiS3dQZ0I3cjdnRDMiLCJkYXRhYmFzZSI6IkRCNGI5MzEzZTNjZWUwOGQ5YWMzZDE0NGUxODg3MGJjMGRiMjA4MTNjZCIsImNsaWVudEtleSI6Ii1OYWxaenZiMndhc1VfNmR1R2NuIiwiaWF0IjoxNzE3NDk1MzQzLCJleHAiOjE5NzQxMDMzNDN9.50knxx6WtR8TBD0byCCPo7Qaxe6SV6MXvHujZYYd4rI`
     config.headers.Authorization = token
 
@@ -278,6 +281,42 @@ const validateCode: TApi["post"]["login"]["validateCode"] = async ({
   })
 }
 
+const confirmPurchase: TApi["post"]["order"]["confirm"] = async ({
+  eventId,
+  orderId,
+  paymentCode,
+}) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await axios
+        .post("/ecommerce/confirmPurchase", {
+          event_id: eventId,
+          order_id: orderId,
+          payment_code: paymentCode,
+        })
+        .then((res) => {
+          const uObj = {
+            ...res.data.user,
+            cpf: res.data.roleData.cpf,
+            fone: res.data.roleData.fone,
+          }
+
+          localStorage.setItem("token", res.data.token)
+
+          resolve({ ok: true, data: uObj })
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Algo deu errado. Tente novamente mais tarde.",
+          })
+        })
+    } catch (error) {
+      reject({ error: "Erro ao requisitar código. Tente novamente mais tarde" })
+    }
+  })
+}
+
 export const Api: TApi = {
   get: {
     qrcode: getQrCode,
@@ -290,6 +329,9 @@ export const Api: TApi = {
     login: {
       requestCode: requestCode,
       validateCode: validateCode,
+    },
+    order: {
+      confirm: confirmPurchase,
     },
   },
 }

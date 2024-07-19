@@ -22,7 +22,7 @@ import loadingAnimation from "../../assets/animations/loading"
 import calendar from "../../assets/icons/calendar.png"
 import location from "../../assets/icons/pin.png"
 import getStore from "../../store"
-import { Api } from "../../api"
+import { Api, baseBackUrl } from "../../api"
 import io from "socket.io-client"
 import { getOrderData } from "../../utils/tb/order"
 import downloadTickets from "../../utils/pdf"
@@ -30,6 +30,8 @@ import downloadTickets from "../../utils/pdf"
 const PaymentPix = () => {
   const lctn = useLocation()
   const navigate = useNavigate()
+
+  const timer = temporizadorDeCincoMinutos()
 
   const { event, controllers } = getStore()
 
@@ -54,69 +56,24 @@ const PaymentPix = () => {
     } catch (error) {}
   }
 
+  useEffect(() => {
+    const handleVisibilityChange = () => {
+      if (!document.hidden) {
+        timer.atualizarTempo()
+      }
+    }
+
+    document.addEventListener("visibilitychange", handleVisibilityChange)
+  }, [])
+
   const returnPage = () => {
     navigate(-1)
   }
 
   const instanceSocket = async () => {
-    const paymentValue = ((lctn.state.tickets as TTicket[]) ?? []).reduce(
-      (sum, ticket) => sum + +(ticket.price_sell ?? "0"),
-      0
-    )
-
-    const socket = io("https://back-moreira.vercel.app", {
+    const socket = io(baseBackUrl, {
       autoConnect: true,
       reconnectionAttempts: 3,
-    })
-
-    socket.on("connection", async (socket) => {
-      setSid(socket.id)
-      console.log("\nSOCKET ID: ", socket.id, "\n\n")
-    })
-
-    socket.on("disconnect", (err) => {
-      console.log("\nSOCKET error: ", err, "\n\n")
-      alert("Ops, houve um erro. Tente novamente mais tarde")
-      navigate(-1)
-      return
-    })
-
-    let f = { ...feedback }
-
-    socket.on("orderUpdate", (data) => {
-      console.log("Here", data, paymentValue)
-
-      if (data.amount === paymentValue) {
-        f = { ...data, visible: true }
-
-        if (data.state === "EXPIRED") {
-          getOrderData({
-            tickets: lctn.state.tickets,
-            buyer: lctn.state.buyer,
-            taxTotal: lctn.state.taxTotal ?? 0,
-          })
-          instanceSocket()
-        } else if (data.state === "PAID") {
-          let f = {
-            state: "PAID",
-            visible: true,
-            message: "Pagamento recebido.\nVocê já pode ver sua compra",
-          }
-
-          setFeedback(f)
-
-          setTimeout(() => {
-            setFeedback({ ...f, visible: false })
-            setTimeout(() => {
-              setPayed(true)
-            }, 400)
-          }, 3500)
-        }
-
-        console.log("f - ", f)
-      }
-
-      // monitor minors payments ?
     })
 
     return socket
@@ -132,13 +89,61 @@ const PaymentPix = () => {
       })
 
       if (orderData) {
-        console.log("Asqui")
         const socket = await instanceSocket()
-        console.log("socket", socket)
 
-        socket.on("connection", async (socket) => {
+        socket.on("connection", (socket) => {
           setSid(socket.id)
-          console.log("\nSOCKET ID: ", socket.id, "\n\n")
+        })
+
+        socket.on("orderUpdate", async (data) => {
+          const paymentValue =
+            ((lctn.state.tickets as TTicket[]) ?? []).reduce(
+              (sum, ticket) => sum + +(ticket.price_sell ?? "0"),
+              0
+            ) + lctn.state.taxTotal
+
+          if (data.amount === paymentValue) {
+            // confirm purchase
+            const purchase = await confirmPurchase(data.orderId, data.code)
+
+            if (purchase.ok) {
+              let f = {
+                state: data.status,
+                visible: true,
+                message: data.message,
+              }
+
+              if (data.status === "EXPIRED") {
+                getOrderData({
+                  tickets: lctn.state.tickets,
+                  buyer: lctn.state.buyer,
+                  taxTotal: lctn.state.taxTotal ?? 0,
+                })
+                socket.disconnect()
+                instanceSocket()
+              }
+
+              setFeedback(f)
+
+              setTimeout(() => {
+                setFeedback({ ...f, visible: false })
+                setTimeout(() => {
+                  setPayed(true)
+                }, 400)
+              }, 3500)
+            }
+
+            socket.on("connect_error", (err) => {
+              alert("Ops, houve um erro. Tente novamente mais tarde")
+              navigate(-1)
+              return
+            })
+          }
+        })
+
+        socket.on("connect_error", (err) => {
+          socket.connect()
+          return
         })
 
         const req = await Api.get.qrcode({
@@ -157,8 +162,6 @@ const PaymentPix = () => {
   }, [])
 
   const runTimer = () => {
-    const timer = temporizadorDeCincoMinutos()
-
     timer.iniciar()
 
     setInterval(() => {
@@ -186,12 +189,6 @@ const PaymentPix = () => {
   }, [])
 
   const signPurchase = useCallback(() => {
-    /*
-      await Api.post.signPurchase({ ... })
-    */
-
-    // place data
-
     let pdfTickets: TShoppingTicket[] = []
 
     const tickets = (lctn.state.tickets ?? []) as any[]
@@ -214,11 +211,26 @@ const PaymentPix = () => {
     setBuyedTickets(pdfTickets)
   }, [])
 
-  const confirmPurchase = useCallback(() => {
-    /*
-      await Api.post.confirmPurchase({ ... })
-    */
-  }, [])
+  const confirmPurchase = async (
+    orderId: string,
+    code: string
+  ): Promise<{ ok: boolean }> => {
+    const params: any = {
+      eventId: event?.id as string,
+      orderId,
+      paymentCode: code,
+    }
+
+    return new Promise(async (resolve) => {
+      try {
+        await Api.post.order.confirm(params)
+
+        resolve({ ok: true })
+      } catch (error) {
+        resolve({ ok: false })
+      }
+    })
+  }
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
@@ -230,8 +242,6 @@ const PaymentPix = () => {
       signPurchase()
       // get qr_code
       getPBcode()
-      // confirm purchase
-      confirmPurchase()
     } catch (error) {}
   }, [loadEventData, getPBcode])
 

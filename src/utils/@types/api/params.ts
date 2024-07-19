@@ -29,6 +29,13 @@ type TParams = {
       requestCode: { phone: string }
       validateCode: { phone: string; code: string }
     }
+    order: {
+      confirm: {
+        eventId: string
+        paymentCode: string
+        orderId: string
+      }
+    }
   }
 }
 

@@ -2,6 +2,7 @@ export const temporizadorDeCincoMinutos = () => {
   const tempoTotalEmSegundos = 5 * 60
   let tempoRestante = tempoTotalEmSegundos
   let timerId: any
+  let start = Math.ceil(new Date().getTime() / 1000)
 
   const formatarTempo = (tempo: any) => {
     const minutos = Math.floor(tempo / 60)
@@ -9,6 +10,13 @@ export const temporizadorDeCincoMinutos = () => {
     return `${minutos.toString().padStart(2, "0")}:${segundos
       .toString()
       .padStart(2, "0")}`
+  }
+
+  const atualizarTempo = () => {
+    const now = Math.ceil(new Date().getTime() / 1000)
+    const elapsed = (start - now) * -1
+    tempoRestante =
+      elapsed < tempoTotalEmSegundos ? tempoTotalEmSegundos - elapsed : 0
   }
 
   const iniciar = () => {
@@ -39,5 +47,6 @@ export const temporizadorDeCincoMinutos = () => {
     parar,
     reiniciar,
     tempoAtualFormatado,
+    atualizarTempo,
   }
 }

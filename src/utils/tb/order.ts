@@ -1,3 +1,4 @@
+import { baseBackUrl } from "../../api"
 import { TTicket } from "../@types/data/ticket"
 
 type Props = {
@@ -48,9 +49,7 @@ export const getOrderData = ({ tickets, buyer, taxTotal }: Props) => {
       },
       items,
       qr_codes: [{ amount: { value: paymentValue, arrangements: "PAGBANK" } }],
-      notification_urls: [
-        "https://back-moreira.vercel.app/api/orders/orderUpdate",
-      ],
+      notification_urls: [`${baseBackUrl}api/orders/orderUpdate`],
     }
 
     return obj

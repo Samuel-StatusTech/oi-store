@@ -26,6 +26,9 @@ type TResponses = {
       requestCode: Promise<TDefaultRes<{}>>
       validateCode: Promise<TDefaultRes<TUser>>
     }
+    order: {
+      confirm: Promise<TDefaultRes<{}>>
+    }
   }
 }
 
