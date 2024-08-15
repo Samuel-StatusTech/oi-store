@@ -16,7 +16,6 @@ import { ReactComponent as DownloadIcon } from "../../assets/icons/download.svg"
 import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
-import QRCode from "qrcode.react"
 import loadingAnimation from "../../assets/animations/loading"
 
 import calendar from "../../assets/icons/calendar.png"
@@ -27,6 +26,9 @@ import io from "socket.io-client"
 import { getOrderData } from "../../utils/tb/order"
 import downloadTickets from "../../utils/pdf"
 
+const socketUrl =
+  "https://fcc72937-d3ce-489c-abbd-4c6d1d4601c2-00-3a89kn5qa5vq6.riker.replit.dev"
+
 const PaymentPix = () => {
   const lctn = useLocation()
   const navigate = useNavigate()
@@ -35,10 +37,12 @@ const PaymentPix = () => {
 
   const [time, setTime] = useState("05:00")
   const [sid, setSid] = useState("")
+  const [oid, setOid] = useState<any>(null)
 
   const [buyedTickets, setBuyedTickets] = useState<TShoppingTicket[]>([])
 
   const [qrCode, setQrCode] = useState("")
+  const [qrCode64, setQrCode64] = useState("")
   const [feedback, setFeedback] = useState<any>({
     visible: false,
     message: "",
@@ -46,27 +50,143 @@ const PaymentPix = () => {
 
   const [payed, setPayed] = useState(false)
 
-  const copyQRToClipboard = () => {
+  // ----- MERCADOPAGO -----
+
+  const startSocket = async () => {
+    if (!lctn.state.tickets || !lctn.state.buyer) return returnPage()
+    else {
+      const socket = instanceSocket()
+
+      if (socket) {
+        socket.on("plugged", (socketId) => {
+          setSid(socketId)
+        })
+
+        socket.on("connect_error", (err) => {
+          alert("Ops, houve um erro. Tente novamente mais tarde")
+          navigate(-1)
+          return
+        })
+
+        // monitor payment
+
+        socket.on("orderUpdate", async (data) => {
+          if (data.status === "approved" || data.status === "denied") {
+            let f = {
+              state: data.status,
+              visible: false,
+              message: data.message,
+            }
+
+            if (data.status === "approved") {
+              const purchase = await confirmPurchase(data.sId, data.code)
+
+              if (purchase.ok && !purchase.data.success) f.state = "denied"
+
+              f.visible = true
+            }
+
+            setFeedback(f)
+
+            setTimeout(() => {
+              setFeedback({ ...f, visible: false })
+
+              if (f.state === "approved") {
+                setTimeout(() => {
+                  setPayed(true)
+                }, 400)
+              }
+            }, 3500)
+          }
+
+          if (data.status === "expired") {
+            socket.disconnect()
+            instanceSocket()
+          }
+        })
+      }
+    }
+  }
+
+  const getQR = async () => {
     try {
-      navigator.clipboard.writeText(qrCode).then(() => {
-        alert("Código copiado")
+      const orderData = getOrderData({
+        tickets: lctn.state.tickets,
+        buyer: lctn.state.buyer,
+        taxTotal: lctn.state.taxTotal ?? 0,
+        sid,
       })
+
+      if (orderData) {
+        const qr = await Api.get.qrcode({ order: orderData } as any)
+
+        if (qr.ok) {
+          setQrCode(qr.data.qrcodes.code)
+          setQrCode64(qr.data.qrcodes.base64)
+          runTimer()
+        }
+      }
     } catch (error) {}
+  }
+
+  const startPurchase = async () => {
+    await signPurchase(sid)
+    getQR()
+  }
+
+  useEffect(() => {
+    if (sid) startPurchase()
+  }, [sid])
+
+  // ----- PAGE -----
+
+  const copyQRToClipboard = async () => {
+    try {
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(qrCode).then(() => {
+          alert("Código copiado")
+        })
+      } else {
+        const textarea = document.createElement("textarea")
+
+        textarea.value = qrCode
+
+        // Torna o elemento invisível
+        textarea.style.position = "fixed"
+        textarea.style.zIndex = "-1"
+        textarea.style.visibility = "invisible"
+        textarea.style.opacity = "0"
+
+        document.body.appendChild(textarea)
+
+        textarea.select()
+
+        try {
+          // Executa o comando de cópia
+          const successful = document.execCommand("copy")
+          const msg = successful
+            ? "Texto copiado com sucesso!"
+            : "Falha ao copiar o texto."
+          alert(msg)
+        } catch (err) {
+          alert("Erro ao copiar o código. Tente novamente mais tarde")
+        }
+
+        textarea.remove()
+      }
+    } catch (error) {
+      alert(error)
+    }
   }
 
   const returnPage = () => {
     navigate(-1)
   }
 
-  const instanceSocket = () => {
-    // const paymentValue = ((lctn.state.tickets as TTicket[]) ?? []).reduce(
-    //   (sum, ticket) => sum + +(ticket.price_sell ?? "0"),
-    //   0
-    // )
-
-    const socket = io("https://back-moreira.vercel.app", {
+  const instanceSocket = useCallback(() => {
+    const socket = io(socketUrl, {
       autoConnect: true,
-      reconnectionAttempts: 3,
+      closeOnBeforeunload: false,
     })
 
     socket.on("connection", (socket) => {
@@ -74,56 +194,11 @@ const PaymentPix = () => {
     })
 
     socket.on("disconnect", () => {
-      alert("Ops, houve um erro. Tente novamente mais tarde")
-      navigate(-1)
+      socket.connect()
       return
     })
 
-    // let f = { ...feedback }
-
-    // socket.on("orderUpdate", (data) => {
-    // console.log("Here", data, paymentValue)
-
-    // if (data.amount === paymentValue) {
-    // f = { ...data, visible: true }
-
-    // if (data.state === 'EXPIRED') {
-    //   getOrderData()
-    //   instanceSocket()
-    // }
-    // }
-
-    // monitor minors payments ?
-    // })
-
     return socket
-  }
-
-  const getPBcode = useCallback(async () => {
-    if (!lctn.state.tickets || !lctn.state.buyer) return returnPage()
-    else {
-      const orderData = getOrderData({
-        tickets: lctn.state.tickets,
-        buyer: lctn.state.buyer,
-        taxTotal: lctn.state.taxTotal ?? 0,
-      })
-
-      if (orderData) {
-        const socket = instanceSocket()
-
-        const req = await Api.get.qrcode({
-          order: { ...orderData, reference_id: socket.id },
-        })
-
-        if (req.ok) {
-          setQrCode(req.data.qr_codes[0].text)
-          runTimer()
-        } else {
-          alert(req.error)
-          navigate(-1)
-        }
-      }
-    }
   }, [])
 
   const runTimer = () => {
@@ -134,23 +209,6 @@ const PaymentPix = () => {
     setInterval(() => {
       setTime(timer.tempoAtualFormatado())
     }, 1000)
-
-    let f = {
-      state: "PAID",
-      visible: true,
-      message: "Pagamento recebido.\nVocê já pode ver sua compra",
-    }
-
-    setTimeout(() => {
-      setFeedback(f)
-
-      setTimeout(() => {
-        setFeedback({ ...f, visible: false })
-        setTimeout(() => {
-          setPayed(true)
-        }, 400)
-      }, 3500)
-    }, 4000)
   }
 
   const loadEventData = useCallback(async () => {
@@ -172,10 +230,19 @@ const PaymentPix = () => {
     } else navigate("/eventSelect")
   }, [])
 
-  const signPurchase = useCallback(() => {
-    /*
-      await Api.post.signPurchase({ ... })
-    */
+  const signPurchase = useCallback(async (sId: string) => {
+    if (sId && event && event?.id) {
+      const sign = await Api.post.purchase.sign({
+        event_id: event?.id as string,
+        order_id: sId,
+        products: lctn.state.tickets as any,
+        payments: [],
+      })
+
+      if (sign.ok && sign.data.success) {
+        setOid(sign.data.order_number)
+      }
+    }
 
     // place data
 
@@ -201,26 +268,27 @@ const PaymentPix = () => {
     setBuyedTickets(pdfTickets)
   }, [])
 
-  const confirmPurchase = useCallback(() => {
-    /*
-      await Api.post.confirmPurchase({ ... })
-    */
+  const confirmPurchase = useCallback(async (sId: string, pcode: string) => {
+    return await Api.post.purchase.confirm({
+      order_id: sId,
+      order_number: oid,
+      payment_code: pcode,
+    })
   }, [])
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
 
+    if (!lctn.state.tickets) {
+      navigate(-1)
+      return
+    }
+
     try {
       loadEventData()
-
-      // sign purchase
-      signPurchase()
-      // get qr_code
-      getPBcode()
-      // confirm purchase
-      confirmPurchase()
+      startSocket()
     } catch (error) {}
-  }, [loadEventData, getPBcode])
+  }, [loadEventData])
 
   const handleDownload = async () => {
     if (event) await downloadTickets(event, buyedTickets, true)
@@ -294,7 +362,12 @@ const PaymentPix = () => {
                 <S.QR>
                   {qrCode ? (
                     <>
-                      {qrCode && <QRCode value={qrCode} renderAs="svg" />}
+                      {qrCode && qrCode64 && (
+                        <img
+                          src={`data:image/jpeg;base64,${qrCode64}`}
+                          alt=""
+                        />
+                      )}
 
                       <S.Button onClick={copyQRToClipboard}>
                         Copiar código

@@ -39,7 +39,6 @@ const Home = () => {
   }, [])
 
   const fetchTickets = useCallback(async () => {
-    console.log(event)
     if (event) {
       try {
         const req = await Api.get.products({ eventId: event?.id })
@@ -136,7 +135,7 @@ const Home = () => {
           <S.DescriptionSection>
             <S.DescTitle>Descrição</S.DescTitle>
             <S.DescTexts
-              dangerouslySetInnerHTML={{ __html: event?.description ?? "" }}
+              dangerouslySetInnerHTML={{ __html: event?.description2 ?? "" }}
             />
           </S.DescriptionSection>
 

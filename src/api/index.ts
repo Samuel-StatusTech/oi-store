@@ -3,12 +3,19 @@ import { TApi } from "../utils/@types/api"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
-const backUrl = "https://back-moreira.vercel.app"
+const backUrl = 
+// "http://localhost:8080/api"
+"https://fcc72937-d3ce-489c-abbd-4c6d1d4601c2-00-3a89kn5qa5vq6.riker.replit.dev/api"
+
+const dToken = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZqTFpROEQyOVBmQ3dJMlNiS3dQZ0I3cjdnRDMiLCJkYXRhYmFzZSI6IkRCNGI5MzEzZTNjZWUwOGQ5YWMzZDE0NGUxODg3MGJjMGRiMjA4MTNjZCIsImNsaWVudEtleSI6Ii1OYWxaenZiMndhc1VfNmR1R2NuIiwiaWF0IjoxNzE3NDk1MzQzLCJleHAiOjE5NzQxMDMzNDN9.50knxx6WtR8TBD0byCCPo7Qaxe6SV6MXvHujZYYd4rI`
 
 try {
   axios.interceptors.request.use(function (config) {
-    const token = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZqTFpROEQyOVBmQ3dJMlNiS3dQZ0I3cjdnRDMiLCJkYXRhYmFzZSI6IkRCNGI5MzEzZTNjZWUwOGQ5YWMzZDE0NGUxODg3MGJjMGRiMjA4MTNjZCIsImNsaWVudEtleSI6Ii1OYWxaenZiMndhc1VfNmR1R2NuIiwiaWF0IjoxNzE3NDk1MzQzLCJleHAiOjE5NzQxMDMzNDN9.50knxx6WtR8TBD0byCCPo7Qaxe6SV6MXvHujZYYd4rI`
-    config.headers.Authorization = token
+    // config.headers.Authorization = (!config.url?.includes("event/getSelect") && !config.url?.includes("event/getData"))
+    //   ? localStorage.getItem("token") ?? dToken
+    //   : dToken
+
+    config.headers.Authorization = dToken
 
     return config
   })
@@ -220,15 +227,15 @@ const requestCode: TApi["post"]["login"]["requestCode"] = async ({ phone }) => {
           database: "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd",
         })
         .then((res) => {
-          // const uObj = {
-          //   ...res.data.user,
-          //   cpf: res.data.roleData.cpf,
-          //   fone: res.data.roleData.fone,
-          // }
+          const uObj = {
+            ...res.data.user,
+            cpf: res.data.roleData.cpf,
+            fone: res.data.roleData.fone,
+          }
 
-          // localStorage.setItem("token", res.data.token)
+          localStorage.setItem("token", res.data.token)
 
-          resolve({ ok: true, data: {} })
+          resolve({ ok: true, data: uObj })
         })
         .catch(() => {
           resolve({
@@ -277,6 +284,89 @@ const validateCode: TApi["post"]["login"]["validateCode"] = async ({
   })
 }
 
+const signPurchase: TApi["post"]["purchase"]["sign"] = async (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const token = localStorage.getItem("token")
+
+      await axios
+        .post("/ecommerce/buyTicket", data, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
+        .then((res) => {
+          const purchase = res.data
+
+          resolve({ ok: true, data: purchase })
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Algo deu errado. Tente novamente mais tarde.",
+          })
+        })
+    } catch (error) {
+      reject({ error: "Erro ao solicitar tickets. Tente novamente mais tarde" })
+    }
+  })
+}
+
+const mpGenerate: TApi["post"]["purchase"]["mpGenerate"] = async ({
+  body,
+  iKey,
+}) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const token = localStorage.getItem("token")
+
+      await axios
+        .post("https://api.mercadopago.com/v1/payments", body, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "X-Idempotency-Key": iKey,
+          },
+          baseURL: "",
+        })
+        .then((res) => {
+          const purchase = res.data
+
+          resolve({ ok: true, data: purchase })
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Algo deu errado. Tente novamente mais tarde.",
+          })
+        })
+    } catch (error) {
+      reject({ error: "Erro ao solicitar tickets. Tente novamente mais tarde" })
+    }
+  })
+}
+
+const confirmPurchase: TApi["post"]["purchase"]["confirm"] = async (data) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await axios
+        .post("/ecommerce/confirmBuyTicket", data)
+        .then((res) => {
+          const purchase = res.data
+
+          resolve({ ok: true, data: purchase })
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Algo deu errado. Tente novamente mais tarde.",
+          })
+        })
+    } catch (error) {
+      reject({ error: "Erro ao solicitar tickets. Tente novamente mais tarde" })
+    }
+  })
+}
+
 export const Api: TApi = {
   get: {
     qrcode: getQrCode,
@@ -289,6 +379,11 @@ export const Api: TApi = {
     login: {
       requestCode: requestCode,
       validateCode: validateCode,
+    },
+    purchase: {
+      sign: signPurchase,
+      mpGenerate: mpGenerate,
+      confirm: confirmPurchase,
     },
   },
 }

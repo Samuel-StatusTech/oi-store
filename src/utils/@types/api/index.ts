@@ -26,6 +26,17 @@ type TApiPosters = {
       p: TParams["post"]["login"]["validateCode"]
     ) => TResponses["post"]["login"]["validateCode"]
   }
+  purchase: {
+    sign: (
+      p: TParams["post"]["purchase"]["sign"]
+    ) => TResponses["post"]["purchase"]["sign"]
+    mpGenerate: (
+      p: TParams["post"]["purchase"]["mpGenerate"]
+    ) => TResponses["post"]["purchase"]["mpGenerate"]
+    confirm: (
+      p: TParams["post"]["purchase"]["confirm"]
+    ) => TResponses["post"]["purchase"]["confirm"]
+  }
 }
 
 export type TApi = {

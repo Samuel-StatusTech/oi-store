@@ -3,6 +3,7 @@ export type TEventData = {
   org_id: string
   name: string
   description: string
+  description2: string
   logo: string
   logo_print: string
   date_ini: string

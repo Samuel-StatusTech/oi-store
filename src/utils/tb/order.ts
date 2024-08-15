@@ -7,9 +7,10 @@ type Props = {
     phone: string
   }
   taxTotal: number
+  sid: string
 }
 
-export const getOrderData = ({ tickets, buyer, taxTotal }: Props) => {
+export const getOrderData = ({ tickets, buyer, taxTotal, sid }: Props) => {
   if (tickets) {
     const paymentValue =
       tickets.reduce((sum, ticket) => sum + +(ticket.price_sell ?? "0"), 0) +
@@ -33,24 +34,25 @@ export const getOrderData = ({ tickets, buyer, taxTotal }: Props) => {
       })
 
     const obj = {
-      customer: {
-        name: buyer?.name ?? "Lorem ipsum",
-        email: "null@null.null",
-        phones: [
-          {
-            country: "55",
-            area: phone.slice(0, 2),
-            number: phone.slice(2),
-            type: "MOBILE",
-          },
-        ],
-        tax_id: "12345678909",
+      transaction_amount: paymentValue / 100,
+      payment_method_id: "pix",
+      // description: "",
+      payer: {
+        first_name: "Developer",
+        last_name: "test",
+        email: "samdg919@gmail.com",
+        // type: "guest",
       },
-      items,
-      qr_codes: [{ amount: { value: paymentValue, arrangements: "PAGBANK" } }],
-      notification_urls: [
-        "https://back-moreira.vercel.app/api/orders/orderUpdate",
-      ],
+      metadata: {
+        payer: {
+          phone: {
+            area_code: phone.slice(0, 2),
+            number: phone.slice(2),
+          },
+        },
+        cCode: sid,
+      },
+      // items
     }
 
     return obj

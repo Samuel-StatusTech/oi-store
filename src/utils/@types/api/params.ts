@@ -1,4 +1,5 @@
 type TParams = {
+  // Get
   get: {
     qrcode: {
       order: {
@@ -24,12 +25,42 @@ type TParams = {
     }
     myTickets: {}
   }
+
+  // Post
   post: {
     login: {
       requestCode: { phone: string }
       validateCode: { phone: string; code: string }
     }
+    purchase: {
+      sign: {
+        order_id: string
+        event_id: string
+        products: TPurchaseProduct[]
+        payments: TPurchasePayment[]
+      }
+      mpGenerate: any
+      confirm: {
+        order_id: string
+        payment_code: string
+        order_number: number
+      }
+    }
   }
+}
+
+type TPurchasePayment = {
+  payment_type: string
+  price: number
+  transitionCode: string | null
+  transitionId: string | null
+}
+
+type TPurchaseProduct = {
+  batch_id: string
+  id: string
+  price_sell: string
+  quantity: number
 }
 
 export default TParams

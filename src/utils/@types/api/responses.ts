@@ -26,6 +26,36 @@ type TResponses = {
       requestCode: Promise<TDefaultRes<{}>>
       validateCode: Promise<TDefaultRes<TUser>>
     }
+    purchase: {
+      sign: Promise<
+        TDefaultRes<
+          | {
+              success: true
+              order_id: string
+              order_number: number
+            }
+          | {
+              success: false
+            }
+        >
+      >
+      mpGenerate: Promise<
+        TDefaultRes<
+          | {
+              success: true
+              data: any
+            }
+          | {
+              success: false
+            }
+        >
+      >
+      confirm: Promise<
+        TDefaultRes<{
+          success: boolean
+        }>
+      >
+    }
   }
 }
 
