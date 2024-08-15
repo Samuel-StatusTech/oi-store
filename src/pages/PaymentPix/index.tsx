@@ -26,7 +26,10 @@ import io from "socket.io-client"
 import { getOrderData } from "../../utils/tb/order"
 import downloadTickets from "../../utils/pdf"
 
-const socketUrl = process.env.REACT_APP_socketUrl as string
+const socketUrl =
+  process.env.NODE_ENV === "production"
+    ? (process.env.REACT_APP_socketUrl as string)
+    : "https://fcc72937-d3ce-489c-abbd-4c6d1d4601c2-00-3a89kn5qa5vq6.riker.replit.dev"
 
 const PaymentPix = () => {
   const lctn = useLocation()
@@ -63,6 +66,8 @@ const PaymentPix = () => {
 
         socket.on("connect_error", (err) => {
           alert("Ops, houve um erro. Tente novamente mais tarde")
+          socket.off("disconnect")
+          socket.disconnect()
           navigate(-1)
           return
         })
@@ -192,10 +197,10 @@ const PaymentPix = () => {
       setSid(socket.id)
     })
 
-    socket.on("disconnect", () => {
-      socket.connect()
-      return
-    })
+    // socket.on("disconnect", () => {
+    //   socket.connect()
+    //   return
+    // })
 
     return socket
   }, [])
@@ -278,7 +283,7 @@ const PaymentPix = () => {
   useEffect(() => {
     window.scrollTo({ top: 0 })
 
-    if (!lctn.state.tickets) {
+    if (!lctn.state || !lctn.state.tickets) {
       navigate(-1)
       return
     }
