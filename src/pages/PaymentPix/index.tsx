@@ -26,8 +26,7 @@ import io from "socket.io-client"
 import { getOrderData } from "../../utils/tb/order"
 import downloadTickets from "../../utils/pdf"
 
-const socketUrl =
-  "https://fcc72937-d3ce-489c-abbd-4c6d1d4601c2-00-3a89kn5qa5vq6.riker.replit.dev"
+const socketUrl = process.env.REACT_APP_socketUrl as string
 
 const PaymentPix = () => {
   const lctn = useLocation()
