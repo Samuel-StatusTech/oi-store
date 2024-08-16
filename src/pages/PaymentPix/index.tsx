@@ -25,6 +25,7 @@ import { Api } from "../../api"
 import io from "socket.io-client"
 import { getOrderData } from "../../utils/tb/order"
 import downloadTickets from "../../utils/pdf"
+import { generateTicketID } from "../../utils/tb/qrcode"
 
 const socketUrl =
   process.env.NODE_ENV === "production"
@@ -254,13 +255,21 @@ const PaymentPix = () => {
 
     const tickets = (lctn.state.tickets ?? []) as any[]
 
-    tickets.forEach((t) => {
+    tickets.forEach((t, k) => {
+      const tid = generateTicketID(
+        false,
+        "ecommerce",
+        t.oid,
+        event?.oid as number,
+        "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd"
+      )
+
       pdfTickets.push({
         id: t.id,
         name: t.name,
         batch_name: "Nome do lote",
         event_name: event?.name as string,
-        qr_data: (t.id as string).toUpperCase(),
+        qr_data: tid,
         order_id: sid,
         date: new Date().toISOString(),
         image: null,

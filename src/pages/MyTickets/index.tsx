@@ -4,7 +4,7 @@ import * as S from "./styled"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
 import Container from "../../components/Container"
-import TicketCard from "../../components/TicketCard"
+// import TicketCard from "../../components/TicketCard"
 
 import { placeList } from "./placeList"
 import getStore from "../../store"
@@ -15,7 +15,7 @@ const MyTickets = () => {
 
   const navigate = useNavigate()
 
-  const [list, setList] = useState<any[]>([])
+  const [, setList] = useState<any[]>([])
 
   const getData = useCallback(() => {
     setList(
@@ -40,11 +40,31 @@ const MyTickets = () => {
         <S.Main>
           <S.PageTitle>Meus tickets</S.PageTitle>
 
-          <S.List>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              width: "100%",
+            }}
+          >
+            <span
+              style={{
+                whiteSpace: "nowrap",
+                textAlign: "center",
+                fontSize: 18,
+                fontStyle: "italic",
+                marginTop: 64,
+                marginBottom: 24,
+              }}
+            >
+              Em desenvolvimento...
+            </span>
+          </div>
+          {/* <S.List>
             {list.map((ticket, k) => (
               <TicketCard k={k} key={k} data={ticket} />
             ))}
-          </S.List>
+          </S.List> */}
         </S.Main>
       </Container>
 
