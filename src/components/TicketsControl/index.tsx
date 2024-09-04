@@ -93,6 +93,8 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
   }
 
   const handleBuy = () => {
+    console.log(event)
+    // @ts-ignore
     if (user && !event?.nominal) {
       const errors = checkErrors()
 
@@ -108,7 +110,7 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
         const buyer: TForm["buyer"] = {
           name: user.name,
           phone: user.fone,
-          cpf: "",
+          email: user.email,
         }
 
         navigate("/payment/pix", {

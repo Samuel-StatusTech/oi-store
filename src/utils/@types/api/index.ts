@@ -11,6 +11,9 @@ type TApiGetters = {
   eventInfo: (p: TParams["get"]["eventInfo"]) => TResponses["get"]["eventInfo"]
   products: (p: TParams["get"]["products"]) => TResponses["get"]["products"]
   myTickets: (p: TParams["get"]["myTickets"]) => TResponses["get"]["myTickets"]
+  purchaseInfo: (
+    p: TParams["get"]["purchaseInfo"]
+  ) => TResponses["get"]["purchaseInfo"]
 }
 
 /*
@@ -18,6 +21,7 @@ type TApiGetters = {
  */
 
 type TApiPosters = {
+  register: (p: TParams["post"]["register"]) => TResponses["post"]["register"]
   login: {
     requestCode: (
       p: TParams["post"]["login"]["requestCode"]

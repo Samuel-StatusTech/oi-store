@@ -3,9 +3,7 @@ import { TApi } from "../utils/@types/api"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
-const backUrl = 
-// "http://localhost:8080/api"
-"https://fcc72937-d3ce-489c-abbd-4c6d1d4601c2-00-3a89kn5qa5vq6.riker.replit.dev/api"
+const backUrl = "https://api.oitickets.com.br/api/v1"
 
 const dToken = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZqTFpROEQyOVBmQ3dJMlNiS3dQZ0I3cjdnRDMiLCJkYXRhYmFzZSI6IkRCNGI5MzEzZTNjZWUwOGQ5YWMzZDE0NGUxODg3MGJjMGRiMjA4MTNjZCIsImNsaWVudEtleSI6Ii1OYWxaenZiMndhc1VfNmR1R2NuIiwiaWF0IjoxNzE3NDk1MzQzLCJleHAiOjE5NzQxMDMzNDN9.50knxx6WtR8TBD0byCCPo7Qaxe6SV6MXvHujZYYd4rI`
 
@@ -29,7 +27,7 @@ const getQrCode: TApi["get"]["qrcode"] = async ({ order }) => {
   return new Promise(async (resolve, reject) => {
     try {
       await axios
-        .post(`${backUrl}/orders/qrcode`, order)
+        .post(`${backUrl}/ecommerce/payment/orders/qrcode`, order)
         .then((res) => {
           const info = res.data
 
@@ -113,19 +111,29 @@ const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
   return new Promise(async (resolve, reject) => {
     try {
       const moreInfo =
-        (await axios.get(`/event/getData/${eventId}`)).data.event ?? {}
+        (
+          await axios.get(`/event/getData/${eventId}`, {
+            headers: {
+              "X-event-id": eventId,
+            },
+          })
+        ).data.event ?? {}
 
       await axios
-        .get(`/ecommerce/getInfo?eventId=${eventId}`)
+        .get(`/ecommerce/getInfo?eventId=${eventId}`, {
+          headers: {
+            "X-event-id": eventId,
+          },
+        })
         .then((res) => {
           const info = res.data.info
-
+          
           if (info) {
             resolve({
               ok: true,
               data: {
-                ...moreInfo,
                 ...info,
+                ...moreInfo,
               },
             })
           } else {
@@ -215,8 +223,37 @@ const getMyTickets: TApi["get"]["myTickets"] = async () => {
 }
 
 /*
- * Create
+ * Login
  */
+
+const registerUser: TApi["post"]["register"] = async ({
+  phone,
+  name,
+  email,
+}) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await axios
+        .post("/ecommerce/register", {
+          name,
+          username: name,
+          fone: phone,
+          email,
+        })
+        .then((res) => {
+          resolve({ ok: true, data: res.data })
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Algo deu errado. Tente novamente mais tarde.",
+          })
+        })
+    } catch (error) {
+      reject({ error: "Erro ao cadastrar usuário. Tente novamente mais tarde" })
+    }
+  })
+}
 
 const requestCode: TApi["post"]["login"]["requestCode"] = async ({ phone }) => {
   return new Promise(async (resolve, reject) => {
@@ -283,6 +320,10 @@ const validateCode: TApi["post"]["login"]["validateCode"] = async ({
     }
   })
 }
+
+/*
+ * Purchase
+ */
 
 const signPurchase: TApi["post"]["purchase"]["sign"] = async (data) => {
   return new Promise(async (resolve, reject) => {
@@ -367,15 +408,42 @@ const confirmPurchase: TApi["post"]["purchase"]["confirm"] = async (data) => {
   })
 }
 
+const getPurchase: TApi["get"]["purchaseInfo"] = async ({
+  eventId,
+  orderId,
+}) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await axios
+        .get(`/${eventId}/ecommerce/orders/${orderId}`)
+        .then((res) => {
+          const purchase = res.data
+
+          resolve({ ok: true, data: purchase })
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Algo deu errado. Tente novamente mais tarde.",
+          })
+        })
+    } catch (error) {
+      reject({ error: "Erro ao solicitar tickets. Tente novamente mais tarde" })
+    }
+  })
+}
+
 export const Api: TApi = {
   get: {
     qrcode: getQrCode,
     events: getEvents,
     eventInfo: getEventInfo,
-    products: getProducts,
     myTickets: getMyTickets,
+    products: getProducts,
+    purchaseInfo: getPurchase,
   },
   post: {
+    register: registerUser,
     login: {
       requestCode: requestCode,
       validateCode: validateCode,

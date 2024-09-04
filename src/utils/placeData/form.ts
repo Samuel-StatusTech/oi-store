@@ -4,7 +4,7 @@ export const initialForm = {
   buyer: {
     name: "",
     phone: "",
-    cpf: "",
+    email: "",
   },
   tickets: [] as TTicketForm[],
   card: {

@@ -18,10 +18,38 @@ type TResponses = {
     qrcode: Promise<TDefaultRes<TQrPaymentData>>
     events: Promise<TDefaultRes<TEventMin[]>>
     eventInfo: Promise<TDefaultRes<TEventData>>
-    products: Promise<TDefaultRes<{ list: TProduct[] }>>
     myTickets: Promise<TDefaultRes<{ list: any[] }>>
+    products: Promise<TDefaultRes<{ list: TProduct[] }>>
+    purchaseInfo: Promise<
+      TDefaultRes<{
+        id: string
+        products: {
+          opuid: string
+          id: string
+          name: string
+          batch_name: string
+          qr_data: string
+          order_id: string
+          image: null | string
+          quantity: number
+          price_unit: number
+        }[]
+        payments: {
+          id: string
+          order_oid: number
+          payment_type: string
+          price: number
+          transition_code: null | string
+          transition_id: null | string
+          machineData: string
+          created_at: string
+          updated_at: string
+        }[]
+      }>
+    >
   }
   post: {
+    register: Promise<TDefaultRes<{ success: true }>>
     login: {
       requestCode: Promise<TDefaultRes<{}>>
       validateCode: Promise<TDefaultRes<TUser>>

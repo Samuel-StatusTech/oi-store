@@ -20,7 +20,6 @@ import OrderResume from "../../components/OrderResume"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { TForm, TTicketForm, initialForm } from "../../utils/placeData/form"
 import { Link, useLocation, useNavigate } from "react-router-dom"
-import { formatCpf } from "../../utils/masks/cpf"
 import { formatPhone } from "../../utils/masks/phone"
 import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
 import getStore from "../../store"
@@ -28,6 +27,8 @@ import { formatCardDate } from "../../utils/masks/date"
 import { formatCardCode } from "../../utils/masks/cardcode"
 import { Api } from "../../api"
 import { sumTaxes, sumTickets } from "../../utils/tb/taxes"
+import { validEmail } from "../../utils/tb/validEmail"
+import Feedback from "../../components/Feedback"
 
 type MProps = {
   checked: boolean
@@ -142,15 +143,19 @@ const Payment = () => {
   const [form, setForm] = useState<TForm>({
     ...initialForm,
     buyer: {
-      cpf: "",
+      email: "",
       name: user?.name ?? "",
       phone: user?.fone ? formatPhone(user?.fone) : "",
     },
   })
   const [flag, setFlag] = useState<TCardFlag>(null)
   const [fieldsOk, setFieldsOk] = useState(false)
+  const [canBuy, setCanBuy] = useState(false)
 
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
+  const [feedback, setFeedback] = useState<any>({ visible: false, message: "" })
+
+  // Fns..
 
   const handleSelect = (newMethod: "pix" | "credit") => {
     if (method === newMethod) setMethod("")
@@ -158,7 +163,8 @@ const Payment = () => {
   }
 
   const handleForm = (field: keyof TForm["buyer"], value: string) => {
-    if (field === "cpf") value = formatCpf(value)
+    if (!user && canBuy) setCanBuy(false)
+
     if (field === "phone") value = formatPhone(value)
 
     setForm({
@@ -195,6 +201,8 @@ const Payment = () => {
     field: keyof TTicketForm["person"],
     value: string
   ) => {
+    if (!user && canBuy) setCanBuy(false)
+
     setForm({
       ...form,
       tickets: form.tickets.map((t) =>
@@ -344,6 +352,8 @@ const Payment = () => {
 
     if (
       form.buyer.name.length < 1 ||
+      form.buyer.email.length < 1 ||
+      !validEmail(form.buyer.email) ||
       form.buyer.phone.replace(/\D/g, "").length < 9
     )
       hasError = true
@@ -354,7 +364,9 @@ const Payment = () => {
     return hasError
   }
 
-  const handlePay = () => {
+  // Payment
+
+  const handlePay = async () => {
     const errors = checkErrors()
 
     if (!errors) {
@@ -367,9 +379,48 @@ const Payment = () => {
       })
 
       if (method === "pix")
-        navigate("/payment/pix", {
-          state: { tickets: form.tickets, buyer: form.buyer, taxTotal: taxes },
-        })
+        if (user) {
+          navigate("/payment/pix", {
+            state: {
+              tickets: form.tickets,
+              buyer: form.buyer,
+              taxTotal: taxes,
+            },
+          })
+        } else {
+          if (!canBuy) {
+            const f = {
+              state: "expired",
+              visible: true,
+              message:
+                "Não há cadastro desse telefone. Confira os dados e confirme para se cadastrar e comprar.",
+            }
+            setFeedback(f)
+
+            setTimeout(() => {
+              setFeedback({ ...f, visible: false })
+
+              setTimeout(() => {
+                setCanBuy(true)
+              }, 400)
+            }, 3500)
+          } else {
+            const newUser = await Api.post.register(form.buyer)
+
+            if (newUser.ok && newUser.data.success) {
+              navigate("/payment/pix", {
+                state: {
+                  tickets: form.tickets,
+                  buyer: form.buyer,
+                  taxTotal: taxes,
+                },
+              })
+            } else {
+              navigate(-1)
+              return
+            }
+          }
+        }
       else if (method === "credit") return
     } else {
       alert("Preencha os campos corretamente e tente novamente.")
@@ -409,6 +460,8 @@ const Payment = () => {
   }, [tickets])
 
   useEffect(() => {
+    if (!user) setCanBuy(false)
+
     if (lctn.state) {
       const pickedTickets = lctn.state.tickets ?? null
 
@@ -419,12 +472,26 @@ const Payment = () => {
   }, [lctn.state, navigate])
 
   useEffect(() => {
-    setFieldsOk(!!form.buyer.name && !!form.buyer.phone)
+    if (event?.nominal) {
+      let buyerFieldsOk =
+        !!form.buyer.name && !!form.buyer.phone && !!form.buyer.email
+
+      let ticketsUsersOk = form.tickets.every((t) => !!t.person.name.trim())
+
+      setFieldsOk(buyerFieldsOk && ticketsUsersOk)
+    } else {
+      setFieldsOk(!!form.buyer.name && !!form.buyer.phone && !!form.buyer.email)
+    }
+  }, [form.buyer, form.tickets])
+
+  useEffect(() => {
     loadEventData()
-  }, [loadEventData, form.buyer])
+  }, [loadEventData])
 
   return (
     <S.Page>
+      <Feedback data={feedback} />
+
       <Header />
 
       <Container>
@@ -478,6 +545,8 @@ const Payment = () => {
                         value={form.buyer.name}
                         onChange={(v: string) => handleForm("name", v)}
                       />
+                    </S.FormLine>
+                    <S.FormLine>
                       <Input
                         label={"Telefone"}
                         value={form.buyer.phone}
@@ -485,16 +554,12 @@ const Payment = () => {
                         inputMode="numeric"
                         enterKeyHint={"done"}
                       />
+                      <Input
+                        label={"Email"}
+                        value={form.buyer.email}
+                        onChange={(v: string) => handleForm("email", v)}
+                      />
                     </S.FormLine>
-                    {method === "credit" && (
-                      <S.FormLine>
-                        <Input
-                          label={"CPF"}
-                          value={form.buyer.cpf}
-                          onChange={(v: string) => handleForm("cpf", v)}
-                        />
-                      </S.FormLine>
-                    )}
                   </S.FormLines>
                 </S.FormBlock>
 

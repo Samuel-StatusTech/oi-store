@@ -1,7 +1,7 @@
 export const generateTicketID = (
   isComboObj: boolean,
   type: string,
-  prodOId: number,
+  prodOId: number | string,
   eventOid: number,
   clientDatabase: string
 ) => {

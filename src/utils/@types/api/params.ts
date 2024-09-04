@@ -20,20 +20,30 @@ type TParams = {
     eventInfo: {
       eventId: string
     }
+    myTickets: {}
     products: {
       eventId: string
     }
-    myTickets: {}
+    purchaseInfo: {
+      eventId: string
+      orderId: string
+    }
   }
 
   // Post
   post: {
+    register: {
+      name: string
+      phone: string
+      email: string
+    }
     login: {
       requestCode: { phone: string }
       validateCode: { phone: string; code: string }
     }
     purchase: {
       sign: {
+        user_fone: string,
         order_id: string
         event_id: string
         products: TPurchaseProduct[]

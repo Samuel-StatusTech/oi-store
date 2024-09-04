@@ -27,16 +27,15 @@ import { getOrderData } from "../../utils/tb/order"
 import downloadTickets from "../../utils/pdf"
 import { generateTicketID } from "../../utils/tb/qrcode"
 
-const socketUrl =
-  process.env.NODE_ENV === "production"
-    ? (process.env.REACT_APP_socketUrl as string)
-    : "https://fcc72937-d3ce-489c-abbd-4c6d1d4601c2-00-3a89kn5qa5vq6.riker.replit.dev"
+const socketUrl = "https://api.oitickets.com.br:3020"
+// "https://fcc72937-d3ce-489c-abbd-4c6d1d4601c2-00-3a89kn5qa5vq6.riker.replit.dev/"
+// process.env.REACT_APP_socketUrl as string
 
 const PaymentPix = () => {
   const lctn = useLocation()
   const navigate = useNavigate()
 
-  const { event, controllers } = getStore()
+  const { user, event, controllers } = getStore()
 
   const [time, setTime] = useState("05:00")
   const [sid, setSid] = useState("")
@@ -61,6 +60,10 @@ const PaymentPix = () => {
       const socket = instanceSocket()
 
       if (socket) {
+        socket.on("connection", () => {
+          console.log(socket)
+        })
+
         socket.on("plugged", (socketId) => {
           setSid(socketId)
         })
@@ -135,8 +138,13 @@ const PaymentPix = () => {
   }
 
   const startPurchase = async () => {
-    await signPurchase(sid)
-    getQR()
+    if (user && user.fone) {
+      await signPurchase(sid)
+      getQR()
+    } else {
+      navigate(-1)
+      return
+    }
   }
 
   useEffect(() => {
@@ -192,6 +200,8 @@ const PaymentPix = () => {
     const socket = io(socketUrl, {
       autoConnect: true,
       closeOnBeforeunload: false,
+      path: "",
+      secure: false,
     })
 
     socket.on("connection", (socket) => {
@@ -236,49 +246,77 @@ const PaymentPix = () => {
   }, [])
 
   const signPurchase = useCallback(async (sId: string) => {
-    if (sId && event && event?.id) {
+    if (sId && event && event?.id && user) {
+      const orderData = getOrderData({
+        tickets: lctn.state.tickets,
+        buyer: lctn.state.buyer,
+        taxTotal: lctn.state.taxTotal ?? 0,
+        sid,
+      })
+
       const sign = await Api.post.purchase.sign({
+        user_fone: user?.fone,
         event_id: event?.id as string,
         order_id: sId,
         products: lctn.state.tickets as any,
-        payments: [],
+        payments: [
+          {
+            payment_type: "pix",
+            price: (orderData?.transaction_amount as number) * 100,
+            transitionCode: null,
+            transitionId: null,
+          },
+        ],
       })
 
       if (sign.ok && sign.data.success) {
-        setOid(sign.data.order_number)
+        setOid(sign.data.order_id)
+
+        loadPurchaseData(sign.data.order_id)
       }
     }
+  }, [])
 
+  const loadPurchaseData = useCallback(async (orderId: string) => {
     // place data
+    if (event) {
+      try {
+        const p = await Api.get.purchaseInfo({ eventId: event.id, orderId })
 
-    let pdfTickets: TShoppingTicket[] = []
+        if (p.ok && p.data.id) {
+          let pdfTickets: TShoppingTicket[] = []
 
-    const tickets = (lctn.state.tickets ?? []) as any[]
+          const tickets = p.data.products
 
-    tickets.forEach((t, k) => {
-      const tid = generateTicketID(
-        false,
-        "ecommerce",
-        t.oid,
-        event?.oid as number,
-        "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd"
-      )
+          tickets.forEach((t, k) => {
+            const tid = generateTicketID(
+              false,
+              "ecommerce",
+              t.opuid, //"cc94aab8-05f1-4896-a230-e36cf8caf5e9", //t.oid,
+              event?.oid as number,
+              "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd"
+            )
 
-      pdfTickets.push({
-        id: t.id,
-        name: t.name,
-        batch_name: "Nome do lote",
-        event_name: event?.name as string,
-        qr_data: tid,
-        order_id: sid,
-        date: new Date().toISOString(),
-        image: null,
-        quantity: t.qnt,
-        price_unit: t.price_sell,
-      })
-    })
+            pdfTickets.push({
+              id: t.id,
+              name: t.name,
+              batch_name: "Nome do lote",
+              event_name: event?.name as string,
+              qr_data: tid,
+              order_id: sid,
+              date: new Date().toISOString(),
+              image: null,
+              quantity: t.quantity,
+              price_unit: t.price_unit,
+            })
+          })
 
-    setBuyedTickets(pdfTickets)
+          setBuyedTickets(pdfTickets)
+        }
+      } catch (error) {
+        console.log(error)
+      }
+    }
   }, [])
 
   const confirmPurchase = useCallback(async (sId: string, pcode: string) => {
