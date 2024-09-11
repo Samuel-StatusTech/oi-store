@@ -33,6 +33,8 @@ type TResponses = {
           image: null | string
           quantity: number
           price_unit: number
+          price_total: number
+          date: string
         }[]
         payments: {
           id: string

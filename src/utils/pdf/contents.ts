@@ -143,9 +143,7 @@ const ticketData = (
     ],
     [
       {
-        text: `${ticket.batch_name ?? ""} - ${
-          ticket.qr_data.slice(0, ticket.qr_data.indexOf("-")) ?? ""
-        }`, // ticket.qr_data only
+        text: `${ticket.batch_name ?? ""} - ${ticket.qr_TID}`, // ticket.qr_data only
       },
     ],
     [
@@ -168,13 +166,13 @@ const ticketData = (
 
   tableBody.push([
     {
-      qr: `${ticket.qr_data + ticket.qr_data + ticket.qr_data}`,
+      qr: `${ticket.qr_data}`,
       style: "qrcode",
     },
   ]) // ticket.qr_data only
   tableBody.push([
     {
-      text: ticket.qr_data.slice(0, ticket.qr_data.indexOf("-")),
+      text: ticket.qr_TID,
       style: "qrcodetext",
     },
   ]) // ticket.qr_data only

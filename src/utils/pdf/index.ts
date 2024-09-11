@@ -5,6 +5,7 @@ import { reportTitle, footer, content } from "./contents"
 import { Content, TDocumentDefinitions } from "pdfmake/interfaces"
 import { TEventData } from "../@types/data/event"
 import { TShoppingTicket } from "../@types/data/ticket"
+import { generateTicketID } from "../tb/qrcode"
 
 const downloadTickets = async (
   eventData: TEventData,
@@ -15,6 +16,26 @@ const downloadTickets = async (
 
   return new Promise(async (resolve) => {
     try {
+      const tkts = tickets.map((t) => {
+        const tid = generateTicketID(
+          false,
+          "ecommerce",
+          t.opuid,
+          eventData?.oid as number,
+          "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd"
+        )
+
+        console.log(tid)
+
+        return {
+          ...t,
+          qr_TID: tid,
+          date: new Date(t.date).toISOString(),
+        }
+      })
+
+      // ---
+
       const filename = `Meus Tickets para ${eventData.name.trim()}.pdf`
 
       let logo = ""
@@ -31,7 +52,7 @@ const downloadTickets = async (
           eventData.logo && !!logo
             ? ([{ ...reportTitle[0], image: "logo" }] as Content)
             : undefined,
-        content: [...content(eventData, tickets)],
+        content: [...content(eventData, tkts as any)],
         footer: [footer(eventData)] as Content,
         styles: styles,
       }

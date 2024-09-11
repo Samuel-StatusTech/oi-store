@@ -7,62 +7,13 @@ import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
 
 import getStore from "../../store"
 import downloadTickets from "../../utils/pdf"
+import { Api } from "../../api"
+import { formatMoney } from "../../utils/tb/formatMoney"
 
 type Props = {
   data: TCardTicket
   k: number
 }
-
-const falseTicketsList: TShoppingTicket[] = [
-  {
-    id: "id1",
-    name: "Ticket teste",
-    batch_name: "Mesas VIP",
-    event_name: "Show Roberto Carlos",
-    qr_data: "ASF789FSDFS7",
-    order_id: "AHJW918-FJSJ453-SAJS229",
-    date: new Date().toISOString(),
-    image: null,
-    quantity: 2,
-    price_unit: 4900,
-  },
-  {
-    id: "id2",
-    name: "Ticket teste",
-    batch_name: "Mesas VIP",
-    event_name: "Show Roberto Carlos",
-    qr_data: "ASF789FSDFS7",
-    order_id: "AHJW918-FJSJ453-SAJS229",
-    date: new Date().toISOString(),
-    image: null,
-    quantity: 2,
-    price_unit: 4900,
-  },
-  {
-    id: "id3",
-    name: "Ticket teste",
-    batch_name: "Mesas VIP",
-    event_name: "Show Roberto Carlos",
-    qr_data: "Q789DS797HJK",
-    order_id: "AHJW918-FJSJ453-SAJS229",
-    date: new Date().toISOString(),
-    image: null,
-    quantity: 2,
-    price_unit: 4900,
-  },
-  {
-    id: "id4",
-    name: "Ticket teste",
-    batch_name: "Mesas VIP",
-    event_name: "Show Roberto Carlos",
-    qr_data: "S9DASK09WQDK",
-    order_id: "AHJW918-FJSJ453-SAJS229",
-    date: new Date().toISOString(),
-    image: null,
-    quantity: 2,
-    price_unit: 4900,
-  },
-]
 
 const TicketCard = ({ k, data }: Props) => {
   const { event } = getStore()
@@ -71,11 +22,16 @@ const TicketCard = ({ k, data }: Props) => {
 
   const loadTickets = useCallback(async () => {
     try {
-      // const req = await Api.get.ticketsById(data.ticketId)
+      const req = await Api.get.purchaseInfo({
+        eventId: event?.id as string,
+        orderId: data.order_id,
+      })
 
-      setTickets(falseTicketsList)
+      if (req.ok) {
+        setTickets(req.data.products)
+      }
     } catch (error) {}
-  }, [])
+  }, [data.order_id, event?.id])
 
   useEffect(() => {
     loadTickets()
@@ -118,7 +74,19 @@ const TicketCard = ({ k, data }: Props) => {
     </S.Icons>
   )
 
-  const renderPrice = () => <S.EventDate>{data.price_sell}</S.EventDate>
+  const renderPrice = () => (
+    <S.EventDate>{formatMoney(+data.total_price, true)}</S.EventDate>
+  )
+
+  const getDate = () => {
+    const d = new Date(data.created_at)
+
+    const todayStr = `${String(d.getDate()).padStart(2, "0")}/${String(
+      d.getMonth() + 1
+    ).padStart(2, "0")}/${d.getFullYear()}`
+
+    return todayStr
+  }
 
   return (
     <S.Component $k={k}>
@@ -128,12 +96,12 @@ const TicketCard = ({ k, data }: Props) => {
         </S.ImageContainer>
         <S.EventInfo>
           <S.CardBottom>
-            <S.EventName>{data.name}</S.EventName>
+            <S.EventName>{getDate()}</S.EventName>
             {renderPrice()}
           </S.CardBottom>
           <S.CardBottom>
             {renderBtns()}
-            <S.TicketsQnt>Tickets: {data.ticketsQnt}</S.TicketsQnt>
+            <S.TicketsQnt>Tickets: {data.sold_quantity}</S.TicketsQnt>
           </S.CardBottom>
         </S.EventInfo>
       </div>

@@ -93,17 +93,20 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
   }
 
   const handleBuy = () => {
-    console.log(event)
     // @ts-ignore
     if (user && !event?.nominal) {
       const errors = checkErrors()
 
       if (!errors) {
         let ptickets: any[] = []
-
         tickets.forEach((t) => {
           for (let k = 0; k <= t.qnt - 1; k++) {
-            ptickets.push({ ...t, oid: k, person: { name: "" } })
+            ptickets.push({
+              ...t,
+              oid: k,
+              person: { name: "" },
+              quantity: 1,
+            })
           }
         })
 

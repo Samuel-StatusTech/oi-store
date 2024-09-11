@@ -127,7 +127,7 @@ const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
         })
         .then((res) => {
           const info = res.data.info
-          
+
           if (info) {
             resolve({
               ok: true,
@@ -189,24 +189,26 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
   })
 }
 
-const getMyTickets: TApi["get"]["myTickets"] = async () => {
+const getMyTickets: TApi["get"]["myTickets"] = async ({ eventId }) => {
   return new Promise(async (resolve, reject) => {
     try {
+      const d = new Date()
+      const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
+        2,
+        "0"
+      )}-${String(d.getDate()).padStart(2, "0")}`
+
       await axios
-        .get(`/ecommerce/getMyTickets`)
+        .get(
+          `${eventId}/ecommerce/orders?dateStart=2024-01-01&dateEnd=${todayStr}&status=`
+        )
         .then(({ data }) => {
-          if (data.success) {
-            const list = Array.isArray(data.shoppings) ? data.shoppings : []
-            resolve({
-              ok: true,
-              data: { list },
-            })
-          } else {
-            resolve({
-              ok: false,
-              error: "Erro ao listar produtos. Tente novamente mais tarde",
-            })
-          }
+          const list = Array.isArray(data.orders) ? data.orders : []
+
+          resolve({
+            ok: true,
+            data: { list },
+          })
         })
         .catch(() => {
           resolve({

@@ -25,6 +25,8 @@ export const styles: StyleDictionary = {
   },
   qrcode: {
     alignment: "center",
+    // @ts-ignore
+    width: "250px",
   },
   qrcodetext: {
     alignment: "center",
@@ -50,7 +52,7 @@ export const styles: StyleDictionary = {
   },
   companyFooterTag: {
     color: "#000",
-    bold: true
+    bold: true,
   },
   companyFooter: {
     color: "#000",

@@ -61,7 +61,7 @@ const MyEventTickets = () => {
 
       <Container>
         <S.Main>
-          <S.PageTitle>Meus tickets "{data?.name}"</S.PageTitle>
+          <S.PageTitle>Meus tickets "{data?.order_id}"</S.PageTitle>
 
           <S.List>
             {list.map((ticket, k) => (

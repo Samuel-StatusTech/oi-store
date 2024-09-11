@@ -20,7 +20,9 @@ type TParams = {
     eventInfo: {
       eventId: string
     }
-    myTickets: {}
+    myTickets: {
+      eventId: string
+    }
     products: {
       eventId: string
     }
@@ -43,7 +45,7 @@ type TParams = {
     }
     purchase: {
       sign: {
-        user_fone: string,
+        user_fone: string
         order_id: string
         event_id: string
         products: TPurchaseProduct[]

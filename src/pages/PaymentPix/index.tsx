@@ -22,12 +22,13 @@ import calendar from "../../assets/icons/calendar.png"
 import location from "../../assets/icons/pin.png"
 import getStore from "../../store"
 import { Api } from "../../api"
-import io from "socket.io-client"
 import { getOrderData } from "../../utils/tb/order"
 import downloadTickets from "../../utils/pdf"
 import { generateTicketID } from "../../utils/tb/qrcode"
+const io = require("socket.io-client")
 
-const socketUrl = "https://api.oitickets.com.br:3020"
+const socketUrl = "https://api.oitickets.com.br"
+// "localhost:8080"
 // "https://fcc72937-d3ce-489c-abbd-4c6d1d4601c2-00-3a89kn5qa5vq6.riker.replit.dev/"
 // process.env.REACT_APP_socketUrl as string
 
@@ -60,15 +61,11 @@ const PaymentPix = () => {
       const socket = instanceSocket()
 
       if (socket) {
-        socket.on("connection", () => {
-          console.log(socket)
-        })
-
-        socket.on("plugged", (socketId) => {
+        socket.on("plugged", (socketId: any) => {
           setSid(socketId)
         })
 
-        socket.on("connect_error", (err) => {
+        socket.on("connect_error", () => {
           alert("Ops, houve um erro. Tente novamente mais tarde")
           socket.off("disconnect")
           socket.disconnect()
@@ -78,7 +75,8 @@ const PaymentPix = () => {
 
         // monitor payment
 
-        socket.on("orderUpdate", async (data) => {
+        socket.on("orderUpdate", async (data: any) => {
+
           if (data.status === "approved" || data.status === "denied") {
             let f = {
               state: data.status,
@@ -204,10 +202,6 @@ const PaymentPix = () => {
       secure: false,
     })
 
-    socket.on("connection", (socket) => {
-      setSid(socket.id)
-    })
-
     // socket.on("disconnect", () => {
     //   socket.connect()
     //   return
@@ -284,7 +278,7 @@ const PaymentPix = () => {
         const p = await Api.get.purchaseInfo({ eventId: event.id, orderId })
 
         if (p.ok && p.data.id) {
-          let pdfTickets: TShoppingTicket[] = []
+          let pdfTickets: any[] = []
 
           const tickets = p.data.products
 
@@ -300,11 +294,12 @@ const PaymentPix = () => {
             pdfTickets.push({
               id: t.id,
               name: t.name,
-              batch_name: "Nome do lote",
+              batch_name: t.batch_name,
               event_name: event?.name as string,
-              qr_data: tid,
+              qr_data: t.qr_data,
+              qr_TID: tid,
               order_id: sid,
-              date: new Date().toISOString(),
+              date: new Date(t.date).toISOString(),
               image: null,
               quantity: t.quantity,
               price_unit: t.price_unit,

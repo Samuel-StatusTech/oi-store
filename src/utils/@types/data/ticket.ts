@@ -5,11 +5,12 @@ export type TTicketDisposal = TProduct & {
 }
 
 export type TCardTicket = {
-  ticketId: string
+  order_id: string
   eventBanner: string
-  name: string
-  price_sell: string
-  ticketsQnt: number
+  created_at: string
+  total_price: string
+  status: any | null
+  sold_quantity: number
 }
 
 export type TTicket = {
@@ -28,15 +29,19 @@ export type TTicket = {
 export type TTicketStatus = "purchased" | "validated" | "expired"
 
 export interface TShoppingTicket {
-  user?: any
-  id: number | string
+  user?: {
+    name: string
+  }
+  opuid: string
+  id: string
   name: string
   batch_name: string
-  event_name: string
   qr_data: string
+  qr_TID?: string
   order_id: string
-  date: string
   image: null | string
   quantity: number
   price_unit: number
+  price_total: number
+  date: string
 }

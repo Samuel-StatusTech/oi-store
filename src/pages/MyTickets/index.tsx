@@ -6,25 +6,32 @@ import Footer from "../../components/Footer"
 import Container from "../../components/Container"
 // import TicketCard from "../../components/TicketCard"
 
-import { placeList } from "./placeList"
 import getStore from "../../store"
 import { useNavigate } from "react-router-dom"
+import TicketCard from "../../components/TicketCard"
+import { Api } from "../../api"
 
 const MyTickets = () => {
   const { event } = getStore()
 
   const navigate = useNavigate()
 
-  const [, setList] = useState<any[]>([])
+  const [list, setList] = useState<any[]>([])
 
-  const getData = useCallback(() => {
-    setList(
-      placeList.map((i) => ({
-        ...i,
-        eventBanner: event?.event_banner as string,
-      }))
-    )
-  }, [event?.event_banner])
+  const getData = useCallback(async () => {
+    try {
+      const req = await Api.get.myTickets({ eventId: event?.id as string })
+
+      if (req.ok) {
+        setList(
+          req.data.list.map((i) => ({
+            ...i,
+            eventBanner: event?.event_banner as string,
+          }))
+        )
+      }
+    } catch (error) {}
+  }, [event?.event_banner, event?.id])
 
   useEffect(() => {
     if (!event) navigate("/eventSelect")
@@ -40,31 +47,11 @@ const MyTickets = () => {
         <S.Main>
           <S.PageTitle>Meus tickets</S.PageTitle>
 
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              width: "100%",
-            }}
-          >
-            <span
-              style={{
-                whiteSpace: "nowrap",
-                textAlign: "center",
-                fontSize: 18,
-                fontStyle: "italic",
-                marginTop: 64,
-                marginBottom: 24,
-              }}
-            >
-              Em desenvolvimento...
-            </span>
-          </div>
-          {/* <S.List>
+          <S.List>
             {list.map((ticket, k) => (
               <TicketCard k={k} key={k} data={ticket} />
             ))}
-          </S.List> */}
+          </S.List>
         </S.Main>
       </Container>
 

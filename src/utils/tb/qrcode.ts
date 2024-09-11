@@ -5,38 +5,43 @@ export const generateTicketID = (
   eventOid: number,
   clientDatabase: string
 ) => {
-  let qrCodeNums = ""
+  try {
+    let qrCodeNums = ""
 
-  if (isComboObj) {
-    if (type === "bar") {
-      qrCodeNums += "2"
-    } else if (type === "estacionamento") {
-      qrCodeNums += "3"
+    if (isComboObj) {
+      if (type === "bar") {
+        qrCodeNums += "2"
+      } else if (type === "estacionamento") {
+        qrCodeNums += "3"
+      } else {
+        qrCodeNums += "4"
+      }
     } else {
-      qrCodeNums += "4"
+      if (type === "bar") {
+        qrCodeNums += "a"
+      } else if (type === "estacionamento") {
+        qrCodeNums += "b"
+      } else {
+        qrCodeNums += "c"
+      }
     }
-  } else {
-    if (type === "bar") {
-      qrCodeNums += "a"
-    } else if (type === "estacionamento") {
-      qrCodeNums += "b"
-    } else {
-      qrCodeNums += "c"
-    }
+
+    qrCodeNums += parseInt(String(eventOid))
+      .toString(36)
+      .padStart(3, "0")
+      .slice(0, 3)
+    qrCodeNums += clientDatabase.slice(2, 5)
+    qrCodeNums += parseInt(String(prodOId))
+      .toString(36)
+      .padStart(3, "0")
+      .slice(0, 3)
+    qrCodeNums += uuidv5()
+
+    return qrCodeNums.toUpperCase()
+  } catch (error) {
+    console.log("Erro", error)
+    return ""
   }
-
-  qrCodeNums += parseInt(String(eventOid))
-    .toString(36)
-    .padStart(3, "0")
-    .slice(0, 3)
-  qrCodeNums += clientDatabase.slice(2, 5)
-  qrCodeNums += parseInt(String(prodOId))
-    .toString(36)
-    .padStart(3, "0")
-    .slice(0, 3)
-  qrCodeNums += uuidv5()
-
-  return qrCodeNums.toUpperCase()
 }
 
 const uuidv5 = () => {
