@@ -105,10 +105,10 @@ const PaymentPix = () => {
             }, 3500)
           }
 
-          if (data.status === "expired") {
-            socket.disconnect()
-            instanceSocket()
-          }
+          // if (data.status === "expired") {
+          //   socket.disconnect()
+          //   instanceSocket()
+          // }
         })
       }
     }
