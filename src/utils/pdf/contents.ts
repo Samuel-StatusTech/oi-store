@@ -137,18 +137,13 @@ const ticketData = (
     [{ text: "Ingresso", bold: true, style: "tableTitle" }],
     [
       {
-        text: `Comprado dia ${getDateString("full", ticket.date)}`,
+        text: `Comprado dia ${getDateString("pdf", ticket.date)}`,
         style: "purchaseDate",
       },
     ],
     [
       {
-        text: `${ticket.batch_name ?? ""} - ${ticket.qr_TID}`, // ticket.qr_data only
-      },
-    ],
-    [
-      {
-        text: ticket.name ?? "",
+        text: `${ticket.batch_name ?? ""} - ${ticket.name}`,
       },
     ],
     [{ text: formatMoney(ticket.price_unit * ticket.quantity, true) }],

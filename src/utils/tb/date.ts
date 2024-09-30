@@ -1,6 +1,6 @@
 import { monthsRelations } from "./getDatePeriod"
 
-type TFormat = "dM" | "dMy" | "full"
+type TFormat = "dM" | "dMy" | "full" | "pdf"
 
 // Formatters
 
@@ -57,12 +57,74 @@ const formatFull = (date: Date | string) => {
   return str
 }
 
+const formatPdf = (date: Date | string) => {
+  let str = ""
+
+  try {
+    const split = (date as string).split("-")
+
+    const _d = new Date(date)
+
+    if (
+      Number.isNaN(+split[0]) ||
+      Number.isNaN(+split[1]) ||
+      Number.isNaN(+split[2].slice(0, 2))
+    ) {
+      throw new Error()
+    }
+
+    const d = new Date(
+      Date.UTC(
+        +split[0],
+        +split[1],
+        +split[2].slice(0, 2),
+        _d.getTimezoneOffset() / 60,
+        0,
+        0
+      )
+    )
+
+    // day
+    str = String(d.getDate()).padStart(2, "0")
+
+    // month
+    str += `/${String(d.getMonth() + 1).padStart(2, "0")}`
+
+    // year
+    str += `/${d.getFullYear()}`
+  } catch (error) {
+    const _d = new Date(date)
+    const d = new Date(
+      Date.UTC(
+        _d.getFullYear(),
+        _d.getMonth(),
+        _d.getDate(),
+        _d.getTimezoneOffset() / 60,
+        0,
+        0
+      )
+    )
+
+    // day
+    str = String(d.getDate()).padStart(2, "0")
+
+    // month
+    str += `/${String(d.getMonth() + 1).padStart(2, "0")}`
+
+    // year
+    str += `/${d.getFullYear()}`
+  }
+
+  return str
+}
+
 const relations: {
   [key in TFormat]: (date: Date | string) => string
 } = {
   dM: formatdM,
   dMy: formatdMy,
   full: formatFull,
+  pdf: formatPdf,
 }
 
 export const getDateString = (format: TFormat, date: Date | string) => {

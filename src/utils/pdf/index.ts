@@ -25,8 +25,6 @@ const downloadTickets = async (
           "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd"
         )
 
-        console.log(tid)
-
         return {
           ...t,
           qr_TID: tid,

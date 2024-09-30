@@ -244,6 +244,8 @@ const registerUser: TApi["post"]["register"] = async ({
         })
         .then((res) => {
           resolve({ ok: true, data: res.data })
+
+          // store token ...
         })
         .catch(() => {
           resolve({
