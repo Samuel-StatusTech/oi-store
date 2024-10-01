@@ -381,9 +381,21 @@ const Payment = () => {
 
       if (method === "pix")
         if (user) {
+          let ptickets: any[] = []
+
+          tickets.forEach((t) => {
+            for (let k = 0; k <= (t.qnt as number) - 1; k++) {
+              ptickets.push({
+                ...t,
+                oid: k,
+                quantity: 1,
+              })
+            }
+          })
+
           navigate("/payment/pix", {
             state: {
-              tickets: form.tickets,
+              tickets: ptickets,
               buyer: form.buyer,
               taxTotal: taxes,
             },
@@ -418,9 +430,21 @@ const Payment = () => {
 
               controllers.user.setData(udata)
 
+              let ptickets: any[] = []
+
+              tickets.forEach((t) => {
+                for (let k = 0; k <= (t.qnt as number) - 1; k++) {
+                  ptickets.push({
+                    ...t,
+                    oid: k,
+                    quantity: 1,
+                  })
+                }
+              })
+
               navigate("/payment/pix", {
                 state: {
-                  tickets: form.tickets,
+                  tickets: ptickets,
                   buyer: form.buyer,
                   taxTotal: taxes,
                 },

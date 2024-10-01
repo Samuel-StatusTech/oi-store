@@ -194,18 +194,10 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
 const getMyTickets: TApi["get"]["myTickets"] = async ({ eventId }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const d = new Date()
-      const todayStr = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(
-        2,
-        "0"
-      )}-${String(d.getDate()).padStart(2, "0")}`
-
       await axios
-        .get(
-          `${eventId}/ecommerce/orders?dateStart=2024-01-01&dateEnd=${todayStr}`
-        )
+        .get(`/ecommerce/getMyTickets?eventId=${eventId}`)
         .then(({ data }) => {
-          const list = Array.isArray(data.orders) ? data.orders : []
+          const list = Array.isArray(data.shoppings) ? data.shoppings : []
 
           resolve({
             ok: true,
