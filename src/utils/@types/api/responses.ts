@@ -51,7 +51,37 @@ type TResponses = {
     >
   }
   post: {
-    register: Promise<TDefaultRes<{ success: true }>>
+    register: Promise<
+      TDefaultRes<{
+        success: true
+        data: {
+          id: string
+          fone: string
+          email: string
+          status: number
+          photo: null | string
+        }
+        token: {
+          success: true
+          token: string
+          roleData: {
+            user_id: string
+            dt_nascimento: null | string
+            cpf: null | string
+            fone: string
+          }
+          user: {
+            id: string
+            org_id: string
+            username: string
+            name: string
+            role: string
+            status: number
+            fone: string
+          }
+        }
+      }>
+    >
     login: {
       requestCode: Promise<TDefaultRes<{}>>
       validateCode: Promise<TDefaultRes<TUser>>

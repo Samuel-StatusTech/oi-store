@@ -9,9 +9,11 @@ const dToken = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZqTFpROEQy
 
 try {
   axios.interceptors.request.use(function (config) {
-    // config.headers.Authorization = (!config.url?.includes("event/getSelect") && !config.url?.includes("event/getData"))
-    //   ? localStorage.getItem("token") ?? dToken
-    //   : dToken
+    config.headers.Authorization =
+      !config.url?.includes("event/getSelect") &&
+      !config.url?.includes("event/getData")
+        ? localStorage.getItem("token") ?? dToken
+        : dToken
 
     config.headers.Authorization = dToken
 
@@ -200,7 +202,7 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({ eventId }) => {
 
       await axios
         .get(
-          `${eventId}/ecommerce/orders?dateStart=2024-01-01&dateEnd=${todayStr}&status=`
+          `${eventId}/ecommerce/orders?dateStart=2024-01-01&dateEnd=${todayStr}`
         )
         .then(({ data }) => {
           const list = Array.isArray(data.orders) ? data.orders : []
@@ -239,13 +241,27 @@ const registerUser: TApi["post"]["register"] = async ({
         .post("/ecommerce/register", {
           name,
           username: name,
-          fone: phone,
+          fone: phone.replace(/\D/g, "").trim(),
           email,
+          password: "123456",
+          status: "1",
+          role: "cliente",
+          org_id: "abc-123",
         })
         .then((res) => {
-          resolve({ ok: true, data: res.data })
-
           // store token ...
+
+          if (res.data.token.token) {
+            localStorage.setItem("token", res.data.token.token)
+
+            resolve({ ok: true, data: res.data })
+          } else {
+            resolve({
+              ok: false,
+              error:
+                "Houver um erro na hora do cadastro. Tente novamente mais tarde.",
+            })
+          }
         })
         .catch(() => {
           resolve({

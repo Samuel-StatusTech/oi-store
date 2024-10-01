@@ -29,6 +29,7 @@ import { Api } from "../../api"
 import { sumTaxes, sumTickets } from "../../utils/tb/taxes"
 import { validEmail } from "../../utils/tb/validEmail"
 import Feedback from "../../components/Feedback"
+import { TUser } from "../../utils/@types/data/user"
 
 type MProps = {
   checked: boolean
@@ -408,6 +409,15 @@ const Payment = () => {
             const newUser = await Api.post.register(form.buyer)
 
             if (newUser.ok && newUser.data.success) {
+              const udata: TUser = {
+                ...newUser.data.token.user,
+                email: newUser.data.data.email,
+                token: newUser.data.token.token,
+                user_id: newUser.data.data.id,
+              }
+
+              controllers.user.setData(udata)
+
               navigate("/payment/pix", {
                 state: {
                   tickets: form.tickets,
@@ -416,7 +426,19 @@ const Payment = () => {
                 },
               })
             } else {
-              navigate(-1)
+              const f = {
+                state: "expired",
+                visible: true,
+                message:
+                  "Houve um erro ao lhe cadastrar. Tente novamente mais tarde.",
+              }
+              setFeedback(f)
+
+              setTimeout(() => {
+                setFeedback({ ...f, visible: false })
+              }, 3500)
+
+              // navigate(-1)
               return
             }
           }
