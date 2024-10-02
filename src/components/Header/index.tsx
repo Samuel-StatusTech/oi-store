@@ -21,6 +21,28 @@ const Header = () => {
     })
   }
 
+  const renderButton = () => {
+    return !document.location.href.includes("/eventSelect") ? (
+      <Link
+        to={user ? "/mytickets" : "/login"}
+        className="myTickets"
+        onClick={(e) => handleBtn(e, user ? "/mytickets" : "/login")}
+      >
+        {user ? "Meus Ingressos" : "Fazer login"}
+      </Link>
+    ) : (
+      !user && (
+        <Link
+          to={"/login"}
+          className="myTickets"
+          onClick={(e) => handleBtn(e, "/login")}
+        >
+          {"Fazer login"}
+        </Link>
+      )
+    )
+  }
+
   return (
     <S.Wrapper>
       <Container>
@@ -34,15 +56,7 @@ const Header = () => {
               )}
             </Link>
           </S.LogoArea>
-          <S.UserArea>
-            <Link
-              to={user ? "/mytickets" : "/login"}
-              className="myTickets"
-              onClick={(e) => handleBtn(e, user ? "/mytickets" : "/login")}
-            >
-              {user ? "Meus Ingressos" : "Fazer login"}
-            </Link>
-          </S.UserArea>
+          <S.UserArea>{renderButton()}</S.UserArea>
         </S.Component>
       </Container>
     </S.Wrapper>
