@@ -1,5 +1,5 @@
-import { useCallback, useEffect, useState } from "react"
-import { TCardTicket, TShoppingTicket } from "../../utils/@types/data/ticket"
+import { useEffect, useState } from "react"
+import { TShoppingTicket } from "../../utils/@types/data/ticket"
 import * as S from "./styled"
 
 import { ReactComponent as DownloadIcon } from "../../assets/icons/download.svg"
@@ -7,11 +7,10 @@ import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
 
 import getStore from "../../store"
 import downloadTickets from "../../utils/pdf"
-import { Api } from "../../api"
 import { formatMoney } from "../../utils/tb/formatMoney"
 
 type Props = {
-  data: TCardTicket
+  data: any
   k: number
 }
 
@@ -20,22 +19,9 @@ const TicketCard = ({ k, data }: Props) => {
 
   const [tickets, setTickets] = useState<TShoppingTicket[]>([])
 
-  const loadTickets = useCallback(async () => {
-    try {
-      const req = await Api.get.purchaseInfo({
-        eventId: event?.id as string,
-        orderId: data.order_id,
-      })
-
-      if (req.ok) {
-        setTickets(req.data.products)
-      }
-    } catch (error) {}
-  }, [data.order_id, event?.id])
-
   useEffect(() => {
-    loadTickets()
-  }, [loadTickets])
+    if (Array.isArray(data.products)) setTickets(data.products)
+  }, [data.products])
 
   const handleDownload = async () => {
     if (event) await downloadTickets(event, tickets, true)
@@ -79,7 +65,8 @@ const TicketCard = ({ k, data }: Props) => {
   )
 
   const getDate = () => {
-    const d = new Date(data.created_at)
+    // @ts-ignore
+    const d = new Date(data.date)
 
     const todayStr = `${String(d.getDate()).padStart(2, "0")}/${String(
       d.getMonth() + 1
@@ -101,7 +88,8 @@ const TicketCard = ({ k, data }: Props) => {
           </S.CardBottom>
           <S.CardBottom>
             {renderBtns()}
-            <S.TicketsQnt>Tickets: {data.sold_quantity}</S.TicketsQnt>
+            {/* @ts-ignore */}
+            <S.TicketsQnt>Tickets: {data.quantity}</S.TicketsQnt>
           </S.CardBottom>
         </S.EventInfo>
       </div>

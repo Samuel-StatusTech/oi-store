@@ -7,7 +7,7 @@ export type TTicketDisposal = TProduct & {
 export type TCardTicket = {
   order_id: string
   eventBanner: string
-  created_at: string
+  date: string
   total_price: string
   status: any | null
   sold_quantity: number

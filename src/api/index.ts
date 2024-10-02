@@ -12,10 +12,9 @@ try {
     config.headers.Authorization =
       !config.url?.includes("event/getSelect") &&
       !config.url?.includes("event/getData")
-        ? localStorage.getItem("token") ?? dToken
+        ? `Bearer ${localStorage.getItem("token")}` ?? dToken
         : dToken
-
-    config.headers.Authorization = dToken
+    // cxonfig.headers.Authorization = dToken
 
     return config
   })
@@ -196,12 +195,44 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({ eventId }) => {
     try {
       await axios
         .get(`/ecommerce/getMyTickets?eventId=${eventId}`)
-        .then(({ data }) => {
+        .then(async ({ data }) => {
+          let returnList: any[] = []
+
           const list = Array.isArray(data.shoppings) ? data.shoppings : []
+
+          let pms: Promise<any>[] = []
+
+          const ordersIds = new Set(list.map((shop: any) => shop.order_id))
+
+          ordersIds.forEach((id) => {
+            pms.push(
+              axios
+                .get(`/${eventId}/ecommerce/orders/${id}`)
+                .then((res) => {
+                  const purchase = res.data
+                  returnList.push(purchase)
+                })
+                .catch(() => {
+                  throw new Error()
+                })
+            )
+          })
+
+          await Promise.all(pms)
+
+          const parsedList = returnList.map((item) => ({
+            ...item,
+            date: item.products.length > 0 ? item.products[0].date : null,
+            quantity: item.products.length,
+            total_price: item.products.reduce(
+              (amount: number, ticket: any) => amount + ticket.price_total,
+              0
+            ),
+          }))
 
           resolve({
             ok: true,
-            data: { list },
+            data: { list: parsedList },
           })
         })
         .catch(() => {
