@@ -406,7 +406,7 @@ const Payment = () => {
               state: "expired",
               visible: true,
               message:
-                "Não há cadastro desse telefone. Confira os dados e confirme para se cadastrar e comprar.",
+                "Você não está logado. Caso tenha uma conta, faça login primeiro. Caso contrário, confira os dados e confirme para se cadastrar e comprar.",
             }
             setFeedback(f)
 
@@ -450,17 +450,32 @@ const Payment = () => {
                 },
               })
             } else {
-              const f = {
-                state: "expired",
-                visible: true,
-                message:
-                  "Houve um erro ao lhe cadastrar. Tente novamente mais tarde.",
-              }
-              setFeedback(f)
+              if (!newUser.ok) {
+                const f = {
+                  state: "denied",
+                  visible: true,
+                  message: newUser.error,
+                }
+                setFeedback(f)
 
-              setTimeout(() => {
-                setFeedback({ ...f, visible: false })
-              }, 3500)
+                setTimeout(() => {
+                  setFeedback({ ...f, visible: false })
+                }, 3500)
+              } else {
+                const f = {
+                  state: "denied",
+                  visible: true,
+                  message:
+                    // @ts-ignore
+                    newUser.error ??
+                    "Houve um erro ao lhe cadastrar. Tente novamente mais tarde.",
+                }
+                setFeedback(f)
+
+                setTimeout(() => {
+                  setFeedback({ ...f, visible: false })
+                }, 3500)
+              }
 
               // navigate(-1)
               return

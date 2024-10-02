@@ -183,6 +183,8 @@ export const QR = styled.div`
 export const PixTime = styled.div`
   display: flex;
   gap: 4px;
+  flex-direction: column;
+  text-align: center;
 
   span {
     white-space: pre-line;
@@ -192,10 +194,6 @@ export const PixTime = styled.div`
   strong {
     color: ${({ theme }) => theme.colors.black.secondary};
     font-weight: bold;
-  }
-
-  @media (max-width: 480px) {
-    text-align: center;
   }
 `
 

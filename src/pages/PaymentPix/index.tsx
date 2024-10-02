@@ -76,7 +76,6 @@ const PaymentPix = () => {
         // monitor payment
 
         socket.on("orderUpdate", async (data: any) => {
-
           if (data.status === "approved" || data.status === "denied") {
             let f = {
               state: data.status,
@@ -433,6 +432,10 @@ const PaymentPix = () => {
                 <S.PixTime>
                   <span>
                     Você tem <strong>{time}</strong> para realizar o pagamento
+                  </span>
+                  <span>
+                    Após o pagamento, clique em <strong>Meus ingressos</strong>{" "}
+                    para ver seus ingressos
                   </span>
                 </S.PixTime>
               </S.PixArea>

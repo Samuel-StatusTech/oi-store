@@ -11,7 +11,8 @@ try {
   axios.interceptors.request.use(function (config) {
     config.headers.Authorization =
       !config.url?.includes("event/getSelect") &&
-      !config.url?.includes("event/getData")
+      !config.url?.includes("event/getData") &&
+      !config.url?.includes("product/getList")
         ? `Bearer ${localStorage.getItem("token")}` ?? dToken
         : dToken
     // cxonfig.headers.Authorization = dToken
@@ -263,13 +264,8 @@ const registerUser: TApi["post"]["register"] = async ({
       await axios
         .post("/ecommerce/register", {
           name,
-          username: name,
           fone: phone.replace(/\D/g, "").trim(),
           email,
-          password: "123456",
-          status: "1",
-          role: "cliente",
-          org_id: "abc-123",
         })
         .then((res) => {
           // store token ...
@@ -282,18 +278,28 @@ const registerUser: TApi["post"]["register"] = async ({
             resolve({
               ok: false,
               error:
-                "Houver um erro na hora do cadastro. Tente novamente mais tarde.",
+                typeof res.data.error === "string"
+                  ? res.data.error
+                  : "Houver um erro na hora do cadastro. Tente novamente mais tarde.",
             })
           }
         })
-        .catch(() => {
+        .catch((error) => {
           resolve({
             ok: false,
-            error: "Algo deu errado. Tente novamente mais tarde.",
+            error:
+              error.response.data.error ??
+              "Algo deu errado. Tente novamente mais tarde.",
           })
         })
     } catch (error) {
-      reject({ error: "Erro ao cadastrar usuário. Tente novamente mais tarde" })
+      // @ts-ignore
+      const errorMessage = error.response.data.error
+      console.log("Erro aqui", errorMessage)
+      reject({
+        ok: false,
+        error: "Erro ao cadastrar usuário. Tente novamente mais tarde",
+      })
     }
   })
 }
