@@ -201,21 +201,26 @@ const PaymentPix = () => {
       secure: false,
     })
 
-    // socket.on("disconnect", () => {
-    //   socket.connect()
-    //   return
-    // })
-
     return socket
   }, [])
 
+  const restartTimer = () => {
+    setQrCode("")
+    setQrCode64("")
+    setTime("05:00")
+
+    getQR()
+  }
+
   const runTimer = () => {
-    const timer = temporizadorDeCincoMinutos()
+    const timer = temporizadorDeCincoMinutos(restartTimer)
 
     timer.iniciar()
 
-    setInterval(() => {
-      setTime(timer.tempoAtualFormatado())
+    const interval = setInterval(() => {
+      const time = timer.tempoAtualFormatado()
+      if (time) setTime(time)
+      else clearInterval(interval)
     }, 1000)
   }
 
@@ -285,9 +290,9 @@ const PaymentPix = () => {
             const tid = generateTicketID(
               false,
               "ecommerce",
-              t.opuid, //"cc94aab8-05f1-4896-a230-e36cf8caf5e9", //t.oid,
+              t.opuid,
               event?.oid as number,
-              "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd"
+              event?.dbName
             )
 
             pdfTickets.push({

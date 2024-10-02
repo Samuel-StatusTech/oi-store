@@ -1,4 +1,4 @@
-export const temporizadorDeCincoMinutos = () => {
+export const temporizadorDeCincoMinutos = (endCallback: () => void) => {
   const tempoTotalEmSegundos = 5 * 60
   let tempoRestante = tempoTotalEmSegundos
   let timerId: any
@@ -16,6 +16,7 @@ export const temporizadorDeCincoMinutos = () => {
       tempoRestante--
       if (tempoRestante === 0) {
         parar()
+        endCallback()
       }
     }, 1000)
   }
@@ -31,7 +32,7 @@ export const temporizadorDeCincoMinutos = () => {
   }
 
   const tempoAtualFormatado = () => {
-    return formatarTempo(tempoRestante)
+    return tempoRestante > 0 ? formatarTempo(tempoRestante) : null
   }
 
   return {
