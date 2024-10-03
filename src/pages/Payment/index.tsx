@@ -351,18 +351,26 @@ const Payment = () => {
   const checkErrors = () => {
     let hasError = false
 
-    if (
-      form.buyer.name.length < 1 ||
-      form.buyer.email.length < 1 ||
-      !validEmail(form.buyer.email) ||
-      form.buyer.phone.replace(/\D/g, "").length < 9
-    )
-      hasError = true
+    const nameField = form.buyer.name.length < 1
+    const phoneField = form.buyer.phone.replace(/\D/g, "").length < 9
+    const emailField =
+      form.buyer.email.length < 1 || !validEmail(form.buyer.email)
 
-    if (event?.nominal && form.tickets.some((t) => t.person.name.length < 1))
-      hasError = true
+    const nominalsErrors =
+      event?.nominal && form.tickets.some((t) => t.person.name.length < 1)
 
-    return hasError
+    if (nameField || emailField || phoneField) hasError = true
+
+    if (nominalsErrors) hasError = true
+
+    return {
+      has: hasError,
+      fields: {
+        name: nameField,
+        phone: phoneField,
+        email: emailField,
+      },
+    }
   }
 
   // Payment
@@ -370,7 +378,7 @@ const Payment = () => {
   const handlePay = async () => {
     const errors = checkErrors()
 
-    if (!errors) {
+    if (!errors.has) {
       const taxes = sumTaxes({
         ticketsTotal: sumTickets(tickets),
         adminTax: event?.eCommerce.adminTax,
@@ -412,11 +420,11 @@ const Payment = () => {
 
             setTimeout(() => {
               setFeedback({ ...f, visible: false })
+            }, 4000)
 
-              setTimeout(() => {
-                setCanBuy(true)
-              }, 400)
-            }, 3500)
+            setTimeout(() => {
+              setCanBuy(true)
+            }, 1000)
           } else {
             const newUser = await Api.post.register(form.buyer)
 
@@ -484,7 +492,29 @@ const Payment = () => {
         }
       else if (method === "credit") return
     } else {
-      alert("Preencha os campos corretamente e tente novamente.")
+      let fieldsErrors = []
+      let fieldsStr = ""
+
+      if (errors.fields.name) fieldsErrors.push("nome")
+      if (errors.fields.phone) fieldsErrors.push("telefone")
+      if (errors.fields.email) fieldsErrors.push("email")
+
+      fieldsStr = fieldsErrors.join(", ")
+
+      const f = {
+        state: "expired",
+        visible: true,
+        message: `Preencha os campos orretamente: ${fieldsStr}`,
+      }
+      setFeedback(f)
+
+      setTimeout(() => {
+        setFeedback({ ...f, visible: false })
+
+        setTimeout(() => {
+          setCanBuy(true)
+        }, 400)
+      }, 3500)
     }
   }
 
