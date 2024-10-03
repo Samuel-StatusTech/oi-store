@@ -504,7 +504,7 @@ const Payment = () => {
       const f = {
         state: "expired",
         visible: true,
-        message: `Preencha os campos orretamente: ${fieldsStr}`,
+        message: `Preencha os campos corretamente: ${fieldsStr}`,
       }
       setFeedback(f)
 
