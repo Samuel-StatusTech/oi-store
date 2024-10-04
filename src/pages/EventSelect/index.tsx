@@ -11,9 +11,11 @@ import { parseList } from "../../utils/tb/parseList"
 import getStore from "../../store"
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
+import { useNavigate } from "react-router-dom"
 
 const EventSelect = () => {
   const store = getStore()
+  const navigate = useNavigate()
 
   const [list, setList] = useState<any[]>([])
 
@@ -21,11 +23,31 @@ const EventSelect = () => {
     const events = await Api.get.events({})
 
     if (events.ok) {
-      setList(parseList.eventMinToEventCard(events.data))
+      const parsed = parseList.eventMinToEventCard(events.data)
+
+      if (parsed.length > 1) setList(parsed)
+      else if (parsed.length === 1) {
+        try {
+          const req = await Api.get.eventInfo({ eventId: parsed[0].id })
+
+          if (req.ok) {
+            store.controllers.event.setData(req.data)
+            navigate("/")
+          } else {
+            alert(
+              "Houve um erro ao selecionar o evento. Tente novamente mais tarde"
+            )
+          }
+        } catch (error) {
+          alert(
+            "Houve um erro ao selecionar o evento. Tente novamente mais tarde"
+          )
+        }
+      }
     } else {
       alert(events.error)
     }
-  }, [])
+  }, [navigate, store.controllers.event])
 
   useEffect(() => {
     store.controllers.event.clear()

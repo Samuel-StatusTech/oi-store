@@ -12,8 +12,6 @@ const downloadTickets = async (
   tickets: TShoppingTicket[],
   shouldDownload?: boolean
 ): Promise<void | File> => {
-  console.log(eventData)
-  console.log("Pdf", tickets)
   pdfMake.vfs = pdfFonts.pdfMake.vfs
 
   return new Promise(async (resolve) => {

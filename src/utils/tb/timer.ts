@@ -1,44 +1,45 @@
-export const temporizadorDeCincoMinutos = (endCallback: () => void) => {
-  const tempoTotalEmSegundos = 5 * 60
-  let tempoRestante = tempoTotalEmSegundos
+export const clockdown = (seconds: number, endCallback?: () => void) => {
+  const totalSeconds = seconds > 0 ? seconds : 0
+
+  let timeLeft = totalSeconds
   let timerId: any
 
-  const formatarTempo = (tempo: any) => {
-    const minutos = Math.floor(tempo / 60)
-    const segundos = tempo % 60
-    return `${minutos.toString().padStart(2, "0")}:${segundos
+  const formatarTime = (time: any) => {
+    const minutes = Math.floor(time / 60)
+    const secs = time % 60
+    return `${minutes.toString().padStart(2, "0")}:${secs
       .toString()
       .padStart(2, "0")}`
   }
 
-  const iniciar = () => {
+  const start = () => {
     timerId = setInterval(() => {
-      tempoRestante--
-      if (tempoRestante === 0) {
-        parar()
-        endCallback()
+      timeLeft--
+      if (timeLeft === 0) {
+        stop()
+        endCallback && endCallback()
       }
     }, 1000)
   }
 
-  const parar = () => {
+  const stop = () => {
     clearInterval(timerId)
   }
 
-  const reiniciar = () => {
-    tempoRestante = tempoTotalEmSegundos
-    parar()
-    iniciar()
+  const restart = () => {
+    timeLeft = totalSeconds
+    stop()
+    start()
   }
 
-  const tempoAtualFormatado = () => {
-    return tempoRestante > 0 ? formatarTempo(tempoRestante) : null
+  const actualTime = () => {
+    return timeLeft >= 0 ? formatarTime(timeLeft) : null
   }
 
   return {
-    iniciar,
-    parar,
-    reiniciar,
-    tempoAtualFormatado,
+    start,
+    stop,
+    restart,
+    actualTime,
   }
 }

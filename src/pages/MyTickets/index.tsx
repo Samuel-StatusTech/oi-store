@@ -22,10 +22,7 @@ const MyTickets = () => {
     try {
       const req = await Api.get.myTickets({ eventId: event?.id as string })
 
-      
       if (req.ok) {
-        console.log(req.data.list)
-        
         setList(
           req.data.list.map((i) => ({
             ...i,

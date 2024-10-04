@@ -12,6 +12,7 @@ import { Api } from "../../api"
 import getStore from "../../store"
 import { sumTaxes, sumTickets } from "../../utils/tb/taxes"
 import { useNavigate } from "react-router-dom"
+import { clockdown } from "../../utils/tb/timer"
 
 type Props = {
   datePeriod: string
@@ -28,6 +29,8 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
 
   const [taxes, setTaxes] = useState(0)
   const [ticketsTotal, setTicketsTotal] = useState(0)
+
+  const [time, setTime] = useState("10:00")
 
   const loadEventData = useCallback(async () => {
     if (event) {
@@ -54,6 +57,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
         adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
         adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
         adminTaxValue: event?.eCommerce.adminTaxValue,
+        tickets: ticketsList,
       })
 
       setTaxes(taxesTotal)
@@ -64,6 +68,22 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
     }
   }
 
+  const runTimer = () => {
+    const timer = clockdown(600)
+
+    timer.start()
+
+    const interval = setInterval(() => {
+      const time = timer.actualTime()
+      if (time) setTime(time)
+      else clearInterval(interval)
+    }, 1000)
+  }
+
+  useEffect(() => {
+    runTimer()
+  }, [])
+
   useEffect(() => {
     loadEventData()
   }, [loadEventData])
@@ -71,16 +91,6 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
   useEffect(() => {
     sumValues()
   }, [ticketsList])
-
-  const getRefreshHour = () => {
-    const today = new Date()
-    today.setHours(today.getHours() + 3)
-
-    const hours = String(today.getHours()).padStart(2, "0")
-    const minutes = String(today.getMinutes()).padStart(2, "0")
-
-    return `${hours}:${minutes}`
-  }
 
   const renderTaxResume = () => {
     let str = ""
@@ -94,6 +104,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
         adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
         adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
         adminTaxValue: event?.eCommerce.adminTaxValue,
+        tickets: ticketsList,
       })
 
       str =
@@ -159,7 +170,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
       <S.ReleaseBlock>
         <S.RLeft>
           <img src={clockIcon} alt={""} />
-          <span>{getRefreshHour()}</span>
+          <span>{time}</span>
         </S.RLeft>
         <S.RRight>
           <span>

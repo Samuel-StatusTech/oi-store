@@ -32,16 +32,19 @@ const Ticket = ({ k, ticket, changeQnt, hasControl = true }: Props) => {
         ) : (
           <S.QntControl>
             {hasControl && changeQnt && (
-              <S.Control onClick={() => changeQnt(ticket.id, "decrease")}>
+              <S.Control
+                $disabled={ticket.qnt === 0}
+                onClick={() => changeQnt(ticket.id, "decrease")}
+              >
                 <img src={minus} alt={""} />
               </S.Control>
             )}
             <span>{ticket.qnt}</span>
             {hasControl && changeQnt && (
               <S.Control
-                $disabled={ticket.quantity - ticket.qnt < 1}
+                $disabled={ticket.quantity - ticket.qnt < 1 || ticket.qnt >= 20}
                 onClick={
-                  ticket.quantity - ticket.qnt < 1
+                  ticket.quantity - ticket.qnt < 1 || ticket.qnt >= 20
                     ? () => {}
                     : () => changeQnt(ticket.id, "increase")
                 }

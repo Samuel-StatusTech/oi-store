@@ -385,6 +385,7 @@ const Payment = () => {
         adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
         adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
         adminTaxValue: event?.eCommerce.adminTaxValue,
+        tickets: tickets,
       })
 
       if (method === "pix")

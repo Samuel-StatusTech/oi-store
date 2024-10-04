@@ -87,64 +87,53 @@ export const PaymentData = styled.div`
   }
 `
 
-export const Methods = styled.div`
-  display: flex;
-  gap: 48px;
-`
-
-// Method
-
-export const Method = styled.div<{ $checked: boolean }>`
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-items: center;
-  gap: 24px;
-  flex: 1;
-  border: 1px solid
-    ${({ $checked, theme }) => ($checked ? theme.colors.blue.main : "#ccc")};
-  border-radius: 6px;
-  padding: 24px 24px 32px;
-  cursor: pointer;
-  transition: border-color 0.3s;
-  overflow: hidden;
-`
-
-export const MTitle = styled.div``
-
-export const List = styled.div`
-  display: flex;
-  gap: 12px;
-  max-width: 100%;
-  flex-wrap: wrap;
-  justify-content: center;
-  align-items: center;
-`
-
-export const CardItem = styled.a`
-  z-index: 1;
-  position: relative;
-`
-
-export const Recommended = styled.div<{ $visible?: boolean }>`
-  display: ${({ $visible }) => ($visible ? "block" : "none")};
-  bottom: 0;
-  left: 0;
-  right: 0;
-  position: absolute;
-  background-color: #111;
-  color: #fff;
-  text-align: center;
-  padding: 0px;
-  z-index: 2;
-`
-
 export const OrderResume = styled.div`
   width: 320px;
 `
 
-// Form
+export const Feedback = styled.div<{ $k: number }>`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto;
+
+  font-size: 32px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.green.main};
+
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  opacity: 0;
+  ${({ $k, theme }) =>
+    theme.animations.types.fadeTop +
+    theme.animations.durations.main +
+    theme.animations.delays.main($k)}
+`
+
+export const FeedbackIntructions = styled.div<{ $k: number }>`
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin: 0 auto;
+
+  font-size: 18px;
+  font-weight: 600;
+  color: ${({ theme }) => theme.colors.black.secondary};
+
+  svg {
+    width: 32px;
+    height: 32px;
+  }
+
+  opacity: 0;
+  ${({ $k, theme }) =>
+    theme.animations.types.fadeTop +
+    theme.animations.durations.main +
+    theme.animations.delays.main($k)}
+`
 
 export const PixArea = styled.div`
   display: flex;
@@ -246,6 +235,7 @@ export const Icons = styled.div`
     flex-direction: column;
     align-items: center;
     gap: 12px;
+    color: ${({ theme }) => theme.colors.blue.main};
 
     svg {
       width: 36px;
@@ -254,7 +244,7 @@ export const Icons = styled.div`
 
     span {
       font-size: 14px;
-      color: ${({ theme }) => theme.colors.blue.main};
+      text-align: center;
     }
 
     &:hover {

@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { TShoppingTicket } from "../../utils/@types/data/ticket"
-import { temporizadorDeCincoMinutos } from "../../utils/tb/timer"
+import { clockdown } from "../../utils/tb/timer"
 import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
 import * as S from "./styled"
 
@@ -14,6 +14,8 @@ import Feedback from "../../components/Feedback"
 
 import { ReactComponent as DownloadIcon } from "../../assets/icons/download.svg"
 import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
+import { ReactComponent as CheckCircle } from "../../assets/icons/check_circle.svg"
+import { ReactComponent as FileIcon } from "../../assets/icons/file_icon.svg"
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
@@ -25,12 +27,10 @@ import { Api } from "../../api"
 import { getOrderData } from "../../utils/tb/order"
 import downloadTickets from "../../utils/pdf"
 import { generateTicketID } from "../../utils/tb/qrcode"
+
 const io = require("socket.io-client")
 
 const socketUrl = "https://api.oitickets.com.br"
-// "localhost:8080"
-// "https://fcc72937-d3ce-489c-abbd-4c6d1d4601c2-00-3a89kn5qa5vq6.riker.replit.dev/"
-// process.env.REACT_APP_socketUrl as string
 
 const PaymentPix = () => {
   const lctn = useLocation()
@@ -46,10 +46,7 @@ const PaymentPix = () => {
 
   const [qrCode, setQrCode] = useState("")
   const [qrCode64, setQrCode64] = useState("")
-  const [feedback, setFeedback] = useState<any>({
-    visible: false,
-    message: "",
-  })
+  const [feedback, setFeedback] = useState<any>({ visible: false, message: "" })
 
   const [payed, setPayed] = useState(false)
 
@@ -213,12 +210,12 @@ const PaymentPix = () => {
   }
 
   const runTimer = () => {
-    const timer = temporizadorDeCincoMinutos(restartTimer)
+    const timer = clockdown(300, restartTimer)
 
-    timer.iniciar()
+    timer.start()
 
     const interval = setInterval(() => {
-      const time = timer.tempoAtualFormatado()
+      const time = timer.actualTime()
       if (time) setTime(time)
       else clearInterval(interval)
     }, 1000)
@@ -312,9 +309,7 @@ const PaymentPix = () => {
 
           setBuyedTickets(pdfTickets)
         }
-      } catch (error) {
-        console.log(error)
-      }
+      } catch (error) {}
     }
   }, [])
 
@@ -363,6 +358,19 @@ const PaymentPix = () => {
     } catch (error) {}
   }
 
+  const handleSee = async () => {
+    try {
+      if (event) {
+        const file = await downloadTickets(event, buyedTickets)
+
+        if (file instanceof File) {
+          const url = URL.createObjectURL(file)
+          window.open(url, "_blank")
+        }
+      }
+    } catch (error) {}
+  }
+
   const keepShopping = () => {
     navigate("/")
   }
@@ -375,11 +383,25 @@ const PaymentPix = () => {
       <Container>
         <S.Main>
           <S.Block $k={2}>
-            <S.BlockTitle $k={4}>
-              {payed
-                ? "Veja os detalhes do seu pedido:"
-                : "Agora só falta concluir o seu Pix."}
-            </S.BlockTitle>
+            {payed && (
+              <S.Feedback $k={3}>
+                <span>Tudo certo! Pedido Aprovado</span>
+                <CheckCircle />
+              </S.Feedback>
+            )}
+            {payed && (
+              <S.FeedbackIntructions $k={4}>
+                <span>
+                  Baixe seus ingressos em PDF ou Compartilhe para seu WhatsApp!
+                </span>
+              </S.FeedbackIntructions>
+            )}
+
+            {!payed && (
+              <S.BlockTitle $k={4}>
+                Agora só falta concluir o seu Pix.
+              </S.BlockTitle>
+            )}
 
             {payed ? (
               <S.PayedArea>
@@ -392,6 +414,10 @@ const PaymentPix = () => {
                     <ShareIcon />
                     <span>Enviar</span>
                   </div>
+                  <div onClick={handleSee}>
+                    <FileIcon />
+                    <span>Ver ingressos</span>
+                  </div>
                 </S.Icons>
                 <S.Button
                   $outlined={true}
@@ -400,6 +426,9 @@ const PaymentPix = () => {
                 >
                   Comprar mais
                 </S.Button>
+                <S.FeedbackIntructions $k={4}>
+                  <span>Cópia enviada para ricardo@hotmail.com.br</span>
+                </S.FeedbackIntructions>
               </S.PayedArea>
             ) : (
               <S.PixArea>

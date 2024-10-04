@@ -37,6 +37,7 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
       adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
       adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
       adminTaxValue: event?.eCommerce.adminTaxValue,
+      tickets: tickets,
     })
 
     setTaxes(tax)
@@ -64,7 +65,7 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
         )
       }
     } else if (action === "increase") {
-      if (tk.qnt + 1 <= tk.quantity) {
+      if (tk.qnt + 1 <= tk.quantity && tk.qnt + 1 <= 20) {
         nList = nList.map((tkt) =>
           tkt.id !== tk.id
             ? tkt
