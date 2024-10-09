@@ -24,10 +24,13 @@ const MyTickets = () => {
 
       if (req.ok) {
         setList(
-          req.data.list.map((i) => ({
-            ...i,
-            eventBanner: event?.event_banner as string,
-          }))
+          req.data.list
+            .map((i) => ({
+              ...i,
+              eventBanner: event?.event_banner as string,
+            }))
+            .sort((a, b) => a.date.localeCompare(b.date))
+            .reverse()
         )
       }
     } catch (error) {}

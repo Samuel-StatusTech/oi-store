@@ -427,7 +427,7 @@ const PaymentPix = () => {
                   Comprar mais
                 </S.Button>
                 <S.FeedbackIntructions $k={4}>
-                  <span>Cópia enviada para ricardo@hotmail.com.br</span>
+                  <span>Cópia enviada para {user?.email ?? "seu email"}</span>
                 </S.FeedbackIntructions>
               </S.PayedArea>
             ) : (
