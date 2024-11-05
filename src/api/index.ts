@@ -25,6 +25,8 @@ try {
   axios.interceptors.request.use(function (config) {
     const localToken = localStorage.getItem("token")
 
+    console.log(config.url, localToken)
+
     if (localToken) {
       const isTokenExpired = checkTokenExpiration(localToken)
 
@@ -33,6 +35,7 @@ try {
         window.location.reload()
       } else {
         const requireUserToken =
+          !config.url?.includes("event/getData") &&
           !config.url?.includes("event/getSelect") &&
           !config.url?.includes("product/getList")
 
@@ -44,6 +47,7 @@ try {
       }
     } else {
       const requireToken =
+        config.url?.includes("event/getData") ||
         config.url?.includes("event/getSelect") ||
         config.url?.includes("product/getList")
 
@@ -145,8 +149,17 @@ const getEvents: TApi["get"]["events"] = async () => {
 const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
   return new Promise(async (resolve, reject) => {
     try {
+      const moreInfo =
+        (
+          await axios.get(`/event/getData/${eventId}`, {
+            headers: {
+              "X-event-id": eventId,
+            },
+          })
+        ).data.event ?? {}
+
       await axios
-        .get(`/ecommerce/getInfo`, {
+        .get(`/ecommerce/getInfo?eventId=${eventId}`, {
           headers: {
             "X-event-id": eventId,
           },
@@ -159,7 +172,7 @@ const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
               ok: true,
               data: {
                 ...info,
-                id: eventId,
+                ...moreInfo,
               },
             })
           } else {
