@@ -1,5 +1,7 @@
 import axios from "axios"
 import { TApi } from "../utils/@types/api"
+import { TProduct } from "../utils/@types/data/product"
+import { jwtDecode } from "jwt-decode"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
@@ -7,15 +9,46 @@ const backUrl = "https://api.oitickets.com.br/api/v1"
 
 const dToken = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZqTFpROEQyOVBmQ3dJMlNiS3dQZ0I3cjdnRDMiLCJkYXRhYmFzZSI6IkRCNGI5MzEzZTNjZWUwOGQ5YWMzZDE0NGUxODg3MGJjMGRiMjA4MTNjZCIsImNsaWVudEtleSI6Ii1OYWxaenZiMndhc1VfNmR1R2NuIiwiaWF0IjoxNzE3NDk1MzQzLCJleHAiOjE5NzQxMDMzNDN9.50knxx6WtR8TBD0byCCPo7Qaxe6SV6MXvHujZYYd4rI`
 
+const checkTokenExpiration = (token: string) => {
+  const decoded = jwtDecode(token)
+
+  const iat = (decoded.iat as number) * 1000
+  const now = +new Date().getTime().toFixed(0)
+
+  const limit = 10 * 60 * 1000
+  const exp = iat + limit
+
+  return now > exp
+}
+
 try {
   axios.interceptors.request.use(function (config) {
-    config.headers.Authorization =
-      !config.url?.includes("event/getSelect") &&
-      !config.url?.includes("event/getData") &&
-      !config.url?.includes("product/getList")
-        ? `Bearer ${localStorage.getItem("token")}` ?? dToken
-        : dToken
-    // cxonfig.headers.Authorization = dToken
+    const localToken = localStorage.getItem("token")
+
+    if (localToken) {
+      const isTokenExpired = checkTokenExpiration(localToken)
+
+      if (isTokenExpired && !localStorage.getItem("shouldClearCache")) {
+        localStorage.setItem("shouldClearCache", "true")
+        window.location.reload()
+      } else {
+        const requireUserToken =
+          !config.url?.includes("event/getSelect") &&
+          !config.url?.includes("product/getList")
+
+        config.headers.Authorization = requireUserToken
+          ? localToken
+            ? `Bearer ${localToken}`
+            : dToken
+          : dToken
+      }
+    } else {
+      const requireToken =
+        config.url?.includes("event/getSelect") ||
+        config.url?.includes("product/getList")
+
+      config.headers.Authorization = requireToken ? dToken : undefined
+    }
 
     return config
   })
@@ -112,17 +145,8 @@ const getEvents: TApi["get"]["events"] = async () => {
 const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const moreInfo =
-        (
-          await axios.get(`/event/getData/${eventId}`, {
-            headers: {
-              "X-event-id": eventId,
-            },
-          })
-        ).data.event ?? {}
-
       await axios
-        .get(`/ecommerce/getInfo?eventId=${eventId}`, {
+        .get(`/ecommerce/getInfo`, {
           headers: {
             "X-event-id": eventId,
           },
@@ -135,7 +159,7 @@ const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
               ok: true,
               data: {
                 ...info,
-                ...moreInfo,
+                id: eventId,
               },
             })
           } else {
@@ -172,9 +196,31 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
           const receivedList = res.data
 
           const list = Array.isArray(receivedList) ? receivedList : []
+
+          let parsed: TProduct[] = []
+          list.forEach((i) => {
+            const activeBatchData = i.batches.find((b: any) =>
+              Boolean(b.active)
+            )
+
+            if (activeBatchData) {
+              parsed.push({
+                id: i.product_id,
+                name: i.name,
+                image: i.image,
+                created_at: i.created_at,
+                updated_at: i.updated_at,
+                active: i.active,
+                batch_id: activeBatchData.batch_id,
+                quantity: activeBatchData.quantity,
+                price_sell: activeBatchData.price_sell,
+              })
+            }
+          })
+
           resolve({
             ok: true,
-            data: { list },
+            data: { list: parsed },
           })
         })
         .catch(() => {
@@ -294,8 +340,7 @@ const registerUser: TApi["post"]["register"] = async ({
         })
     } catch (error) {
       // @ts-ignore
-      const errorMessage = error.response.data.error
-      console.log("Erro aqui", errorMessage)
+      // const errorMessage = error.response.data.error
       reject({
         ok: false,
         error: "Erro ao cadastrar usuário. Tente novamente mais tarde",

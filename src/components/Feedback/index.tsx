@@ -21,11 +21,7 @@ const Feedback = ({ data }: Props) => {
         }
         $visible={data.visible}
       >
-        <span>
-          {
-            "Você não está logado. Caso tenha uma conta, faça login primeiro. Caso contrário, confira os dados e confirme para se cadastrar e comprar."
-          }
-        </span>
+        <span>{data.message}</span>
       </S.Box>
     </S.Wrapper>
   )
