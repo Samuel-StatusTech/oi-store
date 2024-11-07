@@ -25,7 +25,9 @@ try {
   axios.interceptors.request.use(function (config) {
     const localToken = localStorage.getItem("token")
 
-    console.log(config.url, localToken)
+    const requireAdminToken =
+      config.url?.includes("event/getSelect") ||
+      config.url?.includes("product/getList")
 
     if (localToken) {
       const isTokenExpired = checkTokenExpiration(localToken)
@@ -34,24 +36,12 @@ try {
         localStorage.setItem("shouldClearCache", "true")
         window.location.reload()
       } else {
-        const requireUserToken =
-          !config.url?.includes("event/getData") &&
-          !config.url?.includes("event/getSelect") &&
-          !config.url?.includes("product/getList")
-
-        config.headers.Authorization = requireUserToken
-          ? localToken
-            ? `Bearer ${localToken}`
-            : dToken
-          : dToken
+        // token is usable
+        if (requireAdminToken) config.headers.Authorization = dToken
+        else config.headers.Authorization = `Bearer ${localToken}`
       }
     } else {
-      const requireToken =
-        config.url?.includes("event/getData") ||
-        config.url?.includes("event/getSelect") ||
-        config.url?.includes("product/getList")
-
-      config.headers.Authorization = requireToken ? dToken : undefined
+      config.headers.Authorization = requireAdminToken ? dToken : undefined
     }
 
     return config
@@ -98,46 +88,42 @@ const getQrCode: TApi["get"]["qrcode"] = async ({ order }) => {
 const getEvents: TApi["get"]["events"] = async () => {
   return new Promise(async (resolve, reject) => {
     try {
-      await axios
+      const listReq = await axios
         .get(`event/getSelect?status=ativo`)
         .then(async (res) => {
-          const info = res.data.events
+          if (res.data.success) {
+            return res.data.events.filter((event: any) => event.status === 1)
+          } else return null
+        })
+        .catch((err) => {
+          return null
+        })
 
-          let eventsWithImages: any[] = []
-          let promises: Promise<any>[] = []
+      if (listReq && listReq.length > 0) {
+        await axios
+          .get(`ecommerce/getInfo?eventId=${listReq[0].id}`)
+          .then(async (res) => {
+            const list = res.data.events
 
-          info.forEach(async (ev: any) => {
-            promises.push(
-              getEventInfo({ eventId: ev.id }).then((res) => {
-                if (res.ok) {
-                  eventsWithImages.push({
-                    ...ev,
-                    logo: res.data.event_banner ?? ev.logo,
-                  })
-                }
+            if (list) {
+              resolve({
+                ok: true,
+                data: list.filter((ev: any) => Boolean(ev.status)),
               })
-            )
+            } else {
+              reject({
+                error:
+                  "Erro ao carregar os eventos. Tente novamente mais tarde",
+              })
+            }
           })
-
-          await Promise.all(promises)
-
-          if (info) {
+          .catch(() => {
             resolve({
-              ok: true,
-              data: eventsWithImages,
-            })
-          } else {
-            reject({
+              ok: false,
               error: "Erro ao carregar os eventos. Tente novamente mais tarde",
             })
-          }
-        })
-        .catch(() => {
-          resolve({
-            ok: false,
-            error: "Erro ao carregar os eventos. Tente novamente mais tarde",
           })
-        })
+      }
     } catch (error) {
       reject({
         error: "Erro ao carregar os eventos. Tente novamente mais tarde",
@@ -149,48 +135,38 @@ const getEvents: TApi["get"]["events"] = async () => {
 const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const moreInfo =
-        (
-          await axios.get(`/event/getData/${eventId}`, {
-            headers: {
-              "X-event-id": eventId,
-            },
-          })
-        ).data.event ?? {}
+      const req = await axios.get(`/ecommerce/getInfo?eventId=${eventId}`, {
+        headers: {
+          "X-event-id": eventId,
+        },
+      })
 
-      await axios
-        .get(`/ecommerce/getInfo?eventId=${eventId}`, {
-          headers: {
-            "X-event-id": eventId,
-          },
-        })
-        .then((res) => {
-          const info = res.data.info
+      const events = req.data.events ?? null
 
-          if (info) {
-            resolve({
-              ok: true,
-              data: {
-                ...info,
-                ...moreInfo,
-              },
-            })
-          } else {
-            reject({
-              error:
-                "Erro ao carregar as informações do evento. Tente novamente mais tarde",
-            })
+      if (events) {
+        const event = events.find((e: any) => e.id === eventId)
+
+        if (event) {
+          const eventData = {
+            ...req.data.info,
+            ...event,
           }
-        })
-        .catch(() => {
+
+          resolve({
+            ok: true,
+            data: eventData,
+          })
+        } else {
           resolve({
             ok: false,
             error:
               "Erro ao carregar as informações do evento. Tente novamente mais tarde",
           })
-        })
+        }
+      } else throw new Error()
     } catch (error) {
-      reject({
+      resolve({
+        ok: false,
         error:
           "Erro ao carregar as informações do evento. Tente novamente mais tarde",
       })

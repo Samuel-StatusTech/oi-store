@@ -11,7 +11,6 @@ function App() {
   const store = getStore()
 
   useEffect(() => {
-    console.log(localStorage.getItem("shouldClearCache"))
     if (
       (store.event || store.user) &&
       localStorage.getItem("shouldClearCache") === "true"

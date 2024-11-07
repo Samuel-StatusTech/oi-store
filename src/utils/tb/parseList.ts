@@ -8,7 +8,7 @@ const parseEventMinToCard = (minList: TEventMin[]): TCardEvent[] => {
   minList.forEach((event) => {
     newList.push({
       id: event.id,
-      banner: event.logo,
+      banner: event.event_banner,
       dateStr: getDatePeriod(event.date_ini, event.date_end),
       name: event.name,
     })

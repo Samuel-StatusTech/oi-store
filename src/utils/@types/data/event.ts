@@ -74,6 +74,7 @@ export type TEventMin = {
   date_end: string
   status: number
   logo: null | string
+  event_banner: null | string
   city: string
   state: string
 }
