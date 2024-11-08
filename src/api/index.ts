@@ -25,9 +25,9 @@ try {
   axios.interceptors.request.use(function (config) {
     const localToken = localStorage.getItem("token")
 
-    const requireAdminToken =
-      config.url?.includes("event/getSelect") ||
-      config.url?.includes("product/getList")
+    const requireAdminToken = config.url?.includes("event/getSelect")
+    //  ||
+    // config.url?.includes("product/getList")
 
     if (localToken) {
       const isTokenExpired = checkTokenExpiration(localToken)
@@ -88,42 +88,41 @@ const getQrCode: TApi["get"]["qrcode"] = async ({ order }) => {
 const getEvents: TApi["get"]["events"] = async () => {
   return new Promise(async (resolve, reject) => {
     try {
-      const listReq = await axios
-        .get(`event/getSelect?status=ativo`)
+      // const listReq = await axios
+      //   .get(`event/getSelect?status=ativo`)
+      //   .then(async (res) => {
+      //     if (res.data.success) {
+      //       return res.data.events.filter((event: any) => event.status === 1)
+      //     } else return null
+      //   })
+      //   .catch((err) => {
+      //     return null
+      //   })
+
+      // if (listReq && listReq.length > 0) {
+      await axios
+        .get(`ecommerce/getInfo`) //?eventId=${listReq[0].id}`)
         .then(async (res) => {
-          if (res.data.success) {
-            return res.data.events.filter((event: any) => event.status === 1)
-          } else return null
-        })
-        .catch((err) => {
-          return null
-        })
+          const list = res.data.events
 
-      if (listReq && listReq.length > 0) {
-        await axios
-          .get(`ecommerce/getInfo?eventId=${listReq[0].id}`)
-          .then(async (res) => {
-            const list = res.data.events
-
-            if (list) {
-              resolve({
-                ok: true,
-                data: list.filter((ev: any) => Boolean(ev.status)),
-              })
-            } else {
-              reject({
-                error:
-                  "Erro ao carregar os eventos. Tente novamente mais tarde",
-              })
-            }
-          })
-          .catch(() => {
+          if (list) {
             resolve({
-              ok: false,
+              ok: true,
+              data: list.filter((ev: any) => Boolean(ev.status)),
+            })
+          } else {
+            reject({
               error: "Erro ao carregar os eventos. Tente novamente mais tarde",
             })
+          }
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Erro ao carregar os eventos. Tente novamente mais tarde",
           })
-      }
+        })
+      // }
     } catch (error) {
       reject({
         error: "Erro ao carregar os eventos. Tente novamente mais tarde",
