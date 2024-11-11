@@ -50,11 +50,17 @@ const MyTickets = () => {
         <S.Main>
           <S.PageTitle>Meus tickets</S.PageTitle>
 
-          <S.List>
-            {list.map((ticket, k) => (
-              <TicketCard k={k} key={k} data={ticket} />
-            ))}
-          </S.List>
+          {list.length === 0 ? (
+            <S.PageTitle $align="center">
+              Você não possui ingressos para esse evento
+            </S.PageTitle>
+          ) : (
+            <S.List>
+              {list.map((ticket, k) => (
+                <TicketCard k={k} key={k} data={ticket} />
+              ))}
+            </S.List>
+          )}
         </S.Main>
       </Container>
 

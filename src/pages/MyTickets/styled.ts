@@ -13,9 +13,10 @@ export const Main = styled.div`
   padding: 0 0 64px 0;
 `
 
-export const PageTitle = styled.h1`
+export const PageTitle = styled.h1<{ $align?: string }>`
   font-size: 24px;
   font-weight: bold;
+  text-align: ${({ $align }) => $align ?? "left"};
 `
 
 export const List = styled.div`

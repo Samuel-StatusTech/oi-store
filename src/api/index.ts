@@ -88,20 +88,8 @@ const getQrCode: TApi["get"]["qrcode"] = async ({ order }) => {
 const getEvents: TApi["get"]["events"] = async () => {
   return new Promise(async (resolve, reject) => {
     try {
-      // const listReq = await axios
-      //   .get(`event/getSelect?status=ativo`)
-      //   .then(async (res) => {
-      //     if (res.data.success) {
-      //       return res.data.events.filter((event: any) => event.status === 1)
-      //     } else return null
-      //   })
-      //   .catch((err) => {
-      //     return null
-      //   })
-
-      // if (listReq && listReq.length > 0) {
       await axios
-        .get(`ecommerce/getInfo`) //?eventId=${listReq[0].id}`)
+        .get(`ecommerce/getInfo`)
         .then(async (res) => {
           const list = res.data.events
 
