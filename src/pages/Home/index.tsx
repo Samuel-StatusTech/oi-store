@@ -30,7 +30,12 @@ const Home = () => {
 
         if (req.ok) {
           const data = req.data
-          controllers.event.setData(data)
+          if (data.status) {
+            controllers.event.setData(data)
+          } else {
+            controllers.event.clear()
+            navigate("/eventSelect")
+          }
         }
       } catch (error) {
         alert("Erro ao carregar os tickets")
