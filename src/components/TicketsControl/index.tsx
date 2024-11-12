@@ -140,7 +140,9 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
     let str = ""
 
     if (event) {
-      const minValue = +event.eCommerce.adminTaxMinimum ?? 0
+      const minValue = !Number.isNaN(+event.eCommerce.adminTaxMinimum)
+        ? +event.eCommerce.adminTaxMinimum
+        : 0
 
       str =
         taxes > minValue

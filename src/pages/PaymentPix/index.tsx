@@ -27,6 +27,8 @@ import { Api } from "../../api"
 import { getOrderData } from "../../utils/tb/order"
 import downloadTickets from "../../utils/pdf"
 import { generateTicketID } from "../../utils/tb/qrcode"
+import { TUser } from "../../utils/@types/data/user"
+import { TEventData } from "../../utils/@types/data/event"
 
 const io = require("socket.io-client")
 
@@ -117,6 +119,9 @@ const PaymentPix = () => {
         buyer: lctn.state.buyer,
         taxTotal: lctn.state.taxTotal ?? 0,
         sid,
+        user: user as TUser,
+        dk: (event as TEventData).dk,
+        eventId: (event as TEventData).id,
       })
 
       if (orderData) {
@@ -247,6 +252,9 @@ const PaymentPix = () => {
         buyer: lctn.state.buyer,
         taxTotal: lctn.state.taxTotal ?? 0,
         sid,
+        user: user,
+        dk: event.dk,
+        eventId: event.id,
       })
 
       const sign = await Api.post.purchase.sign({

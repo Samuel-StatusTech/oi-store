@@ -39,7 +39,6 @@ export const generateTicketID = (
 
     return qrCodeNums.toUpperCase()
   } catch (error) {
-    console.log("Erro", error)
     return ""
   }
 }

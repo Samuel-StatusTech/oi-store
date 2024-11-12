@@ -1,4 +1,5 @@
 import { TTicket } from "../@types/data/ticket"
+import { TUser } from "../@types/data/user"
 
 type Props = {
   tickets: TTicket[]
@@ -8,9 +9,20 @@ type Props = {
   }
   taxTotal: number
   sid: string
+  user: TUser
+  dk: any
+  eventId: string
 }
 
-export const getOrderData = ({ tickets, buyer, taxTotal, sid }: Props) => {
+export const getOrderData = ({
+  tickets,
+  buyer,
+  taxTotal,
+  sid,
+  user,
+  dk,
+  eventId,
+}: Props) => {
   if (tickets) {
     const paymentValue =
       tickets.reduce((sum, ticket) => sum + +(ticket.price_sell ?? "0"), 0) +
@@ -38,9 +50,9 @@ export const getOrderData = ({ tickets, buyer, taxTotal, sid }: Props) => {
       payment_method_id: "pix",
       // description: "",
       payer: {
-        first_name: "Developer",
-        last_name: "test",
-        email: "samdg919@gmail.com",
+        first_name: user.name,
+        last_name: user.username,
+        email: user.email ?? "email@email.com",
         // type: "guest",
       },
       metadata: {
@@ -51,6 +63,8 @@ export const getOrderData = ({ tickets, buyer, taxTotal, sid }: Props) => {
           },
         },
         cCode: sid,
+        dk,
+        eventId,
       },
       // items
     }

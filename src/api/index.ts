@@ -96,7 +96,12 @@ const getEvents: TApi["get"]["events"] = async () => {
           if (list) {
             resolve({
               ok: true,
-              data: list.filter((ev: any) => Boolean(ev.status)),
+              data: list
+                .filter((ev: any) => Boolean(ev.status))
+                .map((ev: any) => ({
+                  ...ev,
+                  dk: res.data.dk,
+                })),
             })
           } else {
             reject({
@@ -137,6 +142,7 @@ const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
           const eventData = {
             ...req.data.info,
             ...event,
+            dk: req.data.dk
           }
 
           resolve({
@@ -180,7 +186,7 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
             )
 
             if (activeBatchData) {
-              parsed.push({
+              const obj = {
                 id: i.product_id,
                 name: i.name,
                 image: i.image,
@@ -190,7 +196,9 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
                 batch_id: activeBatchData.batch_id,
                 quantity: activeBatchData.quantity,
                 price_sell: activeBatchData.price_sell,
-              })
+              }
+
+              parsed.push(obj)
             }
           })
 
