@@ -144,7 +144,7 @@ const Payment = () => {
   const [form, setForm] = useState<TForm>({
     ...initialForm,
     buyer: {
-      email: "",
+      email: user?.email ?? "",
       name: user?.name ?? "",
       phone: user?.fone ? formatPhone(user?.fone) : "",
     },
