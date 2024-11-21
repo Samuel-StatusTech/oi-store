@@ -7,46 +7,49 @@ axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
 const backUrl = "https://api.oitickets.com.br/api/v1"
 
-const dToken = `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImZqTFpROEQyOVBmQ3dJMlNiS3dQZ0I3cjdnRDMiLCJkYXRhYmFzZSI6IkRCNGI5MzEzZTNjZWUwOGQ5YWMzZDE0NGUxODg3MGJjMGRiMjA4MTNjZCIsImNsaWVudEtleSI6Ii1OYWxaenZiMndhc1VfNmR1R2NuIiwiaWF0IjoxNzE3NDk1MzQzLCJleHAiOjE5NzQxMDMzNDN9.50knxx6WtR8TBD0byCCPo7Qaxe6SV6MXvHujZYYd4rI`
-
 const checkTokenExpiration = (token: string) => {
-  const decoded = jwtDecode(token)
+  try {
+    const decoded = jwtDecode(token)
 
-  const iat = (decoded.iat as number) * 1000
-  const now = +new Date().getTime().toFixed(0)
+    const iat = (decoded.iat as number) * 1000
+    const now = +new Date().getTime().toFixed(0)
 
-  const limit = 5 * 60 * 1000
-  const exp = iat + limit
+    const limit = 5 * 60 * 1000
+    const exp = iat + limit
 
-  return now > exp
+    return now > exp
+  } catch (error) {
+    return true
+  }
 }
 
-try {
-  axios.interceptors.request.use(function (config) {
-    const localToken = localStorage.getItem("token")
-
-    const requireAdminToken = config.url?.includes("event/getSelect")
-    //  ||
-    // config.url?.includes("product/getList")
+axios.interceptors.request.use(function (config) {
+  try {
+    const localToken = sessionStorage.getItem("token")
 
     if (localToken) {
-      const isTokenExpired = checkTokenExpiration(localToken)
+      if (localToken === "undefined") {
+        sessionStorage.removeItem("user")
+        sessionStorage.removeItem("token")
 
-      if (isTokenExpired && !localStorage.getItem("shouldClearCache")) {
-        localStorage.setItem("shouldClearCache", "true")
         window.location.reload()
       } else {
-        // token is usable
-        if (requireAdminToken) config.headers.Authorization = dToken
-        else config.headers.Authorization = `Bearer ${localToken}`
+        const isTokenExpired = checkTokenExpiration(localToken)
+
+        if (isTokenExpired) {
+          sessionStorage.removeItem("user")
+          sessionStorage.removeItem("token")
+
+          window.location.reload()
+        } else config.headers.Authorization = `Bearer ${localToken}`
       }
-    } else {
-      config.headers.Authorization = requireAdminToken ? dToken : undefined
     }
 
     return config
-  })
-} catch (error) {}
+  } catch (error) {
+    return config
+  }
+})
 
 /*
  * Getters
@@ -109,7 +112,7 @@ const getEvents: TApi["get"]["events"] = async () => {
             })
           }
         })
-        .catch(() => {
+        .catch((err) => {
           resolve({
             ok: false,
             error: "Erro ao carregar os eventos. Tente novamente mais tarde",
@@ -142,7 +145,7 @@ const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
           const eventData = {
             ...req.data.info,
             ...event,
-            dk: req.data.dk
+            dk: req.data.dk,
           }
 
           resolve({
@@ -301,7 +304,7 @@ const registerUser: TApi["post"]["register"] = async ({
           // store token ...
 
           if (res.data.token.token) {
-            localStorage.setItem("token", res.data.token.token)
+            sessionStorage.setItem("token", res.data.token.token)
 
             resolve({ ok: true, data: res.data })
           } else {
@@ -342,15 +345,12 @@ const requestCode: TApi["post"]["login"]["requestCode"] = async ({ phone }) => {
           database: "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd",
         })
         .then((res) => {
-          const uObj = {
-            ...res.data.user,
-            cpf: res.data.roleData.cpf,
-            fone: res.data.roleData.fone,
-          }
-
-          localStorage.setItem("token", res.data.token)
-
-          resolve({ ok: true, data: uObj })
+          if (res.data.success) resolve({ ok: true, data: {} })
+          else
+            resolve({
+              ok: false,
+              error: "Algo deu errado. Tente novamente mais tarde.",
+            })
         })
         .catch(() => {
           resolve({
@@ -383,7 +383,7 @@ const validateCode: TApi["post"]["login"]["validateCode"] = async ({
             fone: res.data.roleData.fone,
           }
 
-          localStorage.setItem("token", res.data.token)
+          sessionStorage.setItem("token", res.data.token)
 
           resolve({ ok: true, data: uObj })
         })
@@ -406,14 +406,8 @@ const validateCode: TApi["post"]["login"]["validateCode"] = async ({
 const signPurchase: TApi["post"]["purchase"]["sign"] = async (data) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const token = localStorage.getItem("token")
-
       await axios
-        .post("/ecommerce/buyTicket", data, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        })
+        .post("/ecommerce/buyTicket", data)
         .then((res) => {
           const purchase = res.data
 
@@ -437,12 +431,9 @@ const mpGenerate: TApi["post"]["purchase"]["mpGenerate"] = async ({
 }) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const token = localStorage.getItem("token")
-
       await axios
         .post("https://api.mercadopago.com/v1/payments", body, {
           headers: {
-            Authorization: `Bearer ${token}`,
             "X-Idempotency-Key": iKey,
           },
           baseURL: "",

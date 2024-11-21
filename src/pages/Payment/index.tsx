@@ -30,6 +30,7 @@ import { sumTaxes, sumTickets } from "../../utils/tb/taxes"
 import { validEmail } from "../../utils/tb/validEmail"
 import Feedback from "../../components/Feedback"
 import { TUser } from "../../utils/@types/data/user"
+import ValidateCodeModal from "../../components/Modal/ValidateCode"
 
 type MProps = {
   checked: boolean
@@ -136,9 +137,14 @@ const Payment = () => {
   const navigate = useNavigate()
 
   const store = getStore()
-  const { user, event, controllers } = store
+  const { event, controllers } = store
+
+  const user = sessionStorage.getItem("user")
+    ? JSON.parse(sessionStorage.getItem("user") as string)
+    : null
 
   const [termsAgreed, setTermsAgreed] = useState(false)
+  const [showingCodeModal, setShowingCodeModal] = useState(false)
 
   const [method, setMethod] = useState<"" | "pix" | "credit">("pix")
   const [form, setForm] = useState<TForm>({
@@ -373,7 +379,94 @@ const Payment = () => {
     }
   }
 
+  const requestCode = async () => {
+    return new Promise(async (resolve) => {
+      await Api.post.login
+        .requestCode({
+          phone: form.buyer.phone.replace(/\D/g, ""),
+        })
+        .then((res) => {
+          resolve(res.ok)
+        })
+        .catch(() => {
+          resolve(false)
+        })
+    })
+  }
+
+  const validateCode = async (code: string) => {
+    try {
+      const login = await Api.post.login.validateCode({
+        phone: form.buyer.phone.replace(/\D/g, ""),
+        code,
+      })
+
+      setShowingCodeModal(false)
+
+      if (login.ok) {
+        sessionStorage.setItem("user", JSON.stringify(login.data))
+        controllers.user.setData(login.data)
+
+        goToPix()
+      } else {
+        const f = {
+          state: "denied",
+          visible: true,
+          message: "Código incorreto. Tente novamente.",
+        }
+        setFeedback(f)
+
+        setTimeout(() => {
+          setFeedback({ ...f, visible: false })
+        }, 3500)
+      }
+    } catch (error) {
+      const f = {
+        state: "denied",
+        visible: true,
+        message:
+          "Houve um erro ao validar seu código. Tente novamente mais tarde",
+      }
+      setFeedback(f)
+
+      setTimeout(() => {
+        setFeedback({ ...f, visible: false })
+      }, 3500)
+    }
+  }
+
   // Payment
+
+  const goToPix = () => {
+    const taxes = sumTaxes({
+      ticketsTotal: sumTickets(tickets),
+      adminTax: event?.eCommerce.adminTax,
+      adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
+      adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
+      adminTaxValue: event?.eCommerce.adminTaxValue,
+      tickets: tickets,
+    })
+
+    let ptickets: any[] = []
+
+    tickets.forEach((t) => {
+      for (let k = 0; k <= (t.qnt as number) - 1; k++) {
+        ptickets.push({
+          ...t,
+          oid: k,
+          quantity: 1,
+        })
+      }
+    })
+
+    navigate("/payment/pix", {
+      state: {
+        tickets: ptickets,
+        buyer: form.buyer,
+        taxTotal: taxes,
+      },
+    })
+  }
 
   const handlePay = async () => {
     const errors = checkErrors()
@@ -410,22 +503,12 @@ const Payment = () => {
             },
           })
         } else {
-          if (!canBuy) {
-            const f = {
-              state: "expired",
-              visible: true,
-              message:
-                "Você não está logado. Caso tenha uma conta, faça login primeiro. Caso contrário, confira os dados e confirme para se cadastrar e comprar.",
-            }
-            setFeedback(f)
+          const getToken = await requestCode()
 
-            setTimeout(() => {
-              setFeedback({ ...f, visible: false })
-            }, 4000)
+          if (getToken) {
+            // show modal
 
-            setTimeout(() => {
-              setCanBuy(true)
-            }, 1000)
+            setShowingCodeModal(true)
           } else {
             const newUser = await Api.post.register(form.buyer)
 
@@ -437,27 +520,10 @@ const Payment = () => {
                 user_id: newUser.data.data.id,
               }
 
+              sessionStorage.setItem("user", JSON.stringify(udata))
               controllers.user.setData(udata)
 
-              let ptickets: any[] = []
-
-              tickets.forEach((t) => {
-                for (let k = 0; k <= (t.qnt as number) - 1; k++) {
-                  ptickets.push({
-                    ...t,
-                    oid: k,
-                    quantity: 1,
-                  })
-                }
-              })
-
-              navigate("/payment/pix", {
-                state: {
-                  tickets: ptickets,
-                  buyer: form.buyer,
-                  taxTotal: taxes,
-                },
-              })
+              goToPix()
             } else {
               if (!newUser.ok) {
                 const f = {
@@ -582,6 +648,12 @@ const Payment = () => {
 
   return (
     <S.Page>
+      <ValidateCodeModal
+        shown={showingCodeModal}
+        handleClose={() => setShowingCodeModal(false)}
+        handleValidate={validateCode}
+      />
+
       <Feedback data={feedback} />
 
       <Header />

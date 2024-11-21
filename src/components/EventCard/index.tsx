@@ -1,5 +1,4 @@
 import { Api } from "../../api"
-import getStore from "../../store"
 import { TCardEvent } from "../../utils/@types/data/eventCard"
 import * as S from "./styled"
 
@@ -11,7 +10,6 @@ type Props = {
 }
 
 const EventCard = ({ k, data }: Props) => {
-  const store = getStore()
   const navigate = useNavigate()
 
   const setEvent = async (
@@ -23,7 +21,7 @@ const EventCard = ({ k, data }: Props) => {
       const req = await Api.get.eventInfo({ eventId: data.id })
 
       if (req.ok) {
-        store.controllers.event.setData(req.data)
+        sessionStorage.setItem("event", JSON.stringify(req.data))
         navigate("/")
       } else {
         alert(

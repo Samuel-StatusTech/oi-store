@@ -1,10 +1,9 @@
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import * as S from "./styled"
 
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
 import Container from "../../components/Container"
-// import TicketCard from "../../components/TicketCard"
 
 import getStore from "../../store"
 import { useNavigate } from "react-router-dom"
@@ -12,35 +11,50 @@ import TicketCard from "../../components/TicketCard"
 import { Api } from "../../api"
 
 const MyTickets = () => {
-  const { event } = getStore()
+  const { controllers } = getStore()
 
   const navigate = useNavigate()
 
   const [list, setList] = useState<any[]>([])
 
-  const getData = useCallback(async () => {
+  const getData = async (eventInfo: any) => {
+    console.log("Event", eventInfo)
     try {
-      const req = await Api.get.myTickets({ eventId: event?.id as string })
+      const req = await Api.get.myTickets({ eventId: eventInfo?.id as string })
 
       if (req.ok) {
         setList(
           req.data.list
             .map((i) => ({
               ...i,
-              eventBanner: event?.event_banner as string,
+              eventBanner: eventInfo?.event_banner as string,
             }))
             .sort((a, b) => a.date.localeCompare(b.date))
             .reverse()
         )
       }
     } catch (error) {}
-  }, [event?.event_banner, event?.id])
+  }
 
   useEffect(() => {
-    if (!event) navigate("/eventSelect")
-    else getData()
+    const token = sessionStorage.getItem("token")
+
+    if (token) {
+      const eventData = sessionStorage.getItem("event")
+      console.log(eventData)
+
+      if (eventData) {
+        controllers.event.setData(JSON.parse(eventData))
+        getData(JSON.parse(eventData))
+      } else {
+        navigate("/eventSelect")
+      }
+    } else {
+      navigate("/eventSelect")
+    }
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [getData, event])
+  }, [])
 
   return (
     <S.Page>

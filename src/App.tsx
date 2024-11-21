@@ -11,18 +11,16 @@ function App() {
   const store = getStore()
 
   useEffect(() => {
-    if (
-      (store.event || store.user) &&
-      localStorage.getItem("shouldClearCache") === "true"
-    ) {
-      localStorage.removeItem("token")
-      store.controllers.event.clear()
-      store.controllers.user.clear()
-      localStorage.removeItem("shouldClearCache")
+    const event = sessionStorage.getItem("event")
+    const user = sessionStorage.getItem("user")
 
-      // reload
-      // eslint-disable-next-line no-self-assign
-      // window.location.href = window.location.href
+    if (event) {
+      if (!store.event) store.controllers.event.setData(JSON.parse(event))
+      if (user && !store.user) store.controllers.user.setData(JSON.parse(user))
+    } else {
+      if (!window.location.href.includes("eventSelect")) {
+        window.location.href = "/eventSelect"
+      }
     }
   }, [store.controllers.event, store.controllers.user, store.event, store.user])
 

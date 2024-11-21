@@ -31,7 +31,7 @@ const EventSelect = () => {
           const req = await Api.get.eventInfo({ eventId: parsed[0].id })
 
           if (req.ok) {
-            store.controllers.event.setData(req.data)
+            sessionStorage.setItem("event", JSON.stringify(req.data))
             navigate("/")
           } else {
             alert(
@@ -47,10 +47,10 @@ const EventSelect = () => {
     } else {
       alert(events.error)
     }
-  }, [navigate, store.controllers.event])
+  }, [navigate])
 
   useEffect(() => {
-    store.controllers.event.clear()
+    sessionStorage.removeItem("event")
 
     getData()
   }, [store.controllers, getData])

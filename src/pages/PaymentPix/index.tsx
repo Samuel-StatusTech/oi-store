@@ -38,7 +38,15 @@ const PaymentPix = () => {
   const lctn = useLocation()
   const navigate = useNavigate()
 
-  const { user, event, controllers } = getStore()
+  const eventData = sessionStorage.getItem("event")
+
+  const event = eventData ? JSON.parse(eventData) : null
+
+  const { controllers } = getStore()
+
+  const user = sessionStorage.getItem("user")
+    ? JSON.parse(sessionStorage.getItem("user") as string)
+    : null
 
   const [time, setTime] = useState("05:00")
   const [sid, setSid] = useState("")

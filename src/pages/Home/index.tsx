@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import Header from "../../components/Header"
 import * as S from "./styled"
 
@@ -20,10 +20,14 @@ import { useNavigate } from "react-router-dom"
 const Home = () => {
   const navigate = useNavigate()
 
-  const { event, controllers } = getStore()
+  const eventData = sessionStorage.getItem("event")
+
+  const event = eventData ? JSON.parse(eventData) : null
+
+  const { controllers } = getStore()
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
 
-  const loadEventData = useCallback(async () => {
+  const loadEventData = async () => {
     if (event) {
       try {
         const req = await Api.get.eventInfo({ eventId: event?.id })
@@ -41,9 +45,9 @@ const Home = () => {
         alert("Erro ao carregar os tickets")
       }
     } else navigate("/eventSelect")
-  }, [])
+  }
 
-  const fetchTickets = useCallback(async () => {
+  const fetchTickets = async () => {
     if (event) {
       try {
         const req = await Api.get.products({ eventId: event?.id })
@@ -61,7 +65,7 @@ const Home = () => {
         alert("Erro ao carregar os tickets")
       }
     }
-  }, [])
+  }
 
   const getPhone = () => {
     let str = ""
@@ -72,9 +76,11 @@ const Home = () => {
   }
 
   useEffect(() => {
-    loadEventData()
-    fetchTickets()
-  }, [loadEventData, fetchTickets])
+    if (event) {
+      loadEventData()
+      if (tickets.length === 0) fetchTickets()
+    }
+  }, [])
 
   return (
     <S.Page>

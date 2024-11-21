@@ -68,7 +68,7 @@ const TicketCard = ({ k, data }: Props) => {
     // @ts-ignore
     const _d = data.date.split("-")
     const d =
-      _d.length > 0 ? new Date(_d[0], _d[1], _d[2]) : new Date(data.date)
+      _d.length > 0 ? new Date(_d[0], _d[1] - 1, _d[2]) : new Date(data.date)
 
     const todayStr = `${String(d.getDate()).padStart(2, "0")}/${String(
       d.getMonth() + 1

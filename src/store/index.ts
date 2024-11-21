@@ -17,10 +17,7 @@ const getStore = create<TStore>()(
       {
         name: "global",
         partialize: (store) => {
-          return {
-            user: store.user,
-            event: store.event,
-          }
+          return {}
         },
       }
     )

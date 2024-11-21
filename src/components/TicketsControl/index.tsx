@@ -5,7 +5,7 @@ import { formatMoney } from "../../utils/tb/formatMoney"
 import { useNavigate } from "react-router-dom"
 import getStore from "../../store"
 import { TForm } from "../../utils/placeData/form"
-import { useEffect, useState } from "react"
+import { memo, useCallback, useEffect, useState } from "react"
 import { sumTaxes } from "../../utils/tb/taxes"
 
 type Props = {
@@ -22,13 +22,13 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
   const [ticketsTotal, setTicketsTotal] = useState(0)
   const [total, setTotal] = useState(0)
 
-  const calcTotal = () => {
+  const calcTotal = useCallback(() => {
     let val = tickets.reduce((qnt, tk) => qnt + tk.price_sell * tk.qnt, 0)
 
     return val
-  }
+  }, [tickets])
 
-  const calcTotals = () => {
+  const calcTotals = useCallback(() => {
     const tTotal = calcTotal()
 
     const tax = sumTaxes({
@@ -43,7 +43,7 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
     setTaxes(tax)
     setTicketsTotal(tTotal)
     setTotal(tTotal > 0 ? tTotal + tax : 0)
-  }
+  }, [calcTotal, event, tickets])
 
   const changeQnt = (
     ticketId: number | string,
@@ -195,4 +195,4 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
   )
 }
 
-export default TicketsControl
+export default memo(TicketsControl)
