@@ -345,7 +345,7 @@ const requestCode: TApi["post"]["login"]["requestCode"] = async ({ phone }) => {
           database: "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd",
         })
         .then((res) => {
-          if (res.data.success) resolve({ ok: true, data: {} })
+          if (res.data.success) resolve({ ok: true, data: res.data })
           else
             resolve({
               ok: false,

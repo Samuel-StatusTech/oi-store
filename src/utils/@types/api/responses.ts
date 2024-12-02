@@ -83,7 +83,14 @@ type TResponses = {
       }>
     >
     login: {
-      requestCode: Promise<TDefaultRes<{}>>
+      requestCode: Promise<TDefaultRes<{
+        success: true
+        code: string
+        message: string
+      } | {
+        success: false
+        message: string
+      }>>
       validateCode: Promise<TDefaultRes<TUser>>
     }
     purchase: {

@@ -386,7 +386,7 @@ const Payment = () => {
           phone: form.buyer.phone.replace(/\D/g, ""),
         })
         .then((res) => {
-          resolve(res.ok)
+          resolve(res)
         })
         .catch(() => {
           resolve(false)
@@ -401,7 +401,7 @@ const Payment = () => {
         code,
       })
 
-      setShowingCodeModal(false)
+      // setShowingCodeModal(false)
 
       if (login.ok) {
         sessionStorage.setItem("user", JSON.stringify(login.data))
@@ -503,12 +503,29 @@ const Payment = () => {
             },
           })
         } else {
-          const getToken = await requestCode()
+          const getToken = (await requestCode()) as any
 
-          if (getToken) {
+          if (getToken.ok) {
             // show modal
 
-            setShowingCodeModal(true)
+            if (getToken.ok) {
+              const code = getToken.data.code
+              
+              validateCode(code)
+              return
+            } else {
+              const f = {
+                state: "denied",
+                visible: true,
+                message:
+                  "Houve um erro ao validar seu código. Tente novamente mais tarde",
+              }
+              setFeedback(f)
+        
+              setTimeout(() => {
+                setFeedback({ ...f, visible: false })
+              }, 3500)
+            }
           } else {
             const newUser = await Api.post.register(form.buyer)
 
