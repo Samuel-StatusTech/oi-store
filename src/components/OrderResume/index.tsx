@@ -27,7 +27,11 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
 
   const [resumeExpanded, setResumeExpanded] = useState(false)
 
-  const [taxes, setTaxes] = useState(0)
+  const [taxes, setTaxes] = useState({
+    value: 0,
+    rule: "",
+    strComplement: "",
+  })
   const [ticketsTotal, setTicketsTotal] = useState(0)
 
   const [time, setTime] = useState("10:00")
@@ -50,18 +54,20 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
 
   const sumValues = () => {
     try {
-      const ticketsTotal = sumTickets(ticketsList)
-      const taxesTotal = sumTaxes({
-        ticketsTotal,
-        adminTax: event?.eCommerce.adminTax,
-        adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
-        adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
-        adminTaxValue: event?.eCommerce.adminTaxValue,
-        tickets: ticketsList,
-      })
+      if (event) {
+        const ticketsTotal = sumTickets(ticketsList)
+        const taxesTotal = sumTaxes({
+          ticketsTotal,
+          adminTax: event?.eCommerce.adminTax,
+          adminTaxMinimum: +event?.eCommerce.adminTaxMinimum,
+          adminTaxPercentage: +event?.eCommerce.adminTaxPercentage,
+          adminTaxValue: +event?.eCommerce.adminTaxValue,
+          tickets: ticketsList,
+        })
 
-      setTaxes(taxesTotal)
-      setTicketsTotal(ticketsTotal)
+        setTaxes(taxesTotal)
+        setTicketsTotal(ticketsTotal)
+      }
     } catch (error) {
       alert("Erro ao carregar os tickets")
       navigate("/")
@@ -91,30 +97,6 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
   useEffect(() => {
     sumValues()
   }, [ticketsList])
-
-  const renderTaxResume = () => {
-    let str = ""
-
-    if (event) {
-      const minValue = +event.eCommerce.adminTaxMinimum ?? 0
-      const ticketsTotal = sumTickets(ticketsList)
-      const percentTax = sumTaxes({
-        ticketsTotal,
-        adminTax: event?.eCommerce.adminTax,
-        adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
-        adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
-        adminTaxValue: event?.eCommerce.adminTaxValue,
-        tickets: ticketsList,
-      })
-
-      str =
-        percentTax > minValue
-          ? `(${+event.eCommerce.adminTaxPercentage / 100}%)`
-          : "min"
-    }
-
-    return str
-  }
 
   const handleExpandResume = () => {
     setResumeExpanded(!resumeExpanded)
@@ -156,12 +138,12 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
             <span>{formatMoney(ticketsTotal, true)}</span>
           </S.TotalItem>
           <S.TotalItem>
-            <span>Taxas {renderTaxResume()}</span>
-            <span>{formatMoney(taxes, true)}</span>
+            <span>Taxas {taxes.strComplement}</span>
+            <span>{formatMoney(taxes.value, true)}</span>
           </S.TotalItem>
           <S.TotalItem $main={true}>
             <span>TOTAL</span>
-            <span>{formatMoney(ticketsTotal + taxes, true)}</span>
+            <span>{formatMoney(ticketsTotal + taxes.value, true)}</span>
           </S.TotalItem>
         </S.Total>
       </S.Info>

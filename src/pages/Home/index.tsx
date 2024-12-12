@@ -35,7 +35,7 @@ const Home = () => {
         if (req.ok) {
           const data = req.data
           if (data.status) {
-            controllers.event.setData(data)
+            sessionStorage.setItem("event", JSON.stringify(req.data))
           } else {
             controllers.event.clear()
             navigate("/eventSelect")

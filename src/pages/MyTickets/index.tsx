@@ -18,7 +18,6 @@ const MyTickets = () => {
   const [list, setList] = useState<any[]>([])
 
   const getData = async (eventInfo: any) => {
-    console.log("Event", eventInfo)
     try {
       const req = await Api.get.myTickets({ eventId: eventInfo?.id as string })
 
@@ -41,7 +40,6 @@ const MyTickets = () => {
 
     if (token) {
       const eventData = sessionStorage.getItem("event")
-      console.log(eventData)
 
       if (eventData) {
         controllers.event.setData(JSON.parse(eventData))

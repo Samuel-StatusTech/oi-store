@@ -18,7 +18,11 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
 
   const { event, user } = getStore()
 
-  const [taxes, setTaxes] = useState(0)
+  const [taxes, setTaxes] = useState({
+    value: 0,
+    rule: "",
+    strComplement: "",
+  })
   const [ticketsTotal, setTicketsTotal] = useState(0)
   const [total, setTotal] = useState(0)
 
@@ -29,20 +33,22 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
   }, [tickets])
 
   const calcTotals = useCallback(() => {
-    const tTotal = calcTotal()
+    if (event) {
+      const tTotal = calcTotal()
 
-    const tax = sumTaxes({
-      ticketsTotal: tTotal,
-      adminTax: event?.eCommerce.adminTax,
-      adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
-      adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
-      adminTaxValue: event?.eCommerce.adminTaxValue,
-      tickets: tickets,
-    })
+      const tax = sumTaxes({
+        ticketsTotal: tTotal,
+        adminTax: event?.eCommerce.adminTax,
+        adminTaxMinimum: +event?.eCommerce.adminTaxMinimum,
+        adminTaxPercentage: +event?.eCommerce.adminTaxPercentage,
+        adminTaxValue: +event?.eCommerce.adminTaxValue,
+        tickets: tickets,
+      })
 
-    setTaxes(tax)
-    setTicketsTotal(tTotal)
-    setTotal(tTotal > 0 ? tTotal + tax : 0)
+      setTaxes(tax)
+      setTicketsTotal(tTotal)
+      setTotal(tTotal > 0 ? tTotal + tax.value : 0)
+    }
   }, [calcTotal, event, tickets])
 
   const changeQnt = (
@@ -136,23 +142,6 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tickets])
 
-  const renderTaxResume = () => {
-    let str = ""
-
-    if (event) {
-      const minValue = !Number.isNaN(+event.eCommerce.adminTaxMinimum)
-        ? +event.eCommerce.adminTaxMinimum
-        : 0
-
-      str =
-        taxes > minValue
-          ? `(${+event.eCommerce.adminTaxPercentage / 100}%)`
-          : "min"
-    }
-
-    return str
-  }
-
   return (
     <S.Component>
       <S.Top>
@@ -164,24 +153,19 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
         ))}
       </S.Tickets>
       <S.Bottom>
-        {user && (
-          <S.TaxesResume>
-            <S.TaxResume>
-              <span>Subtotal</span>
-              <span>{formatMoney(ticketsTotal, true)}</span>
-            </S.TaxResume>
-            <S.TaxResume>
-              <span>Taxas {renderTaxResume()}</span>
-              <span>{formatMoney(ticketsTotal > 0 ? taxes : 0, true)}</span>
-            </S.TaxResume>
-          </S.TaxesResume>
-        )}
+        <S.TaxesResume>
+          <S.TaxResume>
+            <span>Subtotal</span>
+            <span>{formatMoney(ticketsTotal, true)}</span>
+          </S.TaxResume>
+          <S.TaxResume>
+            <span>Taxas {taxes.strComplement}</span>
+            <span>{formatMoney(ticketsTotal > 0 ? taxes.value : 0, true)}</span>
+          </S.TaxResume>
+        </S.TaxesResume>
         <S.BottomFinal>
           <S.Resume>
-            <S.Total>{`Total ${formatMoney(
-              user ? total : ticketsTotal,
-              true
-            )}`}</S.Total>
+            <S.Total>{`Total ${formatMoney(total, true)}`}</S.Total>
           </S.Resume>
           <S.BuyBtn
             onClick={tickets.every((t) => t.qnt === 0) ? undefined : handleBuy}
