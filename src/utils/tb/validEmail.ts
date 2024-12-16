@@ -3,7 +3,7 @@ export const validEmail = (email: string) => {
 
     email = email.replace(/\s+/g, ' ');
 
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 
     return emailRegex.test(email);
 }

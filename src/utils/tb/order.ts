@@ -14,15 +14,9 @@ type Props = {
   eventId: string
 }
 
-export const getOrderData = ({
-  tickets,
-  buyer,
-  taxTotal,
-  sid,
-  user,
-  dk,
-  eventId,
-}: Props) => {
+export const getOrderData = (props: Props) => {
+  const { tickets, buyer, taxTotal, sid, user, dk, eventId } = props
+
   if (tickets) {
     const paymentValue =
       tickets.reduce((sum, ticket) => sum + +(ticket.price_sell ?? "0"), 0) +
@@ -46,7 +40,7 @@ export const getOrderData = ({
       })
 
     const obj = {
-      transaction_amount: paymentValue / 100,
+      transaction_amount: paymentValue,
       payment_method_id: "pix",
       // description: "",
       payer: {

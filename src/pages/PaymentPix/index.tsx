@@ -125,7 +125,9 @@ const PaymentPix = () => {
       const orderData = getOrderData({
         tickets: lctn.state.tickets,
         buyer: lctn.state.buyer,
-        taxTotal: lctn.state.taxTotal ?? 0,
+        taxTotal: !Number.isNaN(lctn.state.taxTotal)
+          ? Number(lctn.state.taxTotal)
+          : 0,
         sid,
         user: user as TUser,
         dk: (event as TEventData).dk,
@@ -241,6 +243,7 @@ const PaymentPix = () => {
 
         if (req.ok) {
           const data = req.data
+          sessionStorage.setItem("event", JSON.stringify(data))
           controllers.event.setData(data)
         } else {
           alert("Erro ao carregar as informações do evento")
@@ -258,7 +261,9 @@ const PaymentPix = () => {
       const orderData = getOrderData({
         tickets: lctn.state.tickets,
         buyer: lctn.state.buyer,
-        taxTotal: lctn.state.taxTotal ?? 0,
+        taxTotal: !Number.isNaN(+lctn.state.taxTotal)
+          ? Number(lctn.state.taxTotal)
+          : 0,
         sid,
         user: user,
         dk: event.dk,
@@ -273,7 +278,7 @@ const PaymentPix = () => {
         payments: [
           {
             payment_type: "pix",
-            price: (orderData?.transaction_amount as number) * 100,
+            price: orderData?.transaction_amount as number,
             transitionCode: null,
             transitionId: null,
           },

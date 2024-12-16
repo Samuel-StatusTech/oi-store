@@ -43,6 +43,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
 
         if (req.ok) {
           const data = req.data
+          sessionStorage.setItem("event", JSON.stringify(data))
           controllers.event.setData(data)
         }
       } catch (error) {
@@ -57,11 +58,12 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
       if (event) {
         const ticketsTotal = sumTickets(ticketsList)
         const taxesTotal = sumTaxes({
+          chargeClient: event.eCommerce.chargeClient,
           ticketsTotal,
-          adminTax: event?.eCommerce.adminTax,
-          adminTaxMinimum: +event?.eCommerce.adminTaxMinimum,
-          adminTaxPercentage: +event?.eCommerce.adminTaxPercentage,
-          adminTaxValue: +event?.eCommerce.adminTaxValue,
+          adminTax: event.eCommerce.adminTax,
+          adminTaxMinimum: +event.eCommerce.adminTaxMinimum,
+          adminTaxPercentage: +event.eCommerce.adminTaxPercentage,
+          adminTaxValue: +event.eCommerce.adminTaxValue,
           tickets: ticketsList,
         })
 
@@ -137,10 +139,12 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
             <span>Subtotal</span>
             <span>{formatMoney(ticketsTotal, true)}</span>
           </S.TotalItem>
-          <S.TotalItem>
-            <span>Taxas {taxes.strComplement}</span>
-            <span>{formatMoney(taxes.value, true)}</span>
-          </S.TotalItem>
+          {event?.eCommerce.chargeClient && (
+            <S.TotalItem>
+              <span>Taxas {taxes.strComplement}</span>
+              <span>{formatMoney(taxes.value, true)}</span>
+            </S.TotalItem>
+          )}
           <S.TotalItem $main={true}>
             <span>TOTAL</span>
             <span>{formatMoney(ticketsTotal + taxes.value, true)}</span>

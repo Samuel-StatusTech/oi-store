@@ -37,7 +37,7 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
       const tTotal = calcTotal()
 
       const tax = sumTaxes({
-        ticketsTotal: tTotal,
+        chargeClient: event.eCommerce.chargeClient,
         adminTax: event?.eCommerce.adminTax,
         adminTaxMinimum: +event?.eCommerce.adminTaxMinimum,
         adminTaxPercentage: +event?.eCommerce.adminTaxPercentage,
@@ -123,8 +123,10 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
           email: user.email,
         }
 
+        const stateParams = { tickets: ptickets, buyer, taxTotal: +taxes.value }
+
         navigate("/payment/pix", {
-          state: { tickets: ptickets, buyer, taxTotal: taxes },
+          state: stateParams,
         })
       } else {
         alert("Preencha os campos corretamente e tente novamente.")
@@ -158,10 +160,14 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
             <span>Subtotal</span>
             <span>{formatMoney(ticketsTotal, true)}</span>
           </S.TaxResume>
-          <S.TaxResume>
-            <span>Taxas {taxes.strComplement}</span>
-            <span>{formatMoney(ticketsTotal > 0 ? taxes.value : 0, true)}</span>
-          </S.TaxResume>
+          {event?.eCommerce.chargeClient && (
+            <S.TaxResume>
+              <span>Taxas {taxes.strComplement}</span>
+              <span>
+                {formatMoney(ticketsTotal > 0 ? taxes.value : 0, true)}
+              </span>
+            </S.TaxResume>
+          )}
         </S.TaxesResume>
         <S.BottomFinal>
           <S.Resume>

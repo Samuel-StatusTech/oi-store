@@ -26,11 +26,12 @@ import getStore from "../../store"
 import { formatCardDate } from "../../utils/masks/date"
 import { formatCardCode } from "../../utils/masks/cardcode"
 import { Api } from "../../api"
-import { sumTaxes, sumTickets } from "../../utils/tb/taxes"
+import { sumTaxes } from "../../utils/tb/taxes"
 import { validEmail } from "../../utils/tb/validEmail"
 import Feedback from "../../components/Feedback"
 import { TUser } from "../../utils/@types/data/user"
 import ValidateCodeModal from "../../components/Modal/ValidateCode"
+import { TEventData } from "../../utils/@types/data/event"
 
 type MProps = {
   checked: boolean
@@ -435,18 +436,18 @@ const Payment = () => {
     }
   }
 
-  // Payment
-
-  const goToPix = () => {
-    const taxes = sumTaxes({
-      ticketsTotal: sumTickets(tickets),
-      adminTax: event?.eCommerce.adminTax,
-      adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
-      adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
-      adminTaxValue: event?.eCommerce.adminTaxValue,
+  const getTaxes = () => {
+    return sumTaxes({
+      chargeClient: (event as TEventData).eCommerce.chargeClient,
+      adminTax: (event as TEventData).eCommerce.adminTax,
+      adminTaxMinimum: +(event as TEventData).eCommerce.adminTaxMinimum,
+      adminTaxPercentage: +(event as TEventData).eCommerce.adminTaxPercentage,
+      adminTaxValue: +(event as TEventData).eCommerce.adminTaxValue,
       tickets: tickets,
     })
+  }
 
+  const getTicketsList = () => {
     let ptickets: any[] = []
 
     tickets.forEach((t) => {
@@ -459,11 +460,21 @@ const Payment = () => {
       }
     })
 
+    return ptickets
+  }
+
+  // Payment
+
+  const goToPix = () => {
+    const taxes = getTaxes()
+
+    let ptickets = getTicketsList()
+
     navigate("/payment/pix", {
       state: {
         tickets: ptickets,
         buyer: form.buyer,
-        taxTotal: taxes,
+        taxTotal: taxes.value,
       },
     })
   }
@@ -471,36 +482,21 @@ const Payment = () => {
   const handlePay = async () => {
     const errors = checkErrors()
 
-    if (!errors.has) {
-      const taxes = sumTaxes({
-        ticketsTotal: sumTickets(tickets),
-        adminTax: event?.eCommerce.adminTax,
-        adminTaxMinimum: event?.eCommerce.adminTaxMinimum,
-        adminTaxPercentage: event?.eCommerce.adminTaxPercentage,
-        adminTaxValue: event?.eCommerce.adminTaxValue,
-        tickets: tickets,
-      })
+    if (!errors.has && event) {
+      const taxes = getTaxes()
 
       if (method === "pix")
         if (user) {
-          let ptickets: any[] = []
+          let ptickets = getTicketsList()
 
-          tickets.forEach((t) => {
-            for (let k = 0; k <= (t.qnt as number) - 1; k++) {
-              ptickets.push({
-                ...t,
-                oid: k,
-                quantity: 1,
-              })
-            }
-          })
+          const stateParams = {
+            tickets: ptickets,
+            buyer: form.buyer,
+            taxTotal: +taxes.value,
+          }
 
           navigate("/payment/pix", {
-            state: {
-              tickets: ptickets,
-              buyer: form.buyer,
-              taxTotal: taxes,
-            },
+            state: stateParams,
           })
         } else {
           const getToken = (await requestCode()) as any
@@ -510,7 +506,7 @@ const Payment = () => {
 
             if (getToken.ok) {
               const code = getToken.data.code
-              
+
               validateCode(code)
               return
             } else {
@@ -521,7 +517,7 @@ const Payment = () => {
                   "Houve um erro ao validar seu código. Tente novamente mais tarde",
               }
               setFeedback(f)
-        
+
               setTimeout(() => {
                 setFeedback({ ...f, visible: false })
               }, 3500)
@@ -609,6 +605,7 @@ const Payment = () => {
 
         if (req.ok) {
           const data = req.data
+          sessionStorage.setItem("event", JSON.stringify(data))
           controllers.event.setData(data)
         }
       } catch (error) {

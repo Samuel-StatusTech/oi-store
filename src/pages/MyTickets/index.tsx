@@ -22,8 +22,10 @@ const MyTickets = () => {
       const req = await Api.get.myTickets({ eventId: eventInfo?.id as string })
 
       if (req.ok) {
+        const available = req.data.list.filter((i) => i.status !== null)
+
         setList(
-          req.data.list
+          available
             .map((i) => ({
               ...i,
               eventBanner: eventInfo?.event_banner as string,
