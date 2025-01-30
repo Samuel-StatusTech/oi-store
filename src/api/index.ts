@@ -2,6 +2,7 @@ import axios from "axios"
 import { TApi } from "../utils/@types/api"
 import { TProduct } from "../utils/@types/data/product"
 import { jwtDecode } from "jwt-decode"
+import TParams from "../utils/@types/api/params"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
@@ -58,8 +59,13 @@ axios.interceptors.request.use(function (config) {
 const getQrCode: TApi["get"]["qrcode"] = async ({ order }) => {
   return new Promise(async (resolve, reject) => {
     try {
+      const parsed: TParams["get"]["qrcode"]["order"] = {
+        ...order,
+        transaction_amount: order.transaction_amount / 100,
+      }
+
       await axios
-        .post(`${backUrl}/ecommerce/payment/orders/qrcode`, order)
+        .post(`${backUrl}/ecommerce/payment/orders/qrcode`, parsed)
         .then((res) => {
           const info = res.data
 
