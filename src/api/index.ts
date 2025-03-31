@@ -194,6 +194,9 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
               Boolean(b.active)
             )
 
+            const isTicketActive =
+              i.active || i.batches.some((b: any) => Boolean(b.active))
+
             if (activeBatchData) {
               const obj = {
                 id: i.product_id,
@@ -201,7 +204,7 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
                 image: i.image,
                 created_at: i.created_at,
                 updated_at: i.updated_at,
-                active: i.active,
+                active: isTicketActive,
                 batch_id: activeBatchData.batch_id,
                 quantity: activeBatchData.quantity,
                 price_sell: activeBatchData.price_sell,
