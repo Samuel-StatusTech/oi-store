@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import * as S from "./styled"
 
 import Header from "../../components/Header"
@@ -17,12 +17,14 @@ const MyTickets = () => {
 
   const [list, setList] = useState<any[]>([])
 
-  const getData = async (eventInfo: any) => {
+  const getData = useCallback(async (eventInfo: any) => {
     try {
       const req = await Api.get.myTickets({ eventId: eventInfo?.id as string })
 
       if (req.ok) {
-        const available = req.data.list.filter((i) => i.status !== null)
+        const available = req.data.list.filter(
+          (i) => i.status !== null || i.status === "validado"
+        )
 
         setList(
           available
@@ -33,9 +35,13 @@ const MyTickets = () => {
             .sort((a, b) => a.date.localeCompare(b.date))
             .reverse()
         )
+      } else {
+        // console.log("Req error", req)
       }
-    } catch (error) {}
-  }
+    } catch (error) {
+      // console.log("Error", error)
+    }
+  }, [])
 
   useEffect(() => {
     const token = sessionStorage.getItem("token")
@@ -52,9 +58,7 @@ const MyTickets = () => {
     } else {
       navigate("/eventSelect")
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [controllers.event, getData, navigate])
 
   return (
     <S.Page>

@@ -104,14 +104,22 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
     if (user && !event?.nominal) {
       const errors = checkErrors()
 
+      const itemsQnt = tickets
+        .map((t) => t.qnt)
+        .reduce((prev, current) => prev + current, 0)
+
+      const taxPerTicket = taxes.value / itemsQnt
+
       if (!errors) {
         let ptickets: any[] = []
         tickets.forEach((t) => {
           for (let k = 0; k <= t.qnt - 1; k++) {
             ptickets.push({
-              ...t,
-              oid: k,
-              person: { name: "" },
+              price_sell: t.price_sell,
+              batch_id: t.batch_id,
+              id: t.id,
+              tax_value: taxPerTicket,
+              ticket_name: "",
               quantity: 1,
             })
           }

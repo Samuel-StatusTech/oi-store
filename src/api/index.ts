@@ -256,7 +256,7 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({ eventId }) => {
                   returnList.push(purchase)
                 })
                 .catch(() => {
-                  throw new Error()
+                  // throw new Error()
                 })
             )
           })

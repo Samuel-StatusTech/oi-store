@@ -213,8 +213,8 @@ const Payment = () => {
 
     setForm({
       ...form,
-      tickets: form.tickets.map((t) =>
-        t.id !== ticket.id
+      tickets: form.tickets.map((t: any) =>
+        t.oid !== (ticket as any).oid
           ? t
           : {
               ...t,
@@ -447,17 +447,26 @@ const Payment = () => {
     })
   }
 
-  const getTicketsList = () => {
+  const getTicketsList = (finalTaxValue: number) => {
     let ptickets: any[] = []
 
-    tickets.forEach((t) => {
-      for (let k = 0; k <= (t.qnt as number) - 1; k++) {
-        ptickets.push({
-          ...t,
-          oid: k,
-          quantity: 1,
-        })
-      }
+    const itemsQnt = tickets
+      .map((t) => t.qnt)
+      .reduce((prev, current) => prev + current, 0)
+
+    const taxPerTicket = finalTaxValue / itemsQnt
+
+    form.tickets.forEach((tt) => {
+      const t = tickets.find((t) => t.id === tt.id) as TTicketDisposal
+
+      ptickets.push({
+        price_sell: t.price_sell,
+        batch_id: t.batch_id,
+        id: t.id,
+        tax_value: taxPerTicket,
+        ticket_name: tt?.person.name,
+        quantity: 1,
+      })
     })
 
     return ptickets
@@ -468,7 +477,7 @@ const Payment = () => {
   const goToPix = () => {
     const taxes = getTaxes()
 
-    let ptickets = getTicketsList()
+    let ptickets = getTicketsList(taxes.value)
 
     navigate("/payment/pix", {
       state: {
@@ -487,7 +496,7 @@ const Payment = () => {
 
       if (method === "pix")
         if (user) {
-          let ptickets = getTicketsList()
+          let ptickets = getTicketsList(taxes.value)
 
           const stateParams = {
             tickets: ptickets,

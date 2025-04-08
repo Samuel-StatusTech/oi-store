@@ -150,13 +150,18 @@ const ticketData = (
   ]
 
   // nominal
-  if (event.nominal && ticket.user) {
-    tableBody.push([
-      { text: "Participante", bold: true, margin: [0, 16, 0, 0] },
-    ])
-    tableBody.push([
-      { text: ticket.user.name ?? "Não especificado", margin: [0, 0, 0, 16] },
-    ])
+  if (Boolean(event.nominal)) {
+    // @ts-ignore
+    const ticketUserName = ticket.user ?? ticket.ticket_name ?? null
+
+    if (ticketUserName) {
+      tableBody.push([
+        { text: "Participante", bold: true, margin: [0, 16, 0, 0] },
+      ])
+      tableBody.push([
+        { text: ticketUserName ?? "Não especificado", margin: [0, 0, 0, 16] },
+      ])
+    }
   }
 
   tableBody.push([

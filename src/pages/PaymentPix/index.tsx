@@ -325,6 +325,7 @@ const PaymentPix = () => {
               image: null,
               quantity: t.quantity,
               price_unit: t.price_unit,
+              ticket_name: (t as any).ticket_name,
             })
           })
 
