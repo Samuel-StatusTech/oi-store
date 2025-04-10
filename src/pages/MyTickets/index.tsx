@@ -10,14 +10,20 @@ import { useNavigate } from "react-router-dom"
 import TicketCard from "../../components/TicketCard"
 import { Api } from "../../api"
 
+import { DotLottieReact } from "@lottiefiles/dotlottie-react"
+import loadingAnimation from "../../assets/animations/loading"
+
 const MyTickets = () => {
   const { controllers } = getStore()
 
   const navigate = useNavigate()
 
+  const [loading, setLoading] = useState(true)
   const [list, setList] = useState<any[]>([])
 
   const getData = useCallback(async (eventInfo: any) => {
+    setLoading(true)
+
     try {
       const req = await Api.get.myTickets({ eventId: eventInfo?.id as string })
 
@@ -41,6 +47,8 @@ const MyTickets = () => {
     } catch (error) {
       // console.log("Error", error)
     }
+
+    setLoading(false)
   }, [])
 
   useEffect(() => {
@@ -68,7 +76,16 @@ const MyTickets = () => {
         <S.Main>
           <S.PageTitle>Meus tickets</S.PageTitle>
 
-          {list.length === 0 ? (
+          {loading ? (
+            <div style={{ width: 256, margin: "0 auto" }}>
+              <DotLottieReact
+                data={loadingAnimation}
+                loop
+                autoplay
+                width={"100%"}
+              />
+            </div>
+          ) : list.length === 0 ? (
             <S.PageTitle $align="center">
               Você não possui ingressos para esse evento
             </S.PageTitle>

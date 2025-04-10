@@ -1,4 +1,10 @@
-export const clockdown = (seconds: number, endCallback?: () => void) => {
+export const clockdown = (
+  seconds: number,
+  endCallback?: () => void,
+  textUpdater?: (newTime?: string | null) => void
+) => {
+  const startTime = new Date().getTime()
+
   const totalSeconds = seconds > 0 ? seconds : 0
 
   let timeLeft = totalSeconds
@@ -13,10 +19,25 @@ export const clockdown = (seconds: number, endCallback?: () => void) => {
   }
 
   const start = () => {
+    stop()
+
+    if (timerId) return
+
     timerId = setInterval(() => {
-      timeLeft--
-      if (timeLeft === 0) {
+      const nowTime = new Date().getTime()
+      const spended = Math.round((nowTime - startTime) / 1000)
+
+      const newTimeLeft = totalSeconds - spended
+
+      if (newTimeLeft >= 0) {
+        timeLeft = newTimeLeft
+        if (textUpdater) {
+          const res = formatarTime(newTimeLeft)
+          textUpdater(res)
+        }
+      } else {
         stop()
+        if (textUpdater) textUpdater(null)
         endCallback && endCallback()
       }
     }, 1000)
@@ -24,6 +45,7 @@ export const clockdown = (seconds: number, endCallback?: () => void) => {
 
   const stop = () => {
     clearInterval(timerId)
+    timerId = undefined
   }
 
   const restart = () => {

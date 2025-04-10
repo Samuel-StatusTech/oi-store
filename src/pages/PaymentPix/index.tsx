@@ -225,15 +225,15 @@ const PaymentPix = () => {
   }
 
   const runTimer = () => {
-    const timer = clockdown(300, restartTimer)
+    const timer: any = clockdown(
+      20,
+      restartTimer,
+      (newTime?: string | null) => {
+        if (newTime) setTime(newTime)
+      }
+    )
 
     timer.start()
-
-    const interval = setInterval(() => {
-      const time = timer.actualTime()
-      if (time) setTime(time)
-      else clearInterval(interval)
-    }, 1000)
   }
 
   const loadEventData = useCallback(async () => {

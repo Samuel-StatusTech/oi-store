@@ -88,7 +88,7 @@ const formatPdf = (date: Date | string) => {
     str = String(d.getDate()).padStart(2, "0")
 
     // month
-    str += `/${String(d.getMonth() + 1).padStart(2, "0")}`
+    str += `/${String(d.getMonth()).padStart(2, "0")}`
 
     // year
     str += `/${d.getFullYear()}`
@@ -109,7 +109,7 @@ const formatPdf = (date: Date | string) => {
     str = String(d.getDate()).padStart(2, "0")
 
     // month
-    str += `/${String(d.getMonth() + 1).padStart(2, "0")}`
+    str += `/${String(d.getMonth()).padStart(2, "0")}`
 
     // year
     str += `/${d.getFullYear()}`
