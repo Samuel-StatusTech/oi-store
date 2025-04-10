@@ -28,9 +28,18 @@ const MyTickets = () => {
       const req = await Api.get.myTickets({ eventId: eventInfo?.id as string })
 
       if (req.ok) {
-        const available = req.data.list.filter(
-          (i) => i.status !== null || i.status === "validado"
-        )
+        const available = req.data.list.filter((i) => {
+          let status = true
+
+          if (i.payments.length > 0) {
+            const payment = i.payments[0]
+            const isPayed = payment.transition_id || payment.machine_data
+
+            status = isPayed
+          } else status = false
+
+          return status
+        })
 
         setList(
           available
