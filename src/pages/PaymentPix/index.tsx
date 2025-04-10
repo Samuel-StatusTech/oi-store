@@ -226,7 +226,7 @@ const PaymentPix = () => {
 
   const runTimer = () => {
     const timer: any = clockdown(
-      20,
+      300,
       restartTimer,
       (newTime?: string | null) => {
         if (newTime) setTime(newTime)
