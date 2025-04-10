@@ -214,15 +214,15 @@ const Payment = () => {
     setForm({
       ...form,
       tickets: form.tickets.map((t: any) =>
-        t.oid !== (ticket as any).oid
-          ? t
-          : {
+        t.id === ticket.id && t.oid === (ticket as any).oid
+          ? {
               ...t,
               person: {
                 ...t.person,
                 [field]: value,
               },
             }
+          : t
       ),
     })
   }
