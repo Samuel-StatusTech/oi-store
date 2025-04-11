@@ -6,7 +6,7 @@ import { useNavigate } from "react-router-dom"
 import getStore from "../../store"
 import { TForm } from "../../utils/placeData/form"
 import { memo, useCallback, useEffect, useState } from "react"
-import { sumTaxes } from "../../utils/tb/taxes"
+import { eventHasTaxes, sumTaxes } from "../../utils/tb/taxes"
 
 type Props = {
   tickets: TTicketDisposal[]
@@ -168,7 +168,7 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
             <span>Subtotal</span>
             <span>{formatMoney(ticketsTotal, true)}</span>
           </S.TaxResume>
-          {event?.eCommerce.chargeClient && (
+          {event?.eCommerce.chargeClient && eventHasTaxes(event) && (
             <S.TaxResume>
               <span>Taxas {taxes.strComplement}</span>
               <span>

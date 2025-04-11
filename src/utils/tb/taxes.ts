@@ -1,3 +1,4 @@
+import { TEventData } from "../@types/data/event"
 import { TTicketDisposal } from "../@types/data/ticket"
 import { formatMoney } from "./formatMoney"
 
@@ -73,4 +74,23 @@ export const sumTaxes = (props: {
   }
 
   return result
+}
+
+export const eventHasTaxes = (event: TEventData) => {
+  let has = false
+
+  const shouldChargeClient = event.eCommerce.chargeClient
+  const hasTax = event.eCommerce.adminTax
+  const isTaxAbsolute = event.eCommerce.adminTaxValue !== 0
+  const hasPercentage = event.eCommerce.adminTaxPercentage !== "0"
+
+  const minimum = event.eCommerce.adminTaxMinimum
+  const hasMinimum = !Number.isNaN(+minimum) && +minimum > 0
+
+  has =
+    shouldChargeClient &&
+    hasTax &&
+    (isTaxAbsolute || hasPercentage || hasMinimum)
+
+  return has
 }

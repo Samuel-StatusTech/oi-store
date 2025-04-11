@@ -10,7 +10,7 @@ import Ticket from "../Ticket"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { Api } from "../../api"
 import getStore from "../../store"
-import { sumTaxes, sumTickets } from "../../utils/tb/taxes"
+import { eventHasTaxes, sumTaxes, sumTickets } from "../../utils/tb/taxes"
 import { useNavigate } from "react-router-dom"
 import { clockdown } from "../../utils/tb/timer"
 
@@ -139,7 +139,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
             <span>Subtotal</span>
             <span>{formatMoney(ticketsTotal, true)}</span>
           </S.TotalItem>
-          {event?.eCommerce.chargeClient && (
+          {event?.eCommerce.chargeClient && eventHasTaxes(event) && (
             <S.TotalItem>
               <span>Taxas {taxes.strComplement}</span>
               <span>{formatMoney(taxes.value, true)}</span>

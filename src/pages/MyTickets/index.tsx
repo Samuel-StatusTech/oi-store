@@ -51,11 +51,8 @@ const MyTickets = () => {
             .reverse()
         )
       } else {
-        // console.log("Req error", req)
       }
-    } catch (error) {
-      // console.log("Error", error)
-    }
+    } catch (error) {}
 
     setLoading(false)
   }, [])
