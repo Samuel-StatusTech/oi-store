@@ -56,10 +56,15 @@ const Login = () => {
           phone: phone.replace(/\D/g, ""),
         })
         .then((res) => {
-          setTimeout(() => {
-            fadePhases()
-            code1.current?.focus()
-          }, 400)
+          console.log(res)
+          if (res.ok) {
+            setTimeout(() => {
+              fadePhases()
+              code1.current?.focus()
+            }, 400)
+          } else {
+            alert(res.error)
+          }
         })
     } catch (error) {}
   }

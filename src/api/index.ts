@@ -8,6 +8,11 @@ axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
 const backUrl = "https://api.oitickets.com.br/api/v1"
 
+const zapiInstance = process.env.REACT_APP_ZAPI_INSTANCE
+const zapiToken = process.env.REACT_APP_ZAPI_TOKEN
+const zapiClientToken = process.env.REACT_APP_ZAPI_CLIENT_TOKEN
+const whatsappUrl = `https://api.z-api.io/instances/${zapiInstance}/token/${zapiToken}/send-text`
+
 const checkTokenExpiration = (token: string) => {
   try {
     const decoded = jwtDecode(token)
@@ -15,7 +20,7 @@ const checkTokenExpiration = (token: string) => {
     const iat = (decoded.iat as number) * 1000
     const now = +new Date().getTime().toFixed(0)
 
-    const limit = 5 * 60 * 1000
+    const limit = 50 * 60 * 1000
     const exp = iat + limit
 
     return now > exp
@@ -353,9 +358,40 @@ const requestCode: TApi["post"]["login"]["requestCode"] = async ({ phone }) => {
           fone: phone,
           database: "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd",
         })
-        .then((res) => {
-          if (res.data.success) resolve({ ok: true, data: res.data })
-          else
+        .then(async (res) => {
+          if (res.data.success) {
+            const code = res.data.code
+
+            if (code) {
+              const whatsappReq = await axios.post(
+                whatsappUrl,
+                {
+                  phone: phone,
+                  message: `Aqui está seu código de autenticação para o Lista Pix:\n\n*${code}*`,
+                },
+                {
+                  baseURL: "",
+                  headers: {
+                    "client-token": zapiClientToken,
+                  },
+                }
+              )
+
+              if (whatsappReq.status === 200) {
+                resolve({ ok: true, data: res.data })
+              } else
+                resolve({
+                  ok: false,
+                  error:
+                    "Houve um erro ao enviar o código para seu telefone. Tente novamente mais tarde.",
+                })
+            } else
+              resolve({
+                ok: false,
+                error:
+                  "Houve um erro ao soliciar o código. Tente novamente mais tarde.",
+              })
+          } else
             resolve({
               ok: false,
               error: "Algo deu errado. Tente novamente mais tarde.",
