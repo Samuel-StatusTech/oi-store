@@ -20,7 +20,7 @@ const checkTokenExpiration = (token: string) => {
     const iat = (decoded.iat as number) * 1000
     const now = +new Date().getTime().toFixed(0)
 
-    const limit = 50 * 60 * 1000
+    const limit = 5 * 60 * 1000
     const exp = iat + limit
 
     return now > exp
