@@ -8,6 +8,8 @@ import BlockInfo from "../../components/BlockInfo"
 
 import calendar from "../../assets/icons/calendar.png"
 import location from "../../assets/icons/pin.png"
+import userSafety from "../../assets/icons/user-safety.png"
+
 import TicketsControl from "../../components/TicketsControl"
 import Footer from "../../components/Footer"
 import { Api } from "../../api"
@@ -16,13 +18,14 @@ import { parseDisposalTickets } from "../../utils/tb/ticketsToDisposal"
 import getStore from "../../store"
 import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
 import { useNavigate } from "react-router-dom"
+import { TEventData } from "../../utils/@types/data/event"
 
 const Home = () => {
   const navigate = useNavigate()
 
   const eventData = sessionStorage.getItem("event")
 
-  const event = eventData ? JSON.parse(eventData) : null
+  const event = eventData ? (JSON.parse(eventData) as TEventData) : null
 
   const { controllers } = getStore()
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
@@ -36,6 +39,7 @@ const Home = () => {
           const data = req.data
           if (data.status) {
             controllers.event.setData(req.data)
+            console.log(req.data)
             sessionStorage.setItem("event", JSON.stringify(req.data))
           } else {
             controllers.event.clear()
@@ -130,11 +134,22 @@ const Home = () => {
                 k={4}
                 title="Localização"
                 description={[
-                  `${event?.address}`,
+                  `${event?.local}. ${event?.address}`,
                   `${event?.city} - ${event?.uf}`,
                 ]}
                 icon={<img src={location} alt={""} width={84} />}
               />
+            </S.Blocks>
+            <S.Blocks className="additional">
+              {event?.has_age && (
+                <BlockInfo
+                  title="Informações adicionais"
+                  description={["Faixa etária", String(event?.age)]}
+                  icon={
+                    <img src={userSafety} className="userSafety" alt={""} height={48} width={48} />
+                  }
+                />
+              )}
             </S.Blocks>
           </S.MainData>
 
@@ -161,12 +176,7 @@ const Home = () => {
           )}
 
           <S.DescriptionSection>
-            <S.DescTitle>Local</S.DescTitle>
-            <S.DescText>{event?.local}</S.DescText>
-            <S.DescText $bold={true}>Endereço</S.DescText>
-            <S.DescSubText>{`${event?.address}`}</S.DescSubText>
-            <S.DescSubText>{`${event?.city} - ${event?.uf}`}</S.DescSubText>
-            <S.DescText $bold={true}>Telefone</S.DescText>
+            <S.DescTitle>Telefone</S.DescTitle>
             <S.DescSubText>{getPhone()}</S.DescSubText>
           </S.DescriptionSection>
         </Container>

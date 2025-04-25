@@ -66,6 +66,9 @@ export type TEventData = {
   uid: string
   uidUser: string
   dk: any
+
+  has_age: number
+  age: string | number
 }
 
 export type TEventMin = {

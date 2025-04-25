@@ -23,10 +23,22 @@ export const IconArea = styled.div`
   display: grid;
   place-items: center;
 
+  &:has(img) {
+    background-color: #E5E4ED;
+    border-radius: 8px;
+    min-width: 84px;
+    height: 84px;
+  }
+
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
     img {
       width: 48px;
       height: 48px;
+
+      &.userSafety {
+        width: 24px;
+        height: 24px;
+      }
     }
   }
 `

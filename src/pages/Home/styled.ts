@@ -96,6 +96,11 @@ export const Blocks = styled.div`
   gap: 24px;
   padding: 24px 0;
 
+  &.additional {
+    margin-top: -24px;
+    padding-top: 0;
+  }
+
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
     flex-direction: column;
   }
