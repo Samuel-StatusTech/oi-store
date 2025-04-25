@@ -184,3 +184,10 @@ export const BuyBtn = styled.button`
     theme.animations.durations.main +
     theme.animations.delays.main(3)}
 `
+
+export const KeepOutSellsOnlineMessage = styled.span`
+  margin: 24px;
+  font-size: 16px;
+  color: #2a2a2a;
+  text-align: center;
+`

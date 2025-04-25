@@ -158,37 +158,47 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
         <span>Ingressos</span>
       </S.Top>
       <S.Tickets>
-        {tickets.map((t, k) => (
-          <Ticket k={k} key={k} ticket={t} changeQnt={changeQnt} />
-        ))}
+        {Boolean(event?.keep_sells_online) ? (
+          tickets.map((t, k) => (
+            <Ticket k={k} key={k} ticket={t} changeQnt={changeQnt} />
+          ))
+        ) : (
+          <S.KeepOutSellsOnlineMessage>
+            {event?.keepout_sells_online_message ?? ""}
+          </S.KeepOutSellsOnlineMessage>
+        )}
       </S.Tickets>
-      <S.Bottom>
-        <S.TaxesResume>
-          <S.TaxResume>
-            <span>Subtotal</span>
-            <span>{formatMoney(ticketsTotal, true)}</span>
-          </S.TaxResume>
-          {event?.eCommerce.chargeClient && eventHasTaxes(event) && (
+      {Boolean(event?.keep_sells_online) && (
+        <S.Bottom>
+          <S.TaxesResume>
             <S.TaxResume>
-              <span>Taxas {taxes.strComplement}</span>
-              <span>
-                {formatMoney(ticketsTotal > 0 ? taxes.value : 0, true)}
-              </span>
+              <span>Subtotal</span>
+              <span>{formatMoney(ticketsTotal, true)}</span>
             </S.TaxResume>
-          )}
-        </S.TaxesResume>
-        <S.BottomFinal>
-          <S.Resume>
-            <S.Total>{`Total ${formatMoney(total, true)}`}</S.Total>
-          </S.Resume>
-          <S.BuyBtn
-            onClick={tickets.every((t) => t.qnt === 0) ? undefined : handleBuy}
-            disabled={tickets.every((t) => t.qnt === 0)}
-          >
-            Comprar
-          </S.BuyBtn>
-        </S.BottomFinal>
-      </S.Bottom>
+            {event?.eCommerce.chargeClient && eventHasTaxes(event) && (
+              <S.TaxResume>
+                <span>Taxas {taxes.strComplement}</span>
+                <span>
+                  {formatMoney(ticketsTotal > 0 ? taxes.value : 0, true)}
+                </span>
+              </S.TaxResume>
+            )}
+          </S.TaxesResume>
+          <S.BottomFinal>
+            <S.Resume>
+              <S.Total>{`Total ${formatMoney(total, true)}`}</S.Total>
+            </S.Resume>
+            <S.BuyBtn
+              onClick={
+                tickets.every((t) => t.qnt === 0) ? undefined : handleBuy
+              }
+              disabled={tickets.every((t) => t.qnt === 0)}
+            >
+              Comprar
+            </S.BuyBtn>
+          </S.BottomFinal>
+        </S.Bottom>
+      )}
     </S.Component>
   )
 }
