@@ -510,6 +510,8 @@ const Payment = () => {
 
     let ptickets = getTicketsList(taxes.value)
 
+    localStorage.removeItem("payed")
+
     navigate("/payment/pix", {
       state: {
         tickets: ptickets,
@@ -535,6 +537,8 @@ const Payment = () => {
             taxTotal: +taxes.value,
           }
 
+          localStorage.removeItem("payed")
+          
           navigate("/payment/pix", {
             state: stateParams,
           })

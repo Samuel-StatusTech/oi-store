@@ -133,6 +133,8 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
 
         const stateParams = { tickets: ptickets, buyer, taxTotal: +taxes.value }
 
+        localStorage.removeItem("payed")
+        
         navigate("/payment/pix", {
           state: stateParams,
         })
