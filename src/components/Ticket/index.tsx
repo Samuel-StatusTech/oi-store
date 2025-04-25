@@ -31,6 +31,21 @@ const Ticket = ({ k, ticket, changeQnt, hasControl = true }: Props) => {
           </span>
         ) : (
           <S.QntControl>
+            {ticket.quantity <= 10 && ticket.quantity > 0 && (
+              <span
+                style={{
+                  width: "100%",
+                  maxWidth: 120,
+                  textAlign: "center",
+                  fontSize: 12,
+                  color: "#2a2a2a",
+                  opacity: 0.5,
+                  whiteSpace: "nowrap",
+                }}
+              >
+                Restam {ticket.quantity} ingresso{ticket.quantity > 1 && "s"}
+              </span>
+            )}
             {hasControl && changeQnt && (
               <S.Control
                 $disabled={ticket.qnt === 0}
