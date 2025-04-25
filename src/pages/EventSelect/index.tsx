@@ -17,9 +17,12 @@ const EventSelect = () => {
   const store = getStore()
   const navigate = useNavigate()
 
+  const [loading, setLoading] = useState(true)
   const [list, setList] = useState<any[]>([])
 
   const getData = useCallback(async () => {
+    setLoading(true)
+
     const events = await Api.get.events({})
 
     if (events.ok) {
@@ -47,6 +50,8 @@ const EventSelect = () => {
     } else {
       alert(events.error)
     }
+
+    setLoading(false)
   }, [navigate])
 
   useEffect(() => {
@@ -63,7 +68,7 @@ const EventSelect = () => {
         <S.Main>
           <S.PageTitle>Eventos</S.PageTitle>
 
-          {list.length === 0 ? (
+          {loading ? (
             <div style={{ width: 256, margin: "auto" }}>
               <DotLottieReact
                 data={loadingAnimation}
@@ -72,6 +77,10 @@ const EventSelect = () => {
                 width={"100%"}
               />
             </div>
+          ) : list.length === 0 ? (
+            <S.PageTitle $align="center">
+              Não há eventos ativos no momento
+            </S.PageTitle>
           ) : (
             <S.List>
               {list.map((ticket, k) => (
