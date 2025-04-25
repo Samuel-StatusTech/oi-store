@@ -56,7 +56,6 @@ const Login = () => {
           phone: phone.replace(/\D/g, ""),
         })
         .then((res) => {
-          console.log(res)
           if (res.ok) {
             setTimeout(() => {
               fadePhases()

@@ -22,24 +22,38 @@ const Header = () => {
   }
 
   const renderButton = () => {
-    return !document.location.href.includes("/eventSelect") ? (
-      <Link
-        to={user ? "/mytickets" : "/login"}
-        className="myTickets"
-        onClick={(e) => handleBtn(e, user ? "/mytickets" : "/login")}
-      >
-        {user ? "Meus Ingressos" : "Fazer login"}
-      </Link>
-    ) : (
-      !user && (
-        <Link
-          to={"/login"}
-          className="myTickets"
-          onClick={(e) => handleBtn(e, "/login")}
-        >
-          {"Fazer login"}
-        </Link>
-      )
+    return (
+      <div style={{ display: "flex", gap: 8 }}>
+        {!document.location.href.includes("/eventSelect") ? (
+          <Link
+            to={user ? "/mytickets" : "/login"}
+            className="myTickets"
+            onClick={(e) => handleBtn(e, user ? "/mytickets" : "/login")}
+          >
+            {user ? "Meus Ingressos" : "Fazer login"}
+          </Link>
+        ) : (
+          !user && (
+            <Link
+              to={"/login"}
+              className="myTickets"
+              onClick={(e) => handleBtn(e, "/login")}
+            >
+              {"Fazer login"}
+            </Link>
+          )
+        )}
+
+        {user && (
+          <Link
+            to={"/login"}
+            className="logout"
+            onClick={(e) => handleBtn(e, "/login")}
+          >
+            {"Realizar logout"}
+          </Link>
+        )}
+      </div>
     )
   }
 

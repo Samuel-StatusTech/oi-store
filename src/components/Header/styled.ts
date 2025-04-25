@@ -53,7 +53,8 @@ export const UserArea = styled.div`
   display: flex;
   gap: 12px;
 
-  .myTickets {
+  .myTickets,
+  .logout {
     display: block;
     height: fit-content;
     text-decoration: none;
@@ -65,10 +66,21 @@ export const UserArea = styled.div`
     padding: 0.6em 1.4em;
     border-radius: 32px;
     cursor: pointer;
+    text-align: center;
+  }
+
+  .logout {
+    background-color: transparent;
+    color: ${({ theme }) => theme.colors.blue.main};
+
+    &:hover {
+      text-decoration: underline;
+    }
   }
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
-    .myTickets {
+    .myTickets,
+    .logout {
       font-size: 14px;
       line-height: 14px;
       padding: 0.6rem 0.8rem;
