@@ -547,7 +547,7 @@ const PaymentPix = () => {
                   small={true}
                   icon={<img src={location} alt={""} width={40} />}
                   description={[
-                    `${event?.address ?? ""}`,
+                  `${event?.local}. ${event?.address}`,
                     `${event?.city ?? ""}${event?.uf ? ` - ${event?.uf}` : ""}`,
                   ]}
                 />
