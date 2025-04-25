@@ -14,7 +14,7 @@ import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
 
 const MyTickets = () => {
-  const { controllers } = getStore()
+  const { event, controllers } = getStore()
 
   const navigate = useNavigate()
 
@@ -41,6 +41,21 @@ const MyTickets = () => {
           return status
         })
 
+        if (event) {
+          const req2 = await Api.get.eventInfo({ eventId: event?.id })
+
+          if (req2.ok) {
+            const data = req2.data
+            if (data.status) {
+              controllers.event.setData(req2.data)
+              sessionStorage.setItem("event", JSON.stringify(req2.data))
+            } else {
+              controllers.event.clear()
+              navigate("/eventSelect")
+            }
+          }
+        }
+
         setList(
           available
             .map((i) => ({
@@ -55,6 +70,7 @@ const MyTickets = () => {
     } catch (error) {}
 
     setLoading(false)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
