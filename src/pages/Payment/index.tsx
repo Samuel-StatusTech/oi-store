@@ -83,9 +83,17 @@ type IProps = {
   onChange: (v: string) => void
   inputMode?: string
   enterKeyHint?: string
+  error?: boolean
 }
 
-const Input = ({ label, value, onChange, inputMode, enterKeyHint }: IProps) => {
+const Input = ({
+  label,
+  value,
+  onChange,
+  inputMode,
+  enterKeyHint,
+  error,
+}: IProps) => {
   return (
     <S.Label>
       <S.Input
@@ -94,6 +102,7 @@ const Input = ({ label, value, onChange, inputMode, enterKeyHint }: IProps) => {
         placeholder={""}
         inputMode={inputMode as any}
         enterKeyHint={enterKeyHint as any}
+        $error={error}
       />
       <span>{label}</span>
     </S.Label>
@@ -162,6 +171,17 @@ const Payment = () => {
 
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
   const [feedback, setFeedback] = useState<any>({ visible: false, message: "" })
+  const [formErrors, setFormErrors] = useState<{
+    buyerName: boolean
+    buyerPhone: boolean
+    buyerEmail: boolean
+    ticketsIds: number[]
+  }>({
+    buyerName: false,
+    buyerPhone: false,
+    buyerEmail: false,
+    ticketsIds: [],
+  })
 
   // Fns..
 
@@ -358,13 +378,23 @@ const Payment = () => {
   const checkErrors = () => {
     let hasError = false
 
-    const nameField = form.buyer.name.length < 1
-    const phoneField = form.buyer.phone.replace(/\D/g, "").length < 9
+    const nameField =
+      form.buyer.name.length < 1 || form.buyer.name.trim().split(" ").length < 2
+    const phoneField = form.buyer.phone.replace(/\D/g, "").length < 11
     const emailField =
       form.buyer.email.length < 1 || !validEmail(form.buyer.email)
 
+    let ticketsIds: number[] = []
+
     const nominalsErrors =
-      event?.nominal && form.tickets.some((t) => t.person.name.length < 1)
+      event?.nominal &&
+      form.tickets.some((t, k) => {
+        const status = t.person.name.length < 1
+
+        if (t.person.name.trim().split(" ").length < 2) ticketsIds.push(k)
+
+        return status
+      })
 
     if (nameField || emailField || phoneField) hasError = true
 
@@ -376,6 +406,7 @@ const Payment = () => {
         name: nameField,
         phone: phoneField,
         email: emailField,
+        ticketsIds: ticketsIds,
       },
     }
   }
@@ -584,9 +615,26 @@ const Payment = () => {
       let fieldsErrors = []
       let fieldsStr = ""
 
-      if (errors.fields.name) fieldsErrors.push("nome")
-      if (errors.fields.phone) fieldsErrors.push("telefone")
-      if (errors.fields.email) fieldsErrors.push("email")
+      let newErrorValue = { ...formErrors }
+
+      if (errors.fields.name) {
+        fieldsErrors.push("nome")
+        newErrorValue.buyerName = true
+      }
+      if (errors.fields.phone) {
+        fieldsErrors.push("telefone")
+        newErrorValue.buyerPhone = true
+      }
+      if (errors.fields.email) {
+        fieldsErrors.push("email")
+        newErrorValue.buyerEmail = true
+      }
+      if (errors.fields.ticketsIds.length > 0) {
+        fieldsErrors.push("nome e sobrenome")
+        newErrorValue.ticketsIds = errors.fields.ticketsIds
+      }
+
+      setFormErrors(newErrorValue)
 
       fieldsStr = fieldsErrors.join(", ")
 
@@ -604,6 +652,27 @@ const Payment = () => {
           setCanBuy(true)
         }, 400)
       }, 3500)
+    }
+  }
+
+  const clearFieldError = (field: string, ticketId?: number) => {
+    if (
+      field !== "ticketsIds" &&
+      formErrors[field as keyof typeof formErrors]
+    ) {
+      setFormErrors((prev) => ({
+        ...prev,
+        [field]: false,
+      }))
+    } else if (
+      field === "ticketsIds" &&
+      ticketId !== undefined &&
+      ticketId > -1
+    ) {
+      setFormErrors((prev) => ({
+        ...prev,
+        ticketsIds: prev.ticketsIds.filter((i) => i !== ticketId),
+      }))
     }
   }
 
@@ -730,21 +799,33 @@ const Payment = () => {
                       <Input
                         label={"Nome e sobrenome"}
                         value={form.buyer.name}
-                        onChange={(v: string) => handleForm("name", v)}
+                        onChange={(v: string) => {
+                          handleForm("name", v)
+                          clearFieldError("buyerName")
+                        }}
+                        error={formErrors.buyerName}
                       />
                     </S.FormLine>
                     <S.FormLine>
                       <Input
                         label={"Telefone"}
                         value={form.buyer.phone}
-                        onChange={(v: string) => handleForm("phone", v)}
+                        onChange={(v: string) => {
+                          handleForm("phone", v)
+                          clearFieldError("buyerPhone")
+                        }}
                         inputMode="numeric"
                         enterKeyHint={"done"}
+                        error={formErrors.buyerPhone}
                       />
                       <Input
                         label={"Email"}
                         value={form.buyer.email}
-                        onChange={(v: string) => handleForm("email", v)}
+                        onChange={(v: string) => {
+                          handleForm("email", v)
+                          clearFieldError("buyerEmail")
+                        }}
+                        error={formErrors.buyerEmail}
                       />
                     </S.FormLine>
                   </S.FormLines>
@@ -761,36 +842,40 @@ const Payment = () => {
                           <span>{ticket.name}</span>
                         </S.TicketName>
 
-                        <S.Checkbox htmlFor={`check-${k}`}>
-                          <input
-                            id={`check-${k}`}
-                            type="checkbox"
-                            checked={
-                              !!ticket.person.name &&
-                              ticket.person.name === form.buyer.name
-                            }
-                            onClick={() => {
-                              // eslint-disable-next-line react-hooks/rules-of-hooks
-                              usePayer(
-                                ticket,
-                                !(
-                                  !!ticket.person.name &&
-                                  ticket.person.name === form.buyer.name
+                        {k === 0 && (
+                          <S.Checkbox htmlFor={`check-${k}`}>
+                            <input
+                              id={`check-${k}`}
+                              type="checkbox"
+                              checked={
+                                !!ticket.person.name &&
+                                ticket.person.name === form.buyer.name
+                              }
+                              onClick={() => {
+                                // eslint-disable-next-line react-hooks/rules-of-hooks
+                                usePayer(
+                                  ticket,
+                                  !(
+                                    !!ticket.person.name &&
+                                    ticket.person.name === form.buyer.name
+                                  )
                                 )
-                              )
-                            }}
-                          />
-                          <span>Utilizar dados do(a) comprador(a)</span>
-                        </S.Checkbox>
+                              }}
+                            />
+                            <span>Utilizar dados do(a) comprador(a)</span>
+                          </S.Checkbox>
+                        )}
 
                         <S.FormLines>
                           <S.FormLine>
                             <Input
                               label={"Nome e sobrenome"}
                               value={ticket.person.name}
-                              onChange={(v: string) =>
+                              onChange={(v: string) => {
                                 handleTicketForm(ticket, "name", v)
-                              }
+                                clearFieldError("ticketsIds", k)
+                              }}
+                              error={formErrors.ticketsIds.includes(k)}
                             />
                           </S.FormLine>
                         </S.FormLines>

@@ -219,8 +219,8 @@ export const Label = styled.label`
   }
 `
 
-export const Input = styled.input`
-  border: 1px solid #ccc;
+export const Input = styled.input<{ $error?: boolean }>`
+  border: 1px solid ${({ $error }) => ($error ? "#f44336" : "#ccc")};
   outline: none;
   padding: 12px 6px;
   font-size: 16px;
