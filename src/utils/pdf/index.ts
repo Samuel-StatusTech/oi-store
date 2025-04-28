@@ -14,6 +14,9 @@ const downloadTickets = async (
 ): Promise<void | File> => {
   pdfMake.vfs = pdfFonts.pdfMake.vfs
 
+  console.log("eventData", eventData)
+  console.log("tickets", tickets)
+
   return new Promise(async (resolve) => {
     try {
       const tkts = tickets.map((t) => {

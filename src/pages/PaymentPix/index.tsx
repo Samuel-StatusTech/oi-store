@@ -29,6 +29,7 @@ import downloadTickets from "../../utils/pdf"
 import { generateTicketID } from "../../utils/tb/qrcode"
 import { TUser } from "../../utils/@types/data/user"
 import { TEventData } from "../../utils/@types/data/event"
+import { formatMoney } from "../../utils/tb/formatMoney"
 
 const io = require("socket.io-client")
 
@@ -398,6 +399,22 @@ const PaymentPix = () => {
     navigate("/", { replace: true, state: {} })
   }
 
+  const getOrderValue = () => {
+    const obj = getOrderData({
+      tickets: lctn.state.tickets,
+      buyer: lctn.state.buyer,
+      taxTotal: !Number.isNaN(+lctn.state.taxTotal)
+        ? Number(lctn.state.taxTotal)
+        : 0,
+      sid,
+      user: user,
+      dk: event.dk,
+      eventId: event.id,
+    })
+
+    return obj ? obj.transaction_amount : 0
+  }
+
   return (
     <S.Page>
       <Feedback data={feedback} />
@@ -423,6 +440,8 @@ const PaymentPix = () => {
             {!payed && (
               <S.BlockTitle $k={4}>
                 Agora só falta concluir o seu Pix.
+                <br />
+                <strong>{formatMoney(getOrderValue(), true)}</strong>
               </S.BlockTitle>
             )}
 

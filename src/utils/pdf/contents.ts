@@ -87,7 +87,7 @@ const ticketData = (
         ],
         [{ text: `Início do evento: ${getHours(event.date_ini as string)}` }],
         //   local
-        [{ text: `${event.city}, ${event?.uf}` }],
+        [{ text: `${event.local}. ${event.city}, ${event?.uf}` }],
       ],
       widths: ["*"],
     },
@@ -148,6 +148,14 @@ const ticketData = (
     ],
     [{ text: formatMoney(ticket.price_unit * ticket.quantity, true) }],
   ]
+
+  // Comprador
+  // tableBody.push([
+  //   { text: "Comprador", bold: true, margin: [0, 16, 0, 0] },
+  // ])
+  // tableBody.push([
+  //   { text: ticket.buyer ?? "Não especificado", margin: [0, 0, 0, 16] },
+  // ])
 
   // nominal
   if (Boolean(event.nominal)) {

@@ -26,7 +26,7 @@ export const styles: StyleDictionary = {
   qrcode: {
     alignment: "center",
     // @ts-ignore
-    width: "250px",
+    width: "200px",
   },
   qrcodetext: {
     alignment: "center",
