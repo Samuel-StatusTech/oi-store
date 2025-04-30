@@ -31,7 +31,7 @@ const Ticket = ({ k, ticket, changeQnt, hasControl = true }: Props) => {
           </span>
         ) : (
           <S.QntControl>
-            {ticket.quantity <= 10 && ticket.quantity > 0 && (
+            {(ticket.quantity - ticket.qnt) <= 10 && (ticket.quantity - ticket.qnt) >= 0 && (
               <span
                 style={{
                   width: "100%",
@@ -43,7 +43,7 @@ const Ticket = ({ k, ticket, changeQnt, hasControl = true }: Props) => {
                   whiteSpace: "nowrap",
                 }}
               >
-                Restam {ticket.quantity} ingresso{ticket.quantity > 1 && "s"}
+                Restam {(ticket.quantity - ticket.qnt)} ingresso{(ticket.quantity - ticket.qnt) > 1 && "s"}
               </span>
             )}
             {hasControl && changeQnt && (
