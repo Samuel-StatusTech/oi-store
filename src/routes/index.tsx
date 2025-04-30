@@ -55,8 +55,10 @@ const Router = () => {
             <Route path="" element={<MyTickets />} />
           </Route>
           <Route path="payment">
-            {!localStorage.getItem("payed") ||
-            localStorage.getItem("payed") === "false" ? (
+            {!(
+              !localStorage.getItem("payed") ||
+              localStorage.getItem("payed") === "false"
+            ) ? (
               <Route
                 path=""
                 element={<Navigate to={"/"} replace={true} state={{}} />}
@@ -66,12 +68,12 @@ const Router = () => {
             )}
             {!localStorage.getItem("payed") ||
             localStorage.getItem("payed") === "false" ? (
+              <Route path="pix" element={<PaymentPix />} />
+            ) : (
               <Route
                 path="pix"
                 element={<Navigate to={"/"} replace={true} state={{}} />}
               />
-            ) : (
-              <Route path="pix" element={<PaymentPix />} />
             )}
           </Route>
           <Route path="*" element={<Navigate to={"/"} />} />

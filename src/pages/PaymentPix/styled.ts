@@ -161,6 +161,14 @@ export const QR = styled.div`
   align-items: center;
   max-width: 280px;
 
+  span {
+    margin-top: -24px;
+    text-align: center;
+    white-space: pre-line;
+    color: ${({ theme }) => theme.colors.blue.main};
+    font-weight: 700;
+  }
+
   img,
   svg {
     max-width: 100%;

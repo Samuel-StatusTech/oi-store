@@ -348,7 +348,7 @@ const PaymentPix = () => {
   useEffect(() => {
     window.scrollTo({ top: 0 })
 
-    if (!lctn.state.purchaseEmail || !lctn.state.tickets) {
+    if (!lctn.state.tickets) {
       navigate("/", { replace: true, state: {} })
       return
     }
@@ -440,8 +440,6 @@ const PaymentPix = () => {
             {!payed && (
               <S.BlockTitle $k={4}>
                 Agora só falta concluir o seu Pix.
-                <br />
-                <strong>{formatMoney(getOrderValue(), true)}</strong>
               </S.BlockTitle>
             )}
 
@@ -491,6 +489,8 @@ const PaymentPix = () => {
                           alt=""
                         />
                       )}
+
+                      <span>{formatMoney(getOrderValue(), true)}</span>
 
                       <S.Button onClick={copyQRToClipboard}>
                         Copiar código
