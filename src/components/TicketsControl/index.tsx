@@ -1,5 +1,4 @@
 import * as S from "./styled"
-import Ticket from "../Ticket"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { formatMoney } from "../../utils/tb/formatMoney"
 import { useNavigate } from "react-router-dom"
@@ -7,6 +6,7 @@ import getStore from "../../store"
 import { TForm } from "../../utils/placeData/form"
 import { memo, useCallback, useEffect, useState } from "react"
 import { eventHasTaxes, sumTaxes } from "../../utils/tb/taxes"
+import TicketsGroup from "../TicketsGroup"
 
 type Props = {
   tickets: TTicketDisposal[]
@@ -134,7 +134,7 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
         const stateParams = { tickets: ptickets, buyer, taxTotal: +taxes.value }
 
         localStorage.removeItem("payed")
-        
+
         navigate("/payment/pix", {
           state: stateParams,
         })
@@ -161,9 +161,11 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
       </S.Top>
       <S.Tickets>
         {Boolean(event?.keep_sells_online) ? (
-          tickets.map((t, k) => (
-            <Ticket k={k} key={k} ticket={t} changeQnt={changeQnt} />
-          ))
+          <TicketsGroup
+            k={6}
+            data={tickets.filter((i) => i.name.startsWith("Cadeira Centro"))}
+            changeQnt={changeQnt}
+          />
         ) : (
           <S.KeepOutSellsOnlineMessage>
             {event?.keepout_sells_online_message ?? ""}
