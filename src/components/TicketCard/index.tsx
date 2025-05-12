@@ -65,8 +65,7 @@ const TicketCard = ({ k, data }: Props) => {
   )
 
   const getDate = () => {
-    // @ts-ignore
-    const _d = data.date.split("-")
+    const _d = data.date.split(" ")[0].split("-")
     const d =
       _d.length > 0 ? new Date(_d[0], _d[1] - 1, _d[2]) : new Date(data.date)
 
