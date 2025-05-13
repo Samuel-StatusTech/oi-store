@@ -54,6 +54,8 @@ const ticketData = (
   ticketsLength: number,
   newPage: boolean
 ) => {
+  console.log("Informações do ticket", ticket)
+
   const getHours = (date: string) => {
     let str = ""
 

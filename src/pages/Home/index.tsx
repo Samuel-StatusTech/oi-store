@@ -139,17 +139,23 @@ const Home = () => {
                 icon={<img src={location} alt={""} width={84} />}
               />
             </S.Blocks>
-            <S.Blocks className="additional">
-              {event?.has_age && (
+            {Boolean(event?.has_age) && (
+              <S.Blocks className="additional">
                 <BlockInfo
                   title="Informações adicionais"
                   description={["Faixa etária", String(event?.age)]}
                   icon={
-                    <img src={userSafety} className="userSafety" alt={""} height={48} width={48} />
+                    <img
+                      src={userSafety}
+                      className="userSafety"
+                      alt={""}
+                      height={48}
+                      width={48}
+                    />
                   }
                 />
-              )}
-            </S.Blocks>
+              </S.Blocks>
+            )}
           </S.MainData>
 
           <TicketsControl tickets={tickets} setTickets={setTickets} />
