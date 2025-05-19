@@ -50,12 +50,14 @@ export const footer = (event: TEventData) => [
 
 const ticketData = (
   event: TEventData,
-  ticket: TShoppingTicket,
+  ticket: TShoppingTicket & {
+    user_name?: string
+    tax_value?: number
+    TRN?: string
+  },
   ticketsLength: number,
   newPage: boolean
 ) => {
-  console.log("Informações do ticket", ticket)
-
   const getHours = (date: string) => {
     let str = ""
 
@@ -88,8 +90,7 @@ const ticketData = (
           },
         ],
         [{ text: `Início do evento: ${getHours(event.date_ini as string)}` }],
-        //   local
-        [{ text: `${event.local}. ${event.city}, ${event?.uf}` }],
+        [{ text: `Local: ${event.local}. ${event.city}, ${event?.uf}` }],
       ],
       widths: ["*"],
     },
@@ -143,21 +144,33 @@ const ticketData = (
         style: "purchaseDate",
       },
     ],
+    ticket.user_name
+      ? [
+          {
+            text: `Comprado por ${ticket.user_name}`,
+            style: "purchaseDate",
+          },
+        ]
+      : [],
     [
       {
         text: `${ticket.batch_name ?? ""} - ${ticket.name}`,
       },
     ],
-    [{ text: formatMoney(ticket.price_unit * ticket.quantity, true) }],
+    [
+      {
+        text: `PREÇO: ${formatMoney(
+          ticket.price_unit * ticket.quantity,
+          true
+        )}`,
+      },
+    ],
+    [
+      {
+        text: `TAXA: ${formatMoney(ticket.tax_value as number, true)}`,
+      },
+    ],
   ]
-
-  // Comprador
-  // tableBody.push([
-  //   { text: "Comprador", bold: true, margin: [0, 16, 0, 0] },
-  // ])
-  // tableBody.push([
-  //   { text: ticket.buyer ?? "Não especificado", margin: [0, 0, 0, 16] },
-  // ])
 
   // nominal
   if (Boolean(event.nominal)) {
@@ -186,6 +199,12 @@ const ticketData = (
       style: "qrcodetext",
     },
   ]) // ticket.qr_data only
+
+  tableBody.push([
+    {
+      text: `TRN: ${ticket.TRN}`,
+    },
+  ])
 
   body.push({
     style: "eventTable",
