@@ -14,9 +14,6 @@ const downloadTickets = async (
 ): Promise<void | File> => {
   pdfMake.vfs = pdfFonts.pdfMake.vfs
 
-  console.log("eventData", eventData)
-  console.log("tickets", tickets)
-
   return new Promise(async (resolve) => {
     try {
       const tkts = tickets.map((t) => {
@@ -39,7 +36,7 @@ const downloadTickets = async (
 
       const filename = `Meus Tickets para ${eventData.name.trim()}.pdf`
 
-      let logo = ""
+      let logo = await getBase64EventLogo(eventData)
 
       const docDefs: TDocumentDefinitions = {
         images: {
@@ -69,6 +66,25 @@ const downloadTickets = async (
       }
     } catch (error) {}
   })
+}
+
+const getBase64EventLogo = async (eventData: TEventData) => {
+  let str = ""
+  //
+
+  if (eventData.logo_print) {
+    const response = await fetch(eventData.logo_print)
+    const blob = await response.blob()
+    const reader = new FileReader()
+
+    reader.onloadend = () => {
+      str = reader.result as string
+    }
+
+    reader.readAsDataURL(blob)
+  }
+
+  return str
 }
 
 export default downloadTickets
