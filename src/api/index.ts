@@ -211,6 +211,8 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
                 updated_at: i.updated_at,
                 active: isTicketActive,
                 batch_id: activeBatchData.batch_id,
+                group_id: i.group_id ?? "",
+                group_name: i.group_name ?? "",
                 quantity: activeBatchData.quantity,
                 price_sell: activeBatchData.price_sell,
               }

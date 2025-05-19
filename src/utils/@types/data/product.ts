@@ -8,9 +8,6 @@ export type TProduct = {
   active: number
   created_at: string
   updated_at: string
-
-  // type: string
-  // favourite: number
-  // has_courtesy: number
-  // warehouse_type: string
+  group_id: string
+  group_name: string
 }

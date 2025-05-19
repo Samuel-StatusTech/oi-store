@@ -7,13 +7,21 @@ import { TForm } from "../../utils/placeData/form"
 import { memo, useCallback, useEffect, useState } from "react"
 import { eventHasTaxes, sumTaxes } from "../../utils/tb/taxes"
 import TicketsGroup from "../TicketsGroup"
+import Ticket from "../Ticket"
 
 type Props = {
+  showByGroup: boolean
+  groups: { id: string; name: string }[]
   tickets: TTicketDisposal[]
   setTickets: (list: TTicketDisposal[]) => void
 }
 
-const TicketsControl = ({ tickets, setTickets }: Props) => {
+const TicketsControl = ({
+  showByGroup,
+  tickets,
+  setTickets,
+  groups,
+}: Props) => {
   const navigate = useNavigate()
 
   const { event, user } = getStore()
@@ -161,11 +169,21 @@ const TicketsControl = ({ tickets, setTickets }: Props) => {
       </S.Top>
       <S.Tickets>
         {Boolean(event?.keep_sells_online) ? (
-          <TicketsGroup
-            k={6}
-            data={tickets.filter((i) => i.name.startsWith("Cadeira Centro"))}
-            changeQnt={changeQnt}
-          />
+          showByGroup ? (
+            groups.map((g, gKey) => (
+              <TicketsGroup
+                group_name=""
+                key={gKey}
+                k={6}
+                data={tickets.filter((i) => i.group_id === g.id)}
+                changeQnt={changeQnt}
+              />
+            ))
+          ) : (
+            tickets.map((t, k) => (
+              <Ticket k={k} key={k} ticket={t} changeQnt={changeQnt} />
+            ))
+          )
         ) : (
           <S.KeepOutSellsOnlineMessage>
             {event?.keepout_sells_online_message ?? ""}

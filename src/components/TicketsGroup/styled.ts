@@ -39,6 +39,8 @@ export const GroupInfoSecondary = styled.div`
   flex: 1;
   display: flex;
   justify-content: flex-end;
+  align-items: center;
+  gap: 8px;
 `
 
 export const GroupBasePrice = styled.span`

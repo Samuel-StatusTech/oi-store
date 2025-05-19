@@ -28,7 +28,9 @@ const Home = () => {
   const event = eventData ? (JSON.parse(eventData) as TEventData) : null
 
   const { controllers } = getStore()
+
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
+  const [groups, setGroups] = useState<{ id: string; name: string }[]>([])
 
   const loadEventData = async () => {
     if (event) {
@@ -58,11 +60,25 @@ const Home = () => {
 
         if (req.ok) {
           const list = req.data.list
+
+          let groupsList: { id: string; name: string }[] = []
+
+          list.forEach((i) => {
+            if (groupsList.every((g) => g.id !== i.group_id))
+              groupsList.push({
+                id: i.group_id,
+                name: i.group_name,
+              })
+          })
+
+          setGroups(groupsList)
+
           const parsedTickets = parseDisposalTickets(
             list.filter((t) =>
               t.active !== undefined ? (Boolean(t.active) ? t : null) : t
             )
           )
+
           setTickets(parsedTickets)
         }
       } catch (error) {
@@ -145,14 +161,25 @@ const Home = () => {
                   title="Informações adicionais"
                   description={["Faixa etária", String(event?.age)]}
                   icon={
-                    <img src={userSafety} className="userSafety" alt={""} height={48} width={48} />
+                    <img
+                      src={userSafety}
+                      className="userSafety"
+                      alt={""}
+                      height={48}
+                      width={48}
+                    />
                   }
                 />
               )}
             </S.Blocks>
           </S.MainData>
 
-          <TicketsControl tickets={tickets} setTickets={setTickets} />
+          <TicketsControl
+            showByGroup={groups.length > 1}
+            groups={groups}
+            tickets={tickets}
+            setTickets={setTickets}
+          />
         </S.EventDataArea>
       </Container>
 
