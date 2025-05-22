@@ -46,7 +46,7 @@ const MyTickets = () => {
 
           if (req2.ok) {
             const data = req2.data
-            if (data.status) {
+            if (data.is_ecommerce) {
               controllers.event.setData(req2.data)
               sessionStorage.setItem("event", JSON.stringify(req2.data))
             } else {

@@ -14,6 +14,7 @@ export type TEventData = {
   state: string
   days: number
   status: boolean
+  is_ecommerce: boolean
   print_valid: number
   print_logo: number
   has_cashless: number

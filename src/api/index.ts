@@ -111,7 +111,7 @@ const getEvents: TApi["get"]["events"] = async () => {
             resolve({
               ok: true,
               data: list
-                .filter((ev: any) => Boolean(ev.status))
+                .filter((ev: any) => Boolean(ev.is_ecommerce))
                 .map((ev: any) => ({
                   ...ev,
                   dk: res.data.dk,
