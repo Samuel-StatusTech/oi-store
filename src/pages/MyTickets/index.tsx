@@ -56,15 +56,20 @@ const MyTickets = () => {
           }
         }
 
-        setList(
-          available
-            .map((i) => ({
-              ...i,
-              eventBanner: eventInfo?.event_banner as string,
-            }))
-            .sort((a, b) => a.date.localeCompare(b.date))
-            .reverse()
-        )
+        const newList = available.map((i) => ({
+          ...i,
+          eventBanner: eventInfo?.event_banner as string,
+          products: i.products.map((ip: any) => ({
+            ...ip,
+            TRN: i.payments[0].transition_id,
+          })),
+        }))
+
+        const sortedList = newList
+          .sort((a, b) => a.date.localeCompare(b.date))
+          .reverse()
+
+        setList(sortedList)
       } else {
       }
     } catch (error) {}

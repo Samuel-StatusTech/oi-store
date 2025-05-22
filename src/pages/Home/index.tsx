@@ -155,8 +155,8 @@ const Home = () => {
                 icon={<img src={location} alt={""} width={84} />}
               />
             </S.Blocks>
-            <S.Blocks className="additional">
-              {event?.has_age && (
+            {Boolean(event?.has_age) && (
+              <S.Blocks className="additional">
                 <BlockInfo
                   title="Informações adicionais"
                   description={["Faixa etária", String(event?.age)]}
@@ -170,8 +170,8 @@ const Home = () => {
                     />
                   }
                 />
-              )}
-            </S.Blocks>
+              </S.Blocks>
+            )}
           </S.MainData>
 
           <TicketsControl
