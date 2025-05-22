@@ -19,6 +19,7 @@ import getStore from "../../store"
 import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
 import { useNavigate } from "react-router-dom"
 import { TEventData } from "../../utils/@types/data/event"
+import { parseEmojis } from "../../utils/tb/text"
 
 const Home = () => {
   const navigate = useNavigate()
@@ -188,7 +189,11 @@ const Home = () => {
           <S.DescriptionSection>
             <S.DescTitle>Descrição</S.DescTitle>
             <S.DescTexts
-              dangerouslySetInnerHTML={{ __html: event?.description2 ?? "" }}
+              dangerouslySetInnerHTML={{
+                __html: event?.description2
+                  ? parseEmojis(event?.description2)
+                  : "",
+              }}
             />
           </S.DescriptionSection>
 
