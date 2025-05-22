@@ -172,7 +172,7 @@ const TicketsControl = ({
           showByGroup ? (
             groups.map((g, gKey) => (
               <TicketsGroup
-                group_name=""
+                group_name={g.name}
                 key={gKey}
                 k={6}
                 data={tickets.filter((i) => i.group_id === g.id)}
