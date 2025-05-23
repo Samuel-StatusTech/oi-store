@@ -37,6 +37,7 @@ export interface TShoppingTicket {
   name: string
   batch_name: string
   qr_data: string
+  qr_label: string
   qr_TID?: string
   order_id: string
   image: null | string

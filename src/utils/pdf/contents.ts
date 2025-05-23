@@ -195,7 +195,7 @@ const ticketData = (
   ]) // ticket.qr_data only
   tableBody.push([
     {
-      text: ticket.qr_TID,
+      text: ticket.qr_label,
       style: "qrcodetext",
     },
   ]) // ticket.qr_data only

@@ -36,7 +36,7 @@ const downloadTickets = async (
 
       const filename = `Meus Tickets para ${eventData.name.trim()}.pdf`
 
-      let logo = await getBase64EventLogo(eventData)
+      let logo = "" // await getBase64EventLogo(eventData)
 
       const docDefs: TDocumentDefinitions = {
         images: {
