@@ -2,8 +2,10 @@ import { StyleDictionary } from "pdfmake/interfaces"
 
 export const styles: StyleDictionary = {
   header: {
-    // @ts-ignore
-    width: "100%",
+    alignment: "left",
+    columnGap: 40,
+    color: "blue",
+    background: "orange",
   },
   headerItem: {
     fontSize: 12,

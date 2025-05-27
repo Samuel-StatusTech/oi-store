@@ -1,7 +1,7 @@
 import pdfMake from "pdfmake/build/pdfmake"
 import pdfFonts from "pdfmake/build/vfs_fonts"
 import { styles } from "./styles"
-import { reportTitle, footer, content } from "./contents"
+import { footer, content } from "./contents"
 import { Content, TDocumentDefinitions } from "pdfmake/interfaces"
 import { TEventData } from "../@types/data/event"
 import { TShoppingTicket } from "../@types/data/ticket"
@@ -36,19 +36,47 @@ const downloadTickets = async (
 
       const filename = `Meus Tickets para ${eventData.name.trim()}.pdf`
 
-      let logo = "" // await getBase64EventLogo(eventData)
+      let logo = await resizeImageToFit(eventData.logoWebstore) // await getBase64EventLogo(eventData)
+
+      const logoHeight = logo.height ? 80 : undefined
 
       const docDefs: TDocumentDefinitions = {
         images: {
           logo: {
-            url: logo,
+            url: eventData.logoWebstore,
           },
         },
         pageSize: "A4",
-        pageMargins: [38, 80, 38, 40],
+        pageMargins: [38, logoHeight ? logoHeight + 48 : 80, 38, 40],
         header:
-          eventData.logo && !!logo
-            ? ([{ ...reportTitle[0], image: "logo" }] as Content)
+          eventData.logo && !!eventData.logoWebstore
+            ? ([
+                {
+                  image: "logo",
+                  width: logo.width,
+                  absolutePosition: { x: 38, y: 38 },
+                },
+                // {
+                //   margin: 38,
+                //   columns: [
+                //     {
+                //       table: {
+                //         widths: [logo.width, "*"],
+                //         body: [
+                //           [
+                //             {
+                //               image: "logo",
+                //               // absolutePosition: { x: 38, y: 38 },
+                //             },
+                //             { text: "" },
+                //           ],
+                //         ],
+                //       },
+                //       // layout: "noBorders",
+                //     },
+                //   ],
+                // },
+              ] as Content)
             : undefined,
         content: [...content(eventData, tkts as any)],
         footer: [footer(eventData)] as Content,
@@ -68,23 +96,41 @@ const downloadTickets = async (
   })
 }
 
-const getBase64EventLogo = async (eventData: TEventData) => {
-  let str = ""
-  //
+const resizeImageToFit = (
+  base64: string,
+  maxWidth = 140,
+  maxHeight = 80
+): Promise<{
+  base64: string
+  width: number
+  height: number
+}> => {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.src = base64
 
-  if (eventData.logo_print) {
-    const response = await fetch(eventData.logo_print)
-    const blob = await response.blob()
-    const reader = new FileReader()
+    img.onload = () => {
+      const ratio = Math.min(maxWidth / img.width, maxHeight / img.height)
+      const newWidth = img.width * ratio
+      const newHeight = img.height * ratio
 
-    reader.onloadend = () => {
-      str = reader.result as string
+      const canvas = document.createElement("canvas")
+      canvas.width = newWidth
+      canvas.height = newHeight
+
+      const ctx = canvas.getContext("2d")
+      ctx?.drawImage(img, 0, 0, newWidth, newHeight)
+
+      const resizedBase64 = canvas.toDataURL("image/png")
+      resolve({
+        base64: resizedBase64,
+        width: newWidth,
+        height: newHeight,
+      })
     }
 
-    reader.readAsDataURL(blob)
-  }
-
-  return str
+    img.onerror = (err) => reject("Erro ao carregar a imagem")
+  })
 }
 
 export default downloadTickets

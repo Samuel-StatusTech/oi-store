@@ -57,6 +57,7 @@ export type TEventData = {
   expireAt: number
   hasECommerce: boolean
   logoFixed: string
+  logoWebstore: string
   phone: string
   taxes: {
     credit: string | number

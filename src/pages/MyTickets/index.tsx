@@ -12,9 +12,10 @@ import { Api } from "../../api"
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
+import { TEventData } from "../../utils/@types/data/event"
 
 const MyTickets = () => {
-  const { event, controllers } = getStore()
+  const { controllers } = getStore()
 
   const navigate = useNavigate()
 
@@ -41,13 +42,16 @@ const MyTickets = () => {
           return status
         })
 
-        if (event) {
-          const req2 = await Api.get.eventInfo({ eventId: event?.id })
+        let updatedEventInfo: TEventData | null = null
+
+        if (eventInfo) {
+          const req2 = await Api.get.eventInfo({ eventId: eventInfo?.id })
 
           if (req2.ok) {
             const data = req2.data
             if (data.is_ecommerce) {
               controllers.event.setData(req2.data)
+              updatedEventInfo = req2.data
               sessionStorage.setItem("event", JSON.stringify(req2.data))
             } else {
               controllers.event.clear()
@@ -58,7 +62,7 @@ const MyTickets = () => {
 
         const newList = available.map((i) => ({
           ...i,
-          eventBanner: eventInfo?.event_banner as string,
+          eventBanner: (updatedEventInfo ?? eventInfo).event_banner as string,
           products: i.products.map((ip: any) => ({
             ...ip,
             TRN: i.payments[0].transition_id,
@@ -85,7 +89,6 @@ const MyTickets = () => {
       const eventData = sessionStorage.getItem("event")
 
       if (eventData) {
-        controllers.event.setData(JSON.parse(eventData))
         getData(JSON.parse(eventData))
       } else {
         navigate("/eventSelect")
