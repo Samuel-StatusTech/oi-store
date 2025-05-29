@@ -495,6 +495,7 @@ const Payment = () => {
         batch_id: t.batch_id,
         id: t.id,
         tax_value: taxPerTicket,
+        ticketName: t.name,
         ticket_name: tt?.person.name,
         quantity: 1,
       })
@@ -538,7 +539,7 @@ const Payment = () => {
           }
 
           localStorage.removeItem("payed")
-          
+
           navigate("/payment/pix", {
             state: stateParams,
           })

@@ -30,6 +30,7 @@ import { generateTicketID } from "../../utils/tb/qrcode"
 import { TUser } from "../../utils/@types/data/user"
 import { TEventData } from "../../utils/@types/data/event"
 import { formatMoney } from "../../utils/tb/formatMoney"
+import { formatDate } from "date-fns"
 
 const io = require("socket.io-client")
 
@@ -41,12 +42,12 @@ const PaymentPix = () => {
 
   const eventData = sessionStorage.getItem("event")
 
-  const event = eventData ? JSON.parse(eventData) : null
+  const event = eventData ? (JSON.parse(eventData) as TEventData) : null
 
   const { controllers } = getStore()
 
   const user = sessionStorage.getItem("user")
-    ? JSON.parse(sessionStorage.getItem("user") as string)
+    ? (JSON.parse(sessionStorage.getItem("user") as string) as TUser)
     : null
 
   const [time, setTime] = useState("05:00")
@@ -61,11 +62,147 @@ const PaymentPix = () => {
 
   const [payed, setPayed] = useState(false)
 
+  // ----- EMAIL -----
+
+  const base64ToFile = (base64: string, filename: string): File => {
+    const arr = base64.split(",")
+    const mimeMatch = arr[0].match(/:(.*?);/)
+    const mime = mimeMatch ? mimeMatch[1] : "image/png" // default
+    const bstr = atob(arr[1])
+    let n = bstr.length
+    const u8arr = new Uint8Array(n)
+
+    while (n--) {
+      u8arr[n] = bstr.charCodeAt(n)
+    }
+
+    return new File([u8arr], filename, { type: mime })
+  }
+
+  const getLogoFile = async (): Promise<File | string> => {
+    let res: string | File = ""
+
+    res = event?.logoWebstore
+      ? base64ToFile(event?.logoWebstore, "logo.png")
+      : ""
+
+    return res
+  }
+
+  const getPdfFile = async (): Promise<File> => {
+    const file = (await downloadTickets(
+      event as TEventData,
+      buyedTickets,
+      false
+    )) as File
+
+    return file
+  }
+
+  const sendEmail = async (purchaseInfo: {
+    status: string
+    amount: number
+    message: string
+    sId: string
+    transaction_id: string
+    time: string
+  }) => {
+    try {
+      // Mail Data
+      const startAt = event?.date_ini
+        ? getHours(
+            new Date(
+              event?.date_ini.slice(0, event?.date_ini.indexOf("T")) +
+                "T" +
+                event?.time_ini +
+                ".000Z"
+            )
+          )
+        : event?.time_ini
+        ? event.time_ini.slice(0, 5)
+        : "Dia todo"
+
+      let list: any[] = []
+
+      lctn.state.tickets.forEach((i: any) => {
+        const idx = list.findIndex((li) => li.ticketName.includes(i.ticketName))
+        if (idx < 0) {
+          list.push({
+            name: i.ticketName,
+            total: i.quantity,
+          })
+        } else {
+          list[idx] = {
+            ...list[idx],
+            total: list[idx] + i.quantity,
+          }
+        }
+      })
+
+      list = list.map((i) => ({
+        text: `${i.name} (${i.total})`,
+        total: i.total,
+      }))
+
+      const mailInfo: any = {
+        logo: await getLogoFile(),
+        file: await getPdfFile(),
+        logoWebstoreUrl: event?.logoWebstoreUrl ?? event?.logoFixed,
+
+        eventName: event?.name,
+        eventDate: formatDate(event?.date_ini as string, "dd/MM/yyyy"),
+        eventTime: startAt,
+        eventLocal: event?.local,
+
+        purchaseCode: purchaseInfo?.transaction_id,
+        purchaseTime: formatDate(
+          purchaseInfo.time as string,
+          "dd/MM/yyyy HH:mm:ss"
+        ),
+        purchaseValue: getOrderValue(),
+        purchaseItems: JSON.stringify(list),
+        purchaseStatus: "Pago",
+
+        targetEmail: user?.email,
+      }
+
+      await Api.post.mail.sendEmail(mailInfo)
+    } catch (error) {
+      // ...
+    }
+  }
+
+  const handleEmail = async (purchaseInfo: {
+    status: string
+    amount: number
+    message: string
+    sId: string
+    transaction_id: string
+    time: string
+  }) => {
+    try {
+      const req = await Api.get.purchaseInfo({
+        eventId: event?.id as string,
+        orderId: purchaseInfo.sId,
+      })
+
+      if (req.ok) {
+        sendEmail({
+          ...purchaseInfo,
+          time: req.data.products[0].date,
+        })
+      }
+    } catch (error) {
+      // ...
+    }
+  }
+
   // ----- MERCADOPAGO -----
 
   const startSocket = async () => {
-    if (!lctn.state.tickets || !lctn.state.buyer) return returnPage()
-    else {
+    if (!lctn.state.tickets || !lctn.state.buyer) {
+      return returnPage()
+    } else {
       const socket = instanceSocket()
 
       if (socket) {
@@ -108,6 +245,8 @@ const PaymentPix = () => {
                 setTimeout(() => {
                   setPayed(true)
                   localStorage.setItem("payed", "true")
+
+                  handleEmail(data)
                 }, 400)
               }
             }, 3500)
@@ -357,7 +496,7 @@ const PaymentPix = () => {
       loadEventData()
       startSocket()
     } catch (error) {}
-  }, [loadEventData])
+  }, [])
 
   const handleDownload = async () => {
     if (event) await downloadTickets(event, buyedTickets, true)
@@ -407,9 +546,9 @@ const PaymentPix = () => {
         ? Number(lctn.state.taxTotal)
         : 0,
       sid,
-      user: user,
-      dk: event.dk,
-      eventId: event.id,
+      user: user as TUser,
+      dk: event?.dk as string,
+      eventId: event?.id as string,
     })
 
     return obj ? obj.transaction_amount : 0

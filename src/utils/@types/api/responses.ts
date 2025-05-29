@@ -83,14 +83,19 @@ type TResponses = {
       }>
     >
     login: {
-      requestCode: Promise<TDefaultRes<{
-        success: true
-        code: string
-        message: string
-      } | {
-        success: false
-        message: string
-      }>>
+      requestCode: Promise<
+        TDefaultRes<
+          | {
+              success: true
+              code: string
+              message: string
+            }
+          | {
+              success: false
+              message: string
+            }
+        >
+      >
       validateCode: Promise<TDefaultRes<TUser>>
     }
     purchase: {
@@ -120,6 +125,13 @@ type TResponses = {
       confirm: Promise<
         TDefaultRes<{
           success: boolean
+        }>
+      >
+    }
+    mail: {
+      sendEmail: Promise<
+        TDefaultRes<{
+          sended: boolean
         }>
       >
     }

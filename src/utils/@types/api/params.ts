@@ -60,6 +60,26 @@ type TParams = {
         order_number: number
       }
     }
+    mail: {
+      sendEmail: {
+        file: string | File
+        logo: string | File
+        logoWebstoreUrl: string
+
+        eventName: string
+        eventDate: string
+        eventTime: string
+        eventLocal: string
+
+        purchaseCode: string
+        purchaseTime: string
+        purchaseValue: string
+        purchaseItems: string
+        purchaseStatus: string
+
+        targetEmail: string
+      }
+    }
   }
 }
 

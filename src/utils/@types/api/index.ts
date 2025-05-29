@@ -41,6 +41,11 @@ type TApiPosters = {
       p: TParams["post"]["purchase"]["confirm"]
     ) => TResponses["post"]["purchase"]["confirm"]
   }
+  mail: {
+    sendEmail: (
+      p: TParams["post"]["mail"]["sendEmail"]
+    ) => TResponses["post"]["mail"]["sendEmail"]
+  }
 }
 
 export type TApi = {

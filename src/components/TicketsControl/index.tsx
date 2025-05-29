@@ -127,6 +127,7 @@ const TicketsControl = ({
               batch_id: t.batch_id,
               id: t.id,
               tax_value: taxPerTicket,
+              ticketName: t.name,
               ticket_name: "",
               quantity: 1,
             })
@@ -143,13 +144,17 @@ const TicketsControl = ({
 
         localStorage.removeItem("payed")
 
-        navigate("/payment/pix", {
-          state: stateParams,
-        })
+        setTimeout(() => {
+          console.log("Indo para pix")
+          navigate("/payment/pix", {
+            state: stateParams,
+          })
+        }, 200)
       } else {
         alert("Preencha os campos corretamente e tente novamente.")
       }
     } else {
+      console.log("Indo para pagamento")
       navigate("/payment", {
         state: { tickets },
       })

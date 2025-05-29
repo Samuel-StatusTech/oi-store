@@ -6,7 +6,8 @@ import TParams from "../utils/@types/api/params"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
-const backUrl = "https://api.oitickets.com.br/api/v1"
+const backUrl = process.env.REACT_APP_BACKEND_URL
+const mailingUrl = process.env.REACT_APP_EMAIL_BACKEND_URL
 
 const zapiInstance = process.env.REACT_APP_ZAPI_INSTANCE
 const zapiToken = process.env.REACT_APP_ZAPI_TOKEN
@@ -365,28 +366,28 @@ const requestCode: TApi["post"]["login"]["requestCode"] = async ({ phone }) => {
             const code = res.data.code
 
             if (code) {
-              const whatsappReq = await axios.post(
-                whatsappUrl,
-                {
-                  phone: phone,
-                  message: `Aqui está seu código de autenticação para o Lista Pix:\n\n*${code}*`,
-                },
-                {
-                  baseURL: "",
-                  headers: {
-                    "client-token": zapiClientToken,
-                  },
-                }
-              )
+              // const whatsappReq = await axios.post(
+              //   whatsappUrl,
+              //   {
+              //     phone: phone,
+              //     message: `Aqui está seu código de autenticação para o Lista Pix:\n\n*${code}*`,
+              //   },
+              //   {
+              //     baseURL: "",
+              //     headers: {
+              //       "client-token": zapiClientToken,
+              //     },
+              //   }
+              // )
 
-              if (whatsappReq.status === 200) {
-                resolve({ ok: true, data: res.data })
-              } else
-                resolve({
-                  ok: false,
-                  error:
-                    "Houve um erro ao enviar o código para seu telefone. Tente novamente mais tarde.",
-                })
+              // if (whatsappReq.status === 200) {
+              resolve({ ok: true, data: res.data })
+              // } else
+              //   resolve({
+              //     ok: false,
+              //     error:
+              //       "Houve um erro ao enviar o código para seu telefone. Tente novamente mais tarde.",
+              //   })
             } else
               resolve({
                 ok: false,
@@ -442,6 +443,57 @@ const validateCode: TApi["post"]["login"]["validateCode"] = async ({
         })
     } catch (error) {
       reject({ error: "Erro ao requisitar código. Tente novamente mais tarde" })
+    }
+  })
+}
+
+/*
+ * Mailing
+ */
+
+const sendEmail: TApi["post"]["mail"]["sendEmail"] = async (mailInfo) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const formData = new FormData()
+
+      formData.append("file", mailInfo.file)
+      formData.append("logoWebstoreUrl", mailInfo.logoWebstoreUrl)
+      formData.append("logo", mailInfo.logo)
+
+      formData.append("eventName", mailInfo.eventName)
+      formData.append("eventDate", mailInfo.eventDate)
+      formData.append("eventTime", mailInfo.eventTime)
+      formData.append("eventLocal", mailInfo.eventLocal)
+
+      formData.append("purchaseCode", mailInfo.purchaseCode)
+      formData.append("purchaseTime", mailInfo.purchaseTime)
+      formData.append("purchaseValue", mailInfo.purchaseValue)
+      formData.append("purchaseItems", mailInfo.purchaseItems)
+      formData.append("purchaseStatus", mailInfo.purchaseStatus)
+
+      formData.append("targetEmail", mailInfo.targetEmail)
+
+      await axios
+        .post("/api/sendemail", formData, {
+          baseURL: mailingUrl,
+          headers: {
+            "Content-Type": "multipart/form-data",
+          },
+        })
+        .then((res) => {
+          const status = res.data.sended
+
+          if (Boolean(status)) resolve({ ok: true, data: { sended: status } })
+          else throw new Error()
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Algo deu errado. Tente novamente mais tarde.",
+          })
+        })
+    } catch (error) {
+      reject({ error: "Erro ao enviar email. Tente novamente mais tarde" })
     }
   })
 }
@@ -568,6 +620,9 @@ export const Api: TApi = {
       sign: signPurchase,
       mpGenerate: mpGenerate,
       confirm: confirmPurchase,
+    },
+    mail: {
+      sendEmail,
     },
   },
 }
