@@ -97,6 +97,7 @@ const Home = () => {
   }
 
   useEffect(() => {
+    localStorage.removeItem("payed")
     if (event) {
       loadEventData()
       if (tickets.length === 0) fetchTickets()

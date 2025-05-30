@@ -145,7 +145,6 @@ const TicketsControl = ({
         localStorage.removeItem("payed")
 
         setTimeout(() => {
-          console.log("Indo para pix")
           navigate("/payment/pix", {
             state: stateParams,
           })
@@ -154,7 +153,6 @@ const TicketsControl = ({
         alert("Preencha os campos corretamente e tente novamente.")
       }
     } else {
-      console.log("Indo para pagamento")
       navigate("/payment", {
         state: { tickets },
       })
