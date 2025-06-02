@@ -170,7 +170,7 @@ const Login = () => {
       content.push(
         <S.Input
           ref={refsRelations[i]}
-          type={"text"}
+          type={"number"}
           value={code[i] ?? ""}
           onKeyDown={(e) => {
             if (i === codeLength - 1 && e.key === "Enter") {
