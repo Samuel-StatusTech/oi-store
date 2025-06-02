@@ -2,18 +2,34 @@ import { Link, useNavigate } from "react-router-dom"
 import Container from "../Container"
 import * as S from "./styled"
 
+import { ReactComponent as BurguerIcon } from "../../assets/icons/burguer.svg"
+
 import getStore from "../../store"
+import { useEffect, useRef, useState } from "react"
 
 const Header = () => {
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+
   const navigate = useNavigate()
 
   const { event, user } = getStore()
+
+  const [sideOpened, setSideOpened] = useState(false)
+
+  const toggleSideMenu = () => {
+    if (window.document.body.clientWidth <= 520) {
+      window.document.body.style.overflow = !sideOpened ? "hidden" : "unset"
+
+      setSideOpened(!sideOpened)
+    }
+  }
 
   const handleBtn = (
     e: React.MouseEvent<HTMLAnchorElement, MouseEvent>,
     to: string
   ) => {
     e.preventDefault()
+    toggleSideMenu()
     navigate(to, {
       state: {
         logoFixed: event?.logoFixed,
@@ -23,7 +39,7 @@ const Header = () => {
 
   const renderButton = () => {
     return (
-      <div style={{ display: "flex", gap: 8 }}>
+      <div style={{ display: "flex", gap: 8 }} className="btns-wrapper">
         {!document.location.href.includes("/eventSelect") ? (
           <Link
             to={user ? "/mytickets" : "/login"}
@@ -57,20 +73,45 @@ const Header = () => {
     )
   }
 
+  useEffect(() => {
+    const collapseOwnDropdown = () => {
+      setSideOpened(false)
+    }
+
+    const handleClickOutside = (e: any) => {
+      if (e.target !== document.children[0]) {
+        if (!wrapperRef.current?.contains(e.target) && sideOpened)
+          collapseOwnDropdown()
+      }
+    }
+
+    if (sideOpened) {
+      document.addEventListener("mousedown", handleClickOutside)
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside)
+      }
+    }
+  }, [wrapperRef, sideOpened])
+
   return (
-    <S.Wrapper>
+    <S.Wrapper ref={wrapperRef}>
       <Container>
         <S.Component>
           <S.LogoArea>
             <Link to={"/eventSelect"}>
-              {event?.logoFixed ? (
-                <img src={event?.logoFixed} alt={event?.corporateName} />
+              {event?.logoWebstore ? (
+                <img src={event?.logoWebstore} alt={event?.corporateName} />
               ) : (
                 <span>Início</span>
               )}
             </Link>
           </S.LogoArea>
-          <S.UserArea>{renderButton()}</S.UserArea>
+          <S.UserArea $opened={sideOpened}>
+            <S.BurguerWrapper $opened={sideOpened} onClick={toggleSideMenu}>
+              <BurguerIcon />
+            </S.BurguerWrapper>
+            {renderButton()}
+          </S.UserArea>
         </S.Component>
       </Container>
     </S.Wrapper>
