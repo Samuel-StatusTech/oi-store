@@ -64,9 +64,7 @@ const TicketCard = ({ k, data }: Props) => {
           }
         }
       }
-    } catch (error) {
-      alert(error)
-    }
+    } catch (error) {}
   }
 
   const renderBtns = () => (

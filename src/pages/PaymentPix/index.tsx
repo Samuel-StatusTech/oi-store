@@ -510,11 +510,32 @@ const PaymentPix = () => {
         if (file instanceof File) {
           const data = {
             title: `Meus Tickets para ${event.name}`,
+            text: `Meus Tickets para ${event.name}`,
             files: [file],
           }
 
-          if (navigator.canShare && navigator.canShare(data)) {
-            navigator.share(data)
+          const isMobile = window.document.body.clientWidth <= 520
+
+          if (isMobile) {
+            if (navigator.canShare({ files: [file] })) {
+              navigator.share(data)
+            } else if (navigator.share !== undefined) {
+              await navigator.share(data)
+            } else {
+              alert(
+                "Seu navegador não suporta compartilhamento. Faça o download e compartilhe manualmente."
+              )
+            }
+          } else {
+            if (navigator.canShare(data)) {
+              navigator.share(data)
+            } else if (navigator.share !== undefined) {
+              await navigator.share(data)
+            } else {
+              alert(
+                "Seu navegador não suporta compartilhamento. Faça o download e compartilhe manualmente."
+              )
+            }
           }
         }
       }
