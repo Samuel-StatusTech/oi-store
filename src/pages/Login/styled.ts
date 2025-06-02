@@ -178,6 +178,9 @@ export const MultipleInputs = styled.div`
   display: flex;
   justify-content: space-between;
   gap: 24px;
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    gap: 12px;
+  }
 `
 
 export const Input = styled.input<{ $small?: boolean }>`

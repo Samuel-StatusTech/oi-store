@@ -172,9 +172,31 @@ const Login = () => {
           ref={refsRelations[i]}
           type={"text"}
           value={code[i] ?? ""}
-          onChange={(e) =>
-            !failedCODE ? handleCodeNumber(i, e.target.value) : undefined
-          }
+          onKeyDown={(e) => {
+            if (i === codeLength - 1 && e.key === "Enter") {
+              handleClick()
+            } else if (e.key === "Backspace") {
+              if (e.currentTarget.value === "") {
+                const isFirst = i === 0
+                if (!isFirst) refsRelations[i - 1].current?.focus()
+              }
+            }
+          }}
+          onChange={(e) => {
+            if (e.target.value === "") {
+              let nCode = code
+              nCode = nCode
+                .split("")
+                .map((l, li) => (li !== i ? l : ""))
+                .join("")
+
+              handleCode(nCode)
+            } else {
+              return !failedCODE
+                ? handleCodeNumber(i, e.target.value)
+                : undefined
+            }
+          }}
           placeholder={""}
           $small={true}
           disabled={failedCODE}
@@ -208,6 +230,10 @@ const Login = () => {
                   value={phone}
                   onKeyDown={(e) => {
                     if (e.key === "Tab") e.preventDefault()
+                    if (e.key === "Enter") {
+                      e.preventDefault()
+                      handleClick()
+                    }
                   }}
                   onChange={(e) => handlePhone(e.target.value)}
                   placeholder={""}
