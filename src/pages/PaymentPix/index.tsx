@@ -137,7 +137,7 @@ const PaymentPix = () => {
         } else {
           list[idx] = {
             ...list[idx],
-            total: list[idx] + i.quantity,
+            total: list[idx].quantity + i.quantity,
           }
         }
       })
