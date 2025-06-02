@@ -24,6 +24,7 @@ type TParams = {
     }
     myTickets: {
       eventId: string
+      eventName: string
     }
     products: {
       eventId: string

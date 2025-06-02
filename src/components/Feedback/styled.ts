@@ -43,6 +43,6 @@ export const Box = styled.div<{
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
     padding: 6px 32px;
 
-    margin: 0 36px;
+    margin: 0 auto;
   }
 `

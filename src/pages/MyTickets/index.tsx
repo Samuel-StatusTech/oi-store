@@ -26,7 +26,7 @@ const MyTickets = () => {
     setLoading(true)
 
     try {
-      const req = await Api.get.myTickets({ eventId: eventInfo?.id as string })
+      const req = await Api.get.myTickets({ eventId: eventInfo?.id as string, eventName: eventInfo?.name as string })
 
       if (req.ok) {
         const available = req.data.list.filter((i) => {

@@ -75,7 +75,7 @@ const Header = () => {
 
   useEffect(() => {
     const collapseOwnDropdown = () => {
-      setSideOpened(false)
+      toggleSideMenu()
     }
 
     const handleClickOutside = (e: any) => {

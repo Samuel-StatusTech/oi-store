@@ -168,7 +168,7 @@ const PaymentPix = () => {
 
       await Api.post.mail.sendEmail(mailInfo)
     } catch (error) {
-      // ...
+      console.log(error)
     }
   }
 

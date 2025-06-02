@@ -241,7 +241,7 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
   })
 }
 
-const getMyTickets: TApi["get"]["myTickets"] = async ({ eventId }) => {
+const getMyTickets: TApi["get"]["myTickets"] = async ({ eventId, eventName }) => {
   return new Promise(async (resolve, reject) => {
     try {
       await axios
@@ -253,7 +253,7 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({ eventId }) => {
 
           let pms: Promise<any>[] = []
 
-          const ordersIds = new Set(list.map((shop: any) => shop.order_id))
+          const ordersIds = new Set(list.filter((shop: any) => shop.event_name === eventName).map((shop: any) => shop.order_id))
 
           ordersIds.forEach((id) => {
             pms.push(
