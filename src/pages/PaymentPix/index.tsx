@@ -132,12 +132,12 @@ const PaymentPix = () => {
         if (idx < 0) {
           list.push({
             name: i.ticketName,
-            total: i.quantity,
+            total: +(i.quantity ?? 1),
           })
         } else {
           list[idx] = {
             ...list[idx],
-            total: list[idx].quantity + i.quantity,
+            total: +list[idx].quantity + +(i.quantity ?? 1),
           }
         }
       })
