@@ -89,24 +89,27 @@ const PaymentPix = () => {
     return res
   }
 
-  const getPdfFile = async (): Promise<File> => {
+  const getPdfFile = async (productsList: any[]): Promise<File> => {
     const file = (await downloadTickets(
       event as TEventData,
-      buyedTickets,
+      productsList,
       false
     )) as File
 
     return file
   }
 
-  const sendEmail = async (purchaseInfo: {
-    status: string
-    amount: number
-    message: string
-    sId: string
-    transaction_id: string
-    time: string
-  }) => {
+  const sendEmail = async (
+    purchaseInfo: {
+      status: string
+      amount: number
+      message: string
+      sId: string
+      transaction_id: string
+      time: string
+    },
+    productsList: any[]
+  ) => {
     try {
       // Mail Data
       const startAt = event?.date_ini
@@ -125,7 +128,7 @@ const PaymentPix = () => {
       let list: any[] = []
 
       lctn.state.tickets.forEach((i: any) => {
-        const idx = list.findIndex((li) => li.ticketName.includes(i.ticketName))
+        const idx = list.findIndex((li) => li.name.includes(i.ticketName))
         if (idx < 0) {
           list.push({
             name: i.ticketName,
@@ -146,7 +149,7 @@ const PaymentPix = () => {
 
       const mailInfo: any = {
         logo: await getLogoFile(),
-        file: await getPdfFile(),
+        file: await getPdfFile(productsList),
         logoWebstoreUrl: event?.logoWebstoreUrl ?? event?.logoFixed,
 
         eventName: event?.name,
@@ -167,9 +170,7 @@ const PaymentPix = () => {
       }
 
       await Api.post.mail.sendEmail(mailInfo)
-    } catch (error) {
-      console.log(error)
-    }
+    } catch (error) {}
   }
 
   const handleEmail = async (purchaseInfo: {
@@ -187,14 +188,19 @@ const PaymentPix = () => {
       })
 
       if (req.ok) {
-        sendEmail({
-          ...purchaseInfo,
-          time: req.data.products[0].date,
-        })
+        const parsedData = parsePurchaseInfo(req.data)
+
+        setBuyedTickets(parsedData)
+
+        sendEmail(
+          {
+            ...purchaseInfo,
+            time: req.data.products[0].date,
+          },
+          parsedData
+        )
       }
-    } catch (error) {
-      // ...
-    }
+    } catch (error) {}
   }
 
   // ----- MERCADOPAGO -----
@@ -203,60 +209,74 @@ const PaymentPix = () => {
     if (!lctn.state.tickets || !lctn.state.buyer) {
       return returnPage()
     } else {
-      const socket = instanceSocket()
+      if (!payed) {
+        const socket = instanceSocket()
 
-      if (socket) {
-        socket.on("plugged", (socketId: any) => {
-          setSid(socketId)
-        })
-
-        socket.on("connect_error", () => {
-          alert("Ops, houve um erro. Tente novamente mais tarde")
-          socket.off("disconnect")
-          socket.disconnect()
-          navigate(-1)
-          return
-        })
-
-        // monitor payment
-
-        socket.on("orderUpdate", async (data: any) => {
-          if (data.status === "approved" || data.status === "denied") {
-            let f = {
-              state: data.status,
-              visible: false,
-              message: data.message,
-            }
-
-            if (data.status === "approved") {
-              const purchase = await confirmPurchase(data.sId, data.code)
-
-              if (purchase.ok && !purchase.data.success) f.state = "denied"
-
-              f.visible = true
-            }
-
-            setFeedback(f)
-
-            setTimeout(() => {
-              setFeedback({ ...f, visible: false })
-
-              if (f.state === "approved") {
-                setTimeout(() => {
-                  setPayed(true)
-                  localStorage.setItem("payed", "true")
-
-                  handleEmail(data)
-                }, 400)
-              }
-            }, 3500)
+        if (socket) {
+          const handlePlugged = (socketId: any) => {
+            setSid(socketId)
           }
+          socket.on("plugged", handlePlugged)
 
-          // if (data.status === "expired") {
-          //   socket.disconnect()
-          //   instanceSocket()
-          // }
-        })
+          const handleConnectError = () => {
+            alert("Ops, houve um erro. Tente novamente mais tarde")
+            socket.off("disconnect")
+            socket.disconnect()
+            navigate(-1)
+            return
+          }
+          socket.on("connect_error", handleConnectError)
+
+          // monitor payment
+
+          const handleOrderUpdate = async (data: any) => {
+            if (data.status === "approved" || data.status === "denied") {
+              let f = {
+                state: data.status,
+                visible: false,
+                message: data.message,
+              }
+
+              if (data.status === "approved") {
+                const purchase = await confirmPurchase(data.sId, data.code)
+
+                if (purchase.ok && !purchase.data.success) f.state = "denied"
+
+                f.visible = true
+              }
+
+              setFeedback(f)
+
+              setTimeout(() => {
+                setFeedback({ ...f, visible: false })
+
+                if (f.state === "approved") {
+                  setTimeout(() => {
+                    setPayed(true)
+                    localStorage.setItem("payed", "true")
+
+                    handleEmail(data)
+
+                    socket.disconnect()
+                    socket.off("plugged", handlePlugged)
+                    socket.off("connect_error", handleConnectError)
+                    socket.off("orderUpdate", handleOrderUpdate)
+                  }, 400)
+                }
+              }, 3500)
+            }
+
+            // if (data.status === "expired") {
+            //   socket.disconnect()
+            //   instanceSocket()
+            // }
+          }
+          socket.on("orderUpdate", handleOrderUpdate)
+
+          setTimeout(() => {
+            socket.disconnect()
+          }, 300000)
+        }
       }
     }
   }
@@ -358,11 +378,13 @@ const PaymentPix = () => {
   }, [])
 
   const restartTimer = () => {
-    setQrCode("")
-    setQrCode64("")
-    setTime("05:00")
+    if (!payed) {
+      setQrCode("")
+      setQrCode64("")
+      setTime("05:00")
 
-    getQR()
+      getQR()
+    }
   }
 
   const runTimer = () => {
@@ -434,47 +456,61 @@ const PaymentPix = () => {
     }
   }, [])
 
-  const loadPurchaseData = useCallback(async (orderId: string) => {
+  const parsePurchaseInfo = (p: any) => {
+    let data: any = []
+
+    let pdfTickets: any[] = []
+
+    const tickets = p.products as any[]
+
+    tickets.forEach((t, k) => {
+      const tid = generateTicketID(
+        false,
+        "ecommerce",
+        t.opuid,
+        event?.oid as number,
+        event?.dbName as string
+      )
+
+      const dt = {
+        id: t.id,
+        name: t.name,
+        batch_name: t.batch_name,
+        event_name: event?.name as string,
+        qr_data: t.qr_data,
+        qr_label: t.qr_label,
+        qr_TID: tid,
+        order_id: sid,
+        date: new Date(t.date).toISOString(),
+        image: null,
+        quantity: t.quantity,
+        price_unit: t.price_unit,
+        ticket_name: (t as any).ticket_name,
+        TRN: t.transition_id,
+      }
+
+      pdfTickets.push(dt)
+    })
+
+    data = pdfTickets
+
+    return data
+  }
+
+  const loadPurchaseData = async (orderId: string) => {
     // place data
     if (event) {
       try {
         const p = await Api.get.purchaseInfo({ eventId: event.id, orderId })
 
         if (p.ok && p.data.id) {
-          let pdfTickets: any[] = []
+          const parsedData = parsePurchaseInfo(p.data)
 
-          const tickets = p.data.products
-
-          tickets.forEach((t, k) => {
-            const tid = generateTicketID(
-              false,
-              "ecommerce",
-              t.opuid,
-              event?.oid as number,
-              event?.dbName
-            )
-
-            pdfTickets.push({
-              id: t.id,
-              name: t.name,
-              batch_name: t.batch_name,
-              event_name: event?.name as string,
-              qr_data: t.qr_data,
-              qr_TID: tid,
-              order_id: sid,
-              date: new Date(t.date).toISOString(),
-              image: null,
-              quantity: t.quantity,
-              price_unit: t.price_unit,
-              ticket_name: (t as any).ticket_name,
-            })
-          })
-
-          setBuyedTickets(pdfTickets)
+          setBuyedTickets(parsedData)
         }
       } catch (error) {}
     }
-  }, [])
+  }
 
   const confirmPurchase = useCallback(async (sId: string, pcode: string) => {
     return await Api.post.purchase.confirm({
@@ -510,32 +546,11 @@ const PaymentPix = () => {
         if (file instanceof File) {
           const data = {
             title: `Meus Tickets para ${event.name}`,
-            text: `Meus Tickets para ${event.name}`,
             files: [file],
           }
 
-          const isMobile = window.document.body.clientWidth <= 520
-
-          if (isMobile) {
-            if (navigator.canShare({ files: [file] })) {
-              navigator.share(data)
-            } else if (navigator.share !== undefined) {
-              await navigator.share(data)
-            } else {
-              alert(
-                "Seu navegador não suporta compartilhamento. Faça o download e compartilhe manualmente."
-              )
-            }
-          } else {
-            if (navigator.canShare(data)) {
-              navigator.share(data)
-            } else if (navigator.share !== undefined) {
-              await navigator.share(data)
-            } else {
-              alert(
-                "Seu navegador não suporta compartilhamento. Faça o download e compartilhe manualmente."
-              )
-            }
+          if (navigator.canShare && navigator.canShare(data)) {
+            navigator.share(data)
           }
         }
       }

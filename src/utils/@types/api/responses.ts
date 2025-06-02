@@ -29,12 +29,14 @@ type TResponses = {
           name: string
           batch_name: string
           qr_data: string
+          qr_label: string
           order_id: string
           image: null | string
           quantity: number
           price_unit: number
           price_total: number
           date: string
+          transition_id: string
         }[]
         payments: {
           id: string

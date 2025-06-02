@@ -36,9 +36,11 @@ const downloadTickets = async (
 
       const filename = `Meus Tickets para ${eventData.name.trim()}.pdf`
 
-      let logo = await resizeImageToFit(eventData.logoWebstore) // await getBase64EventLogo(eventData)
+      let logo = eventData.logoWebstore
+        ? await resizeImageToFit(eventData.logoWebstore)
+        : null // await getBase64EventLogo(eventData)
 
-      const logoHeight = logo.height ? 80 : undefined
+      const logoHeight = logo ? (logo.height ? 80 : undefined) : 0
 
       const docDefs: TDocumentDefinitions = {
         images: {
@@ -49,7 +51,7 @@ const downloadTickets = async (
         pageSize: "A4",
         pageMargins: [38, logoHeight ? logoHeight + 48 : 80, 38, 40],
         header:
-          eventData.logo && !!eventData.logoWebstore
+          logo && !!eventData.logoWebstore
             ? ([
                 {
                   image: "logo",
