@@ -9,9 +9,6 @@ axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 const backUrl = process.env.REACT_APP_BACKEND_URL
 const mailingUrl = process.env.REACT_APP_EMAIL_BACKEND_URL
 
-const smsClientToken = process.env.REACT_APP_SMS_CLIENT_TOKEN
-const smsUrl = process.env.REACT_APP_SMS_URL as string
-
 const checkTokenExpiration = (token: string) => {
   try {
     const decoded = jwtDecode(token)
@@ -370,30 +367,33 @@ const requestCode: TApi["post"]["login"]["requestCode"] = async ({ phone }) => {
           if (res.data.success) {
             const code = res.data.code
 
-            const message = `Seu código de autenticação para Lista Pix é: ${code}.`
-
-            const body = {
-              Sender: "webstore",
-              Receivers: `0${phone}`,
-              Content: message,
-            }
+            const body = { phone: phone, code }
 
             if (code) {
-              const smsReq = await axios.post(smsUrl, body, {
-                baseURL: "",
-                headers: {
-                  "Content-Type": "application/json",
-                  "auth-key": smsClientToken,
-                },
-              })
+              await axios
+                .post("/api/sendcode", body, {
+                  baseURL: mailingUrl,
+                })
+                .then((res) => {
+                  const status = res.data.sended
 
-              if (smsReq.status === 200 && smsReq.data.Success === true) {
-                resolve({ ok: true, data: res.data })
-              } else
-                resolve({
-                  ok: false,
-                  error:
-                    "Houve um erro ao enviar o código para seu telefone. Tente novamente mais tarde.",
+                  if (Boolean(status))
+                    resolve({
+                      ok: true,
+                      data: {
+                        code,
+                        message: "Código enviado com sucesso.",
+                        success: true,
+                      },
+                    })
+                  else throw new Error()
+                })
+                .catch(() => {
+                  resolve({
+                    ok: false,
+                    error:
+                      "Houve um erro ao enviar o código para seu telefone. Tente novamente mais tarde.",
+                  })
                 })
             } else
               resolve({
