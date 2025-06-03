@@ -40,33 +40,31 @@ const Header = () => {
   const renderButton = () => {
     return (
       <div style={{ display: "flex", gap: 8 }} className="btns-wrapper">
-        {!document.location.href.includes("/eventSelect") ? (
+        {!document.location.href.includes("/eventSelect") && user && (
           <Link
-            to={user ? "/mytickets" : "/login"}
+            to={"/mytickets"}
             className="myTickets"
-            onClick={(e) => handleBtn(e, user ? "/mytickets" : "/login")}
+            onClick={(e) => handleBtn(e, "/mytickets")}
           >
-            {user ? "Meus Ingressos" : "Fazer login"}
+            {"Meus Ingressos"}
           </Link>
-        ) : (
-          !user && (
-            <Link
-              to={"/login"}
-              className="myTickets"
-              onClick={(e) => handleBtn(e, "/login")}
-            >
-              {"Fazer login"}
-            </Link>
-          )
         )}
 
-        {user && (
+        {user ? (
           <Link
             to={"/login"}
             className="logout"
             onClick={(e) => handleBtn(e, "/login")}
           >
             {"Realizar logout"}
+          </Link>
+        ) : (
+          <Link
+            to={"/login"}
+            className="myTickets"
+            onClick={(e) => handleBtn(e, "/login")}
+          >
+            {"Fazer login"}
           </Link>
         )}
       </div>
@@ -91,6 +89,8 @@ const Header = () => {
         document.removeEventListener("mousedown", handleClickOutside)
       }
     }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [wrapperRef, sideOpened])
 
   return (

@@ -9,10 +9,8 @@ axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 const backUrl = process.env.REACT_APP_BACKEND_URL
 const mailingUrl = process.env.REACT_APP_EMAIL_BACKEND_URL
 
-const zapiInstance = process.env.REACT_APP_ZAPI_INSTANCE
-const zapiToken = process.env.REACT_APP_ZAPI_TOKEN
-const zapiClientToken = process.env.REACT_APP_ZAPI_CLIENT_TOKEN
-const whatsappUrl = `https://api.z-api.io/instances/${zapiInstance}/token/${zapiToken}/send-text`
+const smsClientToken = process.env.REACT_APP_SMS_CLIENT_TOKEN
+const smsUrl = process.env.REACT_APP_SMS_URL as string
 
 const checkTokenExpiration = (token: string) => {
   try {
@@ -241,7 +239,10 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
   })
 }
 
-const getMyTickets: TApi["get"]["myTickets"] = async ({ eventId, eventName }) => {
+const getMyTickets: TApi["get"]["myTickets"] = async ({
+  eventId,
+  eventName,
+}) => {
   return new Promise(async (resolve, reject) => {
     try {
       await axios
@@ -253,7 +254,11 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({ eventId, eventName }) =>
 
           let pms: Promise<any>[] = []
 
-          const ordersIds = new Set(list.filter((shop: any) => shop.event_name === eventName).map((shop: any) => shop.order_id))
+          const ordersIds = new Set(
+            list
+              .filter((shop: any) => shop.event_name === eventName)
+              .map((shop: any) => shop.order_id)
+          )
 
           ordersIds.forEach((id) => {
             pms.push(
@@ -365,29 +370,31 @@ const requestCode: TApi["post"]["login"]["requestCode"] = async ({ phone }) => {
           if (res.data.success) {
             const code = res.data.code
 
-            if (code) {
-              // const whatsappReq = await axios.post(
-              //   whatsappUrl,
-              //   {
-              //     phone: phone,
-              //     message: `Aqui está seu código de autenticação para o Lista Pix:\n\n*${code}*`,
-              //   },
-              //   {
-              //     baseURL: "",
-              //     headers: {
-              //       "client-token": zapiClientToken,
-              //     },
-              //   }
-              // )
+            const message = `Seu código de autenticação para Lista Pix é: ${code}.`
 
-              // if (whatsappReq.status === 200) {
-              resolve({ ok: true, data: res.data })
-              // } else
-              //   resolve({
-              //     ok: false,
-              //     error:
-              //       "Houve um erro ao enviar o código para seu telefone. Tente novamente mais tarde.",
-              //   })
+            const body = {
+              Sender: "webstore",
+              Receivers: `0${phone}`,
+              Content: message,
+            }
+
+            if (code) {
+              const smsReq = await axios.post(smsUrl, body, {
+                baseURL: "",
+                headers: {
+                  "Content-Type": "application/json",
+                  "auth-key": smsClientToken,
+                },
+              })
+
+              if (smsReq.status === 200 && smsReq.data.Success === true) {
+                resolve({ ok: true, data: res.data })
+              } else
+                resolve({
+                  ok: false,
+                  error:
+                    "Houve um erro ao enviar o código para seu telefone. Tente novamente mais tarde.",
+                })
             } else
               resolve({
                 ok: false,

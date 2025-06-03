@@ -51,20 +51,24 @@ const Login = () => {
 
   const handleNext = async () => {
     try {
-      await Api.post.login
-        .requestCode({
-          phone: phone.replace(/\D/g, ""),
-        })
-        .then((res) => {
-          if (res.ok) {
-            setTimeout(() => {
-              fadePhases()
-              code1.current?.focus()
-            }, 400)
-          } else {
-            alert(res.error)
-          }
-        })
+      const cleanPhone = phone.replace(/\D/g, "")
+
+      if (cleanPhone.length === 11) {
+        await Api.post.login
+          .requestCode({
+            phone: cleanPhone,
+          })
+          .then((res) => {
+            if (res.ok) {
+              setTimeout(() => {
+                fadePhases()
+                code1.current?.focus()
+              }, 400)
+            } else {
+              alert(res.error)
+            }
+          })
+      } else alert("Digite um número válido")
     } catch (error) {}
   }
 

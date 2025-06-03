@@ -189,7 +189,7 @@ const TicketsControl = ({
           )
         ) : (
           <S.KeepOutSellsOnlineMessage>
-            {event?.keepout_sells_online_message ?? ""}
+            {event?.keepout_sells_online_message ?? "Vendas online suspensas."}
           </S.KeepOutSellsOnlineMessage>
         )}
       </S.Tickets>
