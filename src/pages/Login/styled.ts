@@ -25,9 +25,10 @@ export const LogoContainer = styled.div`
 
   img {
     width: 80%;
+    max-height: 100%;
     margin: auto;
     opacity: 0;
-    object-fit: cover;
+    object-fit: contain;
     ${({ theme }) =>
       theme.animations.types.fadeTop +
       theme.animations.durations.main +

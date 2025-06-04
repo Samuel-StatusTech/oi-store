@@ -14,7 +14,7 @@ const Login = () => {
 
   const store = getStore()
 
-  const { logoFixed } = location.state ?? {}
+  const { logoWebstoreUrl } = location.state ?? {}
 
   const [phase, setPhase] = useState<"phone" | "code">("phone")
   const [changing, setChanging] = useState(false)
@@ -220,9 +220,9 @@ const Login = () => {
 
   return (
     <S.Page>
-      {logoFixed && (
+      {logoWebstoreUrl && (
         <S.LogoContainer>
-          <img src={logoFixed} alt="" />
+          <img src={logoWebstoreUrl} alt="" />
         </S.LogoContainer>
       )}
 

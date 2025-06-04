@@ -32,7 +32,7 @@ const Header = () => {
     toggleSideMenu()
     navigate(to, {
       state: {
-        logoFixed: event?.logoFixed,
+        logoWebstoreUrl: event?.logoWebstoreUrl,
       },
     })
   }
