@@ -595,7 +595,7 @@ const PaymentPix = () => {
       <Feedback data={feedback} />
       <Header />
 
-      <Container>
+      <Container fullHeight={true}>
         <S.Main>
           <S.Block $k={2}>
             {payed && (

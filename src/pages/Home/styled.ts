@@ -4,6 +4,7 @@ export const Page = styled.div`
   display: flex;
   flex-direction: column;
   gap: 24px;
+  min-height: 100svh;
 `
 
 export const Hero = styled.div`

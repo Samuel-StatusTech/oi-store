@@ -4,7 +4,6 @@ export const Component = styled.footer`
   display: flex;
   flex-direction: column;
   gap: 24px;
-  flex: 1;
   background-color: ${({ theme }) => theme.colors.blue.darker};
 `
 
