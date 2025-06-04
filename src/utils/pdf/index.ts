@@ -25,11 +25,7 @@ const downloadTickets = async (
           eventData.dbName
         )
 
-        return {
-          ...t,
-          qr_TID: tid,
-          date: new Date(t.date).toISOString(),
-        }
+        return { ...t, qr_TID: tid }
       })
 
       // ---

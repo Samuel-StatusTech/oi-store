@@ -195,7 +195,7 @@ const PaymentPix = () => {
         sendEmail(
           {
             ...purchaseInfo,
-            time: req.data.products[0].date,
+            time: new Date(req.data.products[0].date).toISOString(),
           },
           parsedData
         )

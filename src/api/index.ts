@@ -3,6 +3,7 @@ import { TApi } from "../utils/@types/api"
 import { TProduct } from "../utils/@types/data/product"
 import { jwtDecode } from "jwt-decode"
 import TParams from "../utils/@types/api/params"
+import { formatDate } from "date-fns"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
@@ -273,15 +274,34 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({
 
           await Promise.all(pms)
 
-          const parsedList = returnList.map((item) => ({
-            ...item,
-            date: item.products.length > 0 ? item.products[0].date : null,
-            quantity: item.products.length,
-            total_price: item.products.reduce(
-              (amount: number, ticket: any) => amount + ticket.price_total,
-              0
-            ),
-          }))
+          const fuse = new Date().getTimezoneOffset() / 60
+
+          const parsedList = returnList.map((item) => {
+            const d = new Date(item.products[0].date)
+            d.setHours(d.getHours() - fuse)
+            const dString = d.toString()
+
+            const pList = item.products.map((p: any) => {
+              const pd = new Date(p.date)
+              pd.setHours(pd.getHours() - fuse)
+              const pdString = pd.toString()
+
+              const nDate = formatDate(pdString, "yyyy-MM-dd HH:mm:ss")
+
+              return { ...p, date: nDate }
+            })
+
+            return {
+              ...item,
+              date: dString,
+              quantity: item.products.length,
+              products: pList,
+              total_price: item.products.reduce(
+                (amount: number, ticket: any) => amount + ticket.price_total,
+                0
+              ),
+            }
+          })
 
           resolve({
             ok: true,
@@ -594,7 +614,25 @@ const getPurchase: TApi["get"]["purchaseInfo"] = async ({
         .then((res) => {
           const purchase = res.data
 
-          resolve({ ok: true, data: purchase })
+          const productsList = purchase.products.map((t: any) => {
+            const fuse = new Date().getTimezoneOffset() / 60
+
+            const d = new Date(t.date)
+            d.setHours(d.getHours() - fuse)
+            const dString = d.toString()
+
+            return {
+              ...t,
+              date: dString,
+            }
+          })
+
+          const info = {
+            ...purchase,
+            products: productsList,
+          }
+
+          resolve({ ok: true, data: info })
         })
         .catch(() => {
           resolve({

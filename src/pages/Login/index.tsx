@@ -20,6 +20,8 @@ const Login = () => {
   const [changing, setChanging] = useState(false)
   const [failedCODE, setFailedCODE] = useState(false)
 
+  const [loading, setLoading] = useState(false)
+
   const [phone, setPhone] = useState("")
   const [code, setCode] = useState("")
 
@@ -105,6 +107,8 @@ const Login = () => {
   const handleClick = async () => {
     // check errors
 
+    setLoading(true)
+
     switch (phase) {
       case "phone":
         await handleNext()
@@ -116,11 +120,13 @@ const Login = () => {
           setTimeout(() => {
             code1.current?.focus()
           }, 200)
-        } else handleCodeSubmit()
+        } else await handleCodeSubmit()
         break
       default:
         break
     }
+
+    setLoading(false)
   }
 
   // fields control
@@ -278,9 +284,10 @@ const Login = () => {
             onClick={handleClick}
             className={"fl ad-1 f"}
             disabled={
-              phase === "phone"
+              loading ||
+              (phase === "phone"
                 ? phone.replace(/\D/g, "").length < 11
-                : code.length < codeLength
+                : code.length < codeLength)
             }
           >
             {phase === "phone" ? "Próximo" : !failedCODE ? "Entrar" : "Ok"}

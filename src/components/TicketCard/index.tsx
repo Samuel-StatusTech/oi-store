@@ -8,6 +8,7 @@ import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
 import getStore from "../../store"
 import downloadTickets from "../../utils/pdf"
 import { formatMoney } from "../../utils/tb/formatMoney"
+import { formatDate } from "date-fns"
 
 type Props = {
   data: any
@@ -85,13 +86,7 @@ const TicketCard = ({ k, data }: Props) => {
   )
 
   const getDate = () => {
-    const _d = data.date.split(" ")[0].split("-")
-    const d =
-      _d.length > 0 ? new Date(_d[0], _d[1] - 1, _d[2]) : new Date(data.date)
-
-    const todayStr = `${String(d.getDate()).padStart(2, "0")}/${String(
-      d.getMonth() + 1
-    ).padStart(2, "0")}/${d.getFullYear()}`
+    const todayStr = formatDate(data.date, "dd/MM/yyyy")
 
     return todayStr
   }

@@ -1,3 +1,4 @@
+import { formatDate } from "date-fns"
 import { monthsRelations } from "./getDatePeriod"
 
 type TFormat = "dM" | "dMy" | "full" | "pdf"
@@ -73,33 +74,15 @@ const formatPdf = (date: Date | string) => {
       throw new Error()
     }
 
-    const d = new Date(
-      Date.UTC(
-        +split[0],
-        +split[1],
-        +split[2].slice(0, 2),
-        _d.getTimezoneOffset() / 60,
-        0,
-        0
-      )
-    )
-
-    // day
-    str = String(d.getDate()).padStart(2, "0")
-
-    // month
-    str += `/${String(d.getMonth()).padStart(2, "0")}`
-
-    // year
-    str += `/${d.getFullYear()}`
+    str = formatDate(_d, "dd/MM/yyyy")
   } catch (error) {
     const _d = new Date(date)
     const d = new Date(
       Date.UTC(
         _d.getFullYear(),
-        _d.getMonth(),
+        _d.getMonth() + 1,
         _d.getDate(),
-        _d.getTimezoneOffset() / 60,
+        _d.getHours(),
         0,
         0
       )

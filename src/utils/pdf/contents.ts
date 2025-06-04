@@ -133,8 +133,6 @@ const ticketData = (
       },
     }
 
-    console.log("eventInfo", eventInfo)
-
     // event
     body.push(eventInfo)
 
@@ -343,9 +341,7 @@ const ticketData = (
     })
 
     data = body
-  } catch (error) {
-    console.log("Page error", error)
-  }
+  } catch (error) {}
 
   return data
 }
