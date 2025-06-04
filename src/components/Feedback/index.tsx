@@ -2,7 +2,7 @@ import * as S from "./styled"
 
 type Props = {
   data: {
-    state: "approved" | "denied" | "expired"
+    state: "approved" | "denied" | "expired" | "info"
     visible: boolean
     message: string
   }
@@ -17,6 +17,8 @@ const Feedback = ({ data }: Props) => {
             ? "green"
             : data.state === "expired"
             ? "orange"
+            : data.state === "info"
+            ? "blue"
             : "red"
         }
         $visible={data.visible}

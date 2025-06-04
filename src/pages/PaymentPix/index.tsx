@@ -327,7 +327,17 @@ const PaymentPix = () => {
     try {
       if (navigator.clipboard && navigator.clipboard.writeText) {
         navigator.clipboard.writeText(qrCode).then(() => {
-          alert("Código copiado")
+          let f = {
+            state: "info",
+            visible: true,
+            message: "Código copiado",
+          }
+
+          setFeedback(f)
+
+          setTimeout(() => {
+            setFeedback({ ...f, visible: false })
+          }, 2000)
         })
       } else {
         const textarea = document.createElement("textarea")

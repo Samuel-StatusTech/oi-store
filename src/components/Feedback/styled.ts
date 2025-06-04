@@ -18,7 +18,7 @@ export const Wrapper = styled.div<{
 
 export const Box = styled.div<{
   $visible: boolean
-  $color: "green" | "orange" | "red"
+  $color: "green" | "orange" | "red" | "blue"
 }>`
   max-width: 75vw;
   width: fit-content;
@@ -31,6 +31,8 @@ export const Box = styled.div<{
       ? theme.colors.green.main
       : $color === "orange"
       ? theme.colors.orange.main
+      : $color === "blue"
+      ? "rgb(22, 66, 119)"
       : "#D8484A"};
   box-shadow: 0 3px 16px rgba(0, 0, 0, 0.08);
 

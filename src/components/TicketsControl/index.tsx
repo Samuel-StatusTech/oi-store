@@ -193,7 +193,7 @@ const TicketsControl = ({
           </S.KeepOutSellsOnlineMessage>
         )}
       </S.Tickets>
-      {Boolean(event?.keep_sells_online) && (
+      {Boolean(event?.keep_sells_online) && tickets.length > 0 ? (
         <S.Bottom>
           <S.TaxesResume>
             <S.TaxResume>
@@ -223,6 +223,10 @@ const TicketsControl = ({
             </S.BuyBtn>
           </S.BottomFinal>
         </S.Bottom>
+      ) : (
+        <S.KeepOutSellsOnlineMessage>
+          Sem ingressos ativos no momento.
+        </S.KeepOutSellsOnlineMessage>
       )}
     </S.Component>
   )
