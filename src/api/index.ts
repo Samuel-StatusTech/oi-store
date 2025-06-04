@@ -17,7 +17,7 @@ const checkTokenExpiration = (token: string) => {
     const iat = (decoded.iat as number) * 1000
     const now = +new Date().getTime().toFixed(0)
 
-    const limit = 5 * 60 * 1000
+    const limit = 50 * 60 * 1000
     const exp = iat + limit
 
     return now > exp
@@ -375,7 +375,10 @@ const registerUser: TApi["post"]["register"] = async ({
   })
 }
 
-const requestCode: TApi["post"]["login"]["requestCode"] = async ({ phone }) => {
+const requestCode: TApi["post"]["login"]["requestCode"] = async ({
+  phone,
+  avoidSms,
+}) => {
   return new Promise(async (resolve, reject) => {
     try {
       await axios
@@ -390,31 +393,34 @@ const requestCode: TApi["post"]["login"]["requestCode"] = async ({ phone }) => {
             const body = { phone: phone, code }
 
             if (code) {
-              await axios
-                .post("/api/sendcode", body, {
-                  baseURL: mailingUrl,
-                })
-                .then((res) => {
-                  const status = res.data.sended
-
-                  if (Boolean(status))
-                    resolve({
-                      ok: true,
-                      data: {
-                        code,
-                        message: "Código enviado com sucesso.",
-                        success: true,
-                      },
-                    })
-                  else throw new Error()
-                })
-                .catch(() => {
-                  resolve({
-                    ok: false,
-                    error:
-                      "Houve um erro ao enviar o código para seu telefone. Tente novamente mais tarde.",
+              if (avoidSms) resolve({ ok: true, data: { code, success: true } })
+              else {
+                await axios
+                  .post("/api/sendcode", body, {
+                    baseURL: mailingUrl,
                   })
-                })
+                  .then((res) => {
+                    const status = res.data.sended
+
+                    if (Boolean(status))
+                      resolve({
+                        ok: true,
+                        data: {
+                          code,
+                          message: "Código enviado com sucesso.",
+                          success: true,
+                        },
+                      })
+                    else throw new Error()
+                  })
+                  .catch(() => {
+                    resolve({
+                      ok: false,
+                      error:
+                        "Houve um erro ao enviar o código para seu telefone. Tente novamente mais tarde.",
+                    })
+                  })
+              }
             } else
               resolve({
                 ok: false,

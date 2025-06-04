@@ -43,7 +43,7 @@ type TParams = {
       email: string
     }
     login: {
-      requestCode: { phone: string }
+      requestCode: { phone: string; avoidSms?: boolean }
       validateCode: { phone: string; code: string }
     }
     purchase: {

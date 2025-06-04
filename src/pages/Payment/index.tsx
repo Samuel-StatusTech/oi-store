@@ -416,6 +416,7 @@ const Payment = () => {
       await Api.post.login
         .requestCode({
           phone: form.buyer.phone.replace(/\D/g, ""),
+          avoidSms: true
         })
         .then((res) => {
           resolve(res)

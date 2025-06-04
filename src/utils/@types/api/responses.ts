@@ -90,7 +90,7 @@ type TResponses = {
           | {
               success: true
               code: string
-              message: string
+              message?: string
             }
           | {
               success: false
