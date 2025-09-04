@@ -18,15 +18,28 @@ export const getDatePeriod = (date_ini: string, date_end: string) => {
 
   const [iniDate, endDate] = [new Date(date_ini), new Date(date_end)]
 
-  const isMultipleDays = iniDate.getTime() !== endDate.getTime()
+  const isEndDateValid = !(endDate instanceof Date && !isNaN(endDate.valueOf())) || endDate.getUTCFullYear() > 1970
+
+  const isMultipleDays = iniDate.getTime() !== endDate.getTime() && isEndDateValid
 
   if (isMultipleDays) {
-    str = `De ${String(iniDate.getUTCDate()).padStart(2, "0")}`
-    str += ` a ${String(endDate.getUTCDate()).padStart(2, "0")}`
-  } else str = String(iniDate.getUTCDate()).padStart(2, "0")
 
-  str += ` de ${monthsRelations[endDate.getMonth()]}`
-  str += ` de ${endDate.getFullYear()}`
+    str = `De ${String(iniDate.getUTCDate()).padStart(2, "0")}`
+
+    if (iniDate.getUTCMonth() !== endDate.getUTCMonth()) str += ` de ${monthsRelations[iniDate.getMonth()]}`
+    if (iniDate.getUTCFullYear() !== endDate.getUTCFullYear()) str += ` de ${iniDate.getUTCFullYear()}`
+
+    str += ` a ${String(endDate.getUTCDate()).padStart(2, "0")}`
+    str += ` de ${monthsRelations[endDate.getMonth()]}`
+    str += ` de ${endDate.getUTCFullYear()}`
+
+  } else {
+
+    str = String(iniDate.getUTCDate()).padStart(2, "0")
+    str += ` de ${monthsRelations[iniDate.getMonth()]}`
+    str += ` de ${iniDate.getUTCFullYear()}`
+
+  }
 
   return str
 }
