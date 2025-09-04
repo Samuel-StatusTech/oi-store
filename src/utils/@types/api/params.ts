@@ -44,7 +44,7 @@ type TParams = {
     }
     login: {
       requestCode: { phone: string; avoidSms?: boolean }
-      validateCode: { phone: string; code: string }
+      validateCode: { phone: string; code: string, email?: string, name?: string }
     }
     purchase: {
       sign: {

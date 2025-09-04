@@ -495,6 +495,7 @@ const PaymentPix = () => {
         image: null,
         quantity: t.quantity,
         price_unit: t.price_unit,
+        tax_value: t.tax_value,
         ticket_name: (t as any).ticket_name,
         TRN: t.transition_id,
       }
