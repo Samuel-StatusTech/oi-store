@@ -73,7 +73,7 @@ export type TEventData = {
   has_age: number
   age: string | number
   keep_sells_online: boolean
-  keepout_sells_online_message?: string
+  keep_out_sells_online_message?: string
 }
 
 export type TEventMin = {

@@ -45,8 +45,10 @@ export const GroupInfoSecondary = styled.div`
 
 export const GroupBasePrice = styled.span`
   font-size: 16px;
+  text-align: right;
 
   strong {
+    word-wrap: nowrap;
     font-weight: 600;
   }
 `

@@ -432,6 +432,8 @@ const Payment = () => {
       const login = await Api.post.login.validateCode({
         phone: form.buyer.phone.replace(/\D/g, ""),
         code,
+        email: form.buyer.email.trim(),
+        name: form.buyer.name.trim(),
       })
 
       // setShowingCodeModal(false)

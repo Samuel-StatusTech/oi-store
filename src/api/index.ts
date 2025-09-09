@@ -448,6 +448,8 @@ const requestCode: TApi["post"]["login"]["requestCode"] = async ({
 const validateCode: TApi["post"]["login"]["validateCode"] = async ({
   phone,
   code,
+  email,
+  name
 }) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -460,6 +462,8 @@ const validateCode: TApi["post"]["login"]["validateCode"] = async ({
         .then((res) => {
           const uObj = {
             ...res.data.user,
+            email: email ?? res.data.user.email,
+            name: name ?? res.data.user.name,
             cpf: res.data.roleData.cpf,
             fone: res.data.roleData.fone,
           }
