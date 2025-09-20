@@ -30,7 +30,9 @@ import { generateTicketID } from "../../utils/tb/qrcode"
 import { TUser } from "../../utils/@types/data/user"
 import { TEventData } from "../../utils/@types/data/event"
 import { formatMoney } from "../../utils/tb/formatMoney"
-import { formatDate } from "date-fns"
+
+import pageTools from "../../utils/tb/pageTools/pix"
+import { TPaymentSession } from "../../utils/@types/data/paymentSession"
 
 const io = require("socket.io-client")
 
@@ -56,6 +58,8 @@ const PaymentPix = () => {
 
   const [buyedTickets, setBuyedTickets] = useState<TShoppingTicket[]>([])
 
+  const [requiringQr, setRequiringQr] = useState(false)
+
   const [qrCode, setQrCode] = useState("")
   const [qrCode64, setQrCode64] = useState("")
   const [feedback, setFeedback] = useState<any>({ visible: false, message: "" })
@@ -63,115 +67,6 @@ const PaymentPix = () => {
   const [payed, setPayed] = useState(false)
 
   // ----- EMAIL -----
-
-  const base64ToFile = (base64: string, filename: string): File => {
-    const arr = base64.split(",")
-    const mimeMatch = arr[0].match(/:(.*?);/)
-    const mime = mimeMatch ? mimeMatch[1] : "image/png" // default
-    const bstr = atob(arr[1])
-    let n = bstr.length
-    const u8arr = new Uint8Array(n)
-
-    while (n--) {
-      u8arr[n] = bstr.charCodeAt(n)
-    }
-
-    return new File([u8arr], filename, { type: mime })
-  }
-
-  const getLogoFile = async (): Promise<File | string> => {
-    let res: string | File = ""
-
-    res = event?.logoWebstore
-      ? base64ToFile(event?.logoWebstore, "logo.png")
-      : ""
-
-    return res
-  }
-
-  const getPdfFile = async (productsList: any[]): Promise<File> => {
-    const file = (await downloadTickets(
-      event as TEventData,
-      productsList,
-      false
-    )) as File
-
-    return file
-  }
-
-  const sendEmail = async (
-    purchaseInfo: {
-      status: string
-      amount: number
-      message: string
-      sId: string
-      transaction_id: string
-      time: string
-    },
-    productsList: any[]
-  ) => {
-    try {
-      // Mail Data
-      const startAt = event?.date_ini
-        ? getHours(
-            new Date(
-              event?.date_ini.slice(0, event?.date_ini.indexOf("T")) +
-                "T" +
-                event?.time_ini +
-                ".000Z"
-            )
-          )
-        : event?.time_ini
-        ? event.time_ini.slice(0, 5)
-        : "Dia todo"
-
-      let list: any[] = []
-
-      lctn.state.tickets.forEach((i: any) => {
-        const idx = list.findIndex((li) => li.name.includes(i.ticketName))
-        if (idx < 0) {
-          list.push({
-            name: i.ticketName,
-            total: i.quantity,
-          })
-        } else {
-          list[idx] = {
-            ...list[idx],
-            total: list[idx].total + i.quantity,
-          }
-        }
-      })
-
-      list = list.map((i) => ({
-        text: `${i.name} (${i.total})`,
-        total: i.total,
-      }))
-
-      const mailInfo: any = {
-        logo: await getLogoFile(),
-        file: await getPdfFile(productsList),
-        logoWebstoreUrl: event?.logoWebstoreUrl ?? event?.logoFixed,
-
-        eventName: event?.name,
-        eventDate: formatDate(event?.date_ini as string, "dd/MM/yyyy"),
-        eventTime: startAt,
-        eventLocal: event?.local,
-
-        purchaseCode: purchaseInfo?.transaction_id,
-        purchaseTime: formatDate(
-          purchaseInfo.time as string,
-          "dd/MM/yyyy HH:mm:ss"
-        ),
-        purchaseValue: getOrderValue(),
-        purchaseItems: JSON.stringify(list),
-        purchaseStatus: "Pago",
-
-        targetEmail: user?.email,
-      }
-
-      await Api.post.mail.sendEmail(mailInfo)
-    } catch (error) {}
-  }
 
   const handleEmail = async (purchaseInfo: {
     status: string
@@ -192,7 +87,21 @@ const PaymentPix = () => {
 
         setBuyedTickets(parsedData)
 
-        sendEmail(
+        const purchaseValue = pageTools.order.getOrderValue(
+          lctn.state.tickets,
+          lctn.state.buyer,
+          lctn.state.taxTotal,
+          sid,
+          user as TUser,
+          event?.dk as string,
+          event?.id as string
+        )
+
+        pageTools.email.sendEmail(
+          event as TEventData,
+          user as TUser,
+          purchaseValue,
+          lctn.state.tickets,
           {
             ...purchaseInfo,
             time: new Date(req.data.products[0].date).toISOString(),
@@ -205,6 +114,99 @@ const PaymentPix = () => {
 
   // ----- MERCADOPAGO -----
 
+  const clearAndGetNewPurchase = () => {
+    localStorage.removeItem("paymentSession")
+    const savedPayed = localStorage.getItem("payed") === "true"
+    if (!savedPayed) {
+      startPurchase()
+    }
+  }
+
+  const checkPendingPayment = useCallback(
+    (socket: any) => {
+      const paymentSession = localStorage.getItem("paymentSession")
+      const paymentToRecover: TPaymentSession | null = paymentSession
+        ? JSON.parse(paymentSession)
+        : null
+
+      if (paymentToRecover) {
+        const runnedTime = Math.floor(
+          (new Date().getTime() - +paymentToRecover.paymentStartedAt) / 1000
+        )
+
+        const remainingTime = 5 * 60 - runnedTime
+
+        const isPaymentRecoverable = remainingTime > 0
+
+        if (isPaymentRecoverable && paymentToRecover.qrCode) {
+          setQrCode(paymentToRecover.qrCode)
+          setQrCode64(paymentToRecover.qrCode64)
+          socket.emit("rejoinPaymentSession", {
+            paymentId: paymentToRecover.paymentId,
+            oldSocketId: paymentToRecover.socketId,
+          })
+          runTimer(remainingTime)
+        } else clearAndGetNewPurchase()
+      } else clearAndGetNewPurchase()
+    },
+    [localStorage, setQrCode, setQrCode64]
+  )
+
+  const handlePlugged = useCallback((socketId: string) => {
+    setSid(socketId)
+  }, [])
+
+  const handleConnectError = useCallback((socket: any) => {
+    alert("Ops, houve um erro. Tente novamente mais tarde")
+    socket.off("disconnect")
+    socket.disconnect()
+    navigate(-1)
+    return
+  }, [])
+
+  const handleOrderUpdate = useCallback(
+    async (socket: any, data: any) => {
+      if (data.status === "approved" || data.status === "denied") {
+        let f = {
+          state: data.status,
+          visible: false,
+          message: data.message,
+        }
+
+        if (data.status === "approved") {
+          const purchase = await confirmPurchase(data.sId, data.code)
+
+          if (purchase.ok && !purchase.data.success) f.state = "denied"
+
+          f.visible = true
+        }
+
+        setFeedback(f)
+
+        setTimeout(() => {
+          setFeedback({ ...f, visible: false })
+
+          if (f.state === "approved") {
+            setTimeout(() => {
+              setPayed(true)
+              localStorage.removeItem("paymentSession")
+
+              localStorage.setItem("payed", "true")
+
+              handleEmail(data)
+
+              socket.disconnect()
+              socket.off("plugged", handlePlugged)
+              socket.off("connect_error", handleConnectError)
+              socket.off("orderUpdate", handleOrderUpdate)
+            }, 400)
+          }
+        }, 3500)
+      }
+    },
+    [localStorage]
+  )
+
   const startSocket = async () => {
     if (!lctn.state.tickets || !lctn.state.buyer) {
       return returnPage()
@@ -213,66 +215,18 @@ const PaymentPix = () => {
         const socket = instanceSocket()
 
         if (socket) {
-          const handlePlugged = (socketId: any) => {
-            setSid(socketId)
-          }
+          socket.on("connect", () => {
+            checkPendingPayment(socket)
+          })
           socket.on("plugged", handlePlugged)
-
-          const handleConnectError = () => {
-            alert("Ops, houve um erro. Tente novamente mais tarde")
-            socket.off("disconnect")
-            socket.disconnect()
-            navigate(-1)
-            return
-          }
-          socket.on("connect_error", handleConnectError)
+          socket.on("connect_error", () => handleConnectError(socket))
 
           // monitor payment
+          socket.on("orderUpdate", (socketData: any) => {
+            handleOrderUpdate(socket, socketData)
+          })
 
-          const handleOrderUpdate = async (data: any) => {
-            if (data.status === "approved" || data.status === "denied") {
-              let f = {
-                state: data.status,
-                visible: false,
-                message: data.message,
-              }
-
-              if (data.status === "approved") {
-                const purchase = await confirmPurchase(data.sId, data.code)
-
-                if (purchase.ok && !purchase.data.success) f.state = "denied"
-
-                f.visible = true
-              }
-
-              setFeedback(f)
-
-              setTimeout(() => {
-                setFeedback({ ...f, visible: false })
-
-                if (f.state === "approved") {
-                  setTimeout(() => {
-                    setPayed(true)
-                    localStorage.setItem("payed", "true")
-
-                    handleEmail(data)
-
-                    socket.disconnect()
-                    socket.off("plugged", handlePlugged)
-                    socket.off("connect_error", handleConnectError)
-                    socket.off("orderUpdate", handleOrderUpdate)
-                  }, 400)
-                }
-              }, 3500)
-            }
-
-            // if (data.status === "expired") {
-            //   socket.disconnect()
-            //   instanceSocket()
-            // }
-          }
-          socket.on("orderUpdate", handleOrderUpdate)
-
+          // Disconnect after 5 minutes
           setTimeout(() => {
             socket.disconnect()
           }, 300000)
@@ -281,36 +235,64 @@ const PaymentPix = () => {
     }
   }
 
-  const getQR = async () => {
+  const storeQrCodeIntoPaymentSession = (qrCode: string, qrCode64: string) => {
+    const paymentSession = localStorage.getItem("paymentSession")
+    const paymentToRecover: TPaymentSession | null = paymentSession
+      ? JSON.parse(paymentSession)
+      : null
+
+    if (paymentToRecover) {
+      if (paymentToRecover.qrCode.length === 0) {
+        const newData: TPaymentSession = {
+          ...paymentToRecover,
+          qrCode,
+          qrCode64,
+        }
+
+        localStorage.setItem("paymentSession", JSON.stringify(newData))
+      }
+    }
+  }
+
+  const getQR = async (socketId?: string) => {
     try {
-      const orderData = getOrderData({
-        tickets: lctn.state.tickets,
-        buyer: lctn.state.buyer,
-        taxTotal: !Number.isNaN(lctn.state.taxTotal)
-          ? Number(lctn.state.taxTotal)
-          : 0,
-        sid,
-        user: user as TUser,
-        dk: (event as TEventData).dk,
-        eventId: (event as TEventData).id,
-      })
+      if (!requiringQr && (socketId || sid)) {
+        setRequiringQr(true)
+        const orderData = getOrderData({
+          tickets: lctn.state.tickets,
+          buyer: lctn.state.buyer,
+          taxTotal: !Number.isNaN(lctn.state.taxTotal)
+            ? Number(lctn.state.taxTotal)
+            : 0,
+          sid: socketId ?? sid,
+          user: user as TUser,
+          dk: (event as TEventData).dk,
+          eventId: (event as TEventData).id,
+        })
 
-      if (orderData) {
-        const qr = await Api.get.qrcode({ order: orderData } as any)
+        if (orderData) {
+          const qr = await Api.get.qrcode({ order: orderData } as any)
 
-        if (qr.ok) {
-          setQrCode(qr.data.qrcodes.code)
-          setQrCode64(qr.data.qrcodes.base64)
-          runTimer()
+          if (qr.ok) {
+            setQrCode(qr.data.qrcodes.code)
+            setQrCode64(qr.data.qrcodes.base64)
+            storeQrCodeIntoPaymentSession(
+              qr.data.qrcodes.code,
+              qr.data.qrcodes.base64
+            )
+            runTimer()
+          }
         }
       }
     } catch (error) {}
+
+    setRequiringQr(false)
   }
 
   const startPurchase = async () => {
     if (user && user.fone) {
       await signPurchase(sid)
-      getQR()
+      getQR(sid)
     } else {
       navigate(-1)
       return
@@ -318,8 +300,12 @@ const PaymentPix = () => {
   }
 
   useEffect(() => {
-    if (sid) startPurchase()
-  }, [sid])
+    const pendingPayment = localStorage.getItem("paymentSession")
+
+    if (sid !== "" && !pendingPayment) {
+      startPurchase()
+    }
+  }, [sid, localStorage])
 
   // ----- PAGE -----
 
@@ -397,9 +383,9 @@ const PaymentPix = () => {
     }
   }
 
-  const runTimer = () => {
+  const runTimer = (seconds = 300) => {
     const timer: any = clockdown(
-      300,
+      seconds,
       restartTimer,
       (newTime?: string | null) => {
         if (newTime) setTime(newTime)
@@ -437,7 +423,7 @@ const PaymentPix = () => {
         taxTotal: !Number.isNaN(+lctn.state.taxTotal)
           ? Number(lctn.state.taxTotal)
           : 0,
-        sid,
+        sid: sId,
         user: user,
         dk: event.dk,
         eventId: event.id,
@@ -460,6 +446,20 @@ const PaymentPix = () => {
 
       if (sign.ok && sign.data.success) {
         setOid(sign.data.order_id)
+
+        const localPaymentSession = localStorage.getItem("paymentSession")
+
+        if (!localPaymentSession) {
+          const paymentSession: TPaymentSession = {
+            paymentId: sign.data.order_id,
+            socketId: sId,
+            qrCode: "",
+            qrCode64: "",
+            paymentStartedAt: new Date().getTime().toString(),
+          }
+
+          localStorage.setItem("paymentSession", JSON.stringify(paymentSession))
+        }
 
         loadPurchaseData(sign.data.order_id)
       }
@@ -585,22 +585,6 @@ const PaymentPix = () => {
     navigate("/", { replace: true, state: {} })
   }
 
-  const getOrderValue = () => {
-    const obj = getOrderData({
-      tickets: lctn.state.tickets,
-      buyer: lctn.state.buyer,
-      taxTotal: !Number.isNaN(+lctn.state.taxTotal)
-        ? Number(lctn.state.taxTotal)
-        : 0,
-      sid,
-      user: user as TUser,
-      dk: event?.dk as string,
-      eventId: event?.id as string,
-    })
-
-    return obj ? obj.transaction_amount : 0
-  }
-
   return (
     <S.Page>
       <Feedback data={feedback} />
@@ -676,7 +660,20 @@ const PaymentPix = () => {
                         />
                       )}
 
-                      <span>{formatMoney(getOrderValue(), true)}</span>
+                      <span>
+                        {formatMoney(
+                          pageTools.order.getOrderValue(
+                            lctn.state.tickets,
+                            lctn.state.buyer,
+                            lctn.state.taxTotal,
+                            sid,
+                            user as TUser,
+                            event?.dk as string,
+                            event?.id as string
+                          ),
+                          true
+                        )}
+                      </span>
 
                       <S.Button onClick={copyQRToClipboard}>
                         Copiar código

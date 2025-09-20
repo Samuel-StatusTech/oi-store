@@ -449,7 +449,7 @@ const validateCode: TApi["post"]["login"]["validateCode"] = async ({
   phone,
   code,
   email,
-  name
+  name,
 }) => {
   return new Promise(async (resolve, reject) => {
     try {
