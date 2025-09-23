@@ -36,7 +36,8 @@ import { TPaymentSession } from "../../utils/@types/data/paymentSession"
 
 const io = require("socket.io-client")
 
-const socketUrl = process.env.REACT_APP_SOCKET_URL || "https://api.oitickets.com.br"
+const socketUrl =
+  process.env.REACT_APP_SOCKET_URL || "https://api.oitickets.com.br"
 
 const PaymentPix = () => {
   const lctn = useLocation()
