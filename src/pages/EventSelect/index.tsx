@@ -12,6 +12,7 @@ import getStore from "../../store"
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
 import { useNavigate } from "react-router-dom"
+import { TOrganizer } from "../../utils/@types/data/organizer"
 
 const EventSelect = () => {
   const store = getStore()
@@ -20,32 +21,41 @@ const EventSelect = () => {
   const [loading, setLoading] = useState(true)
   const [list, setList] = useState<any[]>([])
 
+  const [organizerData, setOrganizerData] = useState<TOrganizer>()
+
   const getData = useCallback(async () => {
     setLoading(true)
 
     const events = await Api.get.events({})
 
     if (events.ok) {
-      const parsed = parseList.eventMinToEventCard(events.data)
+      if (events.data.events && events.data.organizer) {
+        setOrganizerData(events.data.organizer)
+        const parsed = parseList.eventMinToEventCard(events.data.events)
 
-      if (parsed.length > 1) setList(parsed)
-      else if (parsed.length === 1) {
-        try {
-          const req = await Api.get.eventInfo({ eventId: parsed[0].id })
+        if (parsed.length > 1) setList(parsed)
+        else if (parsed.length === 1) {
+          try {
+            const req = await Api.get.eventInfo({ eventId: parsed[0].id })
 
-          if (req.ok) {
-            sessionStorage.setItem("event", JSON.stringify(req.data))
-            navigate("/")
-          } else {
+            if (req.ok) {
+              sessionStorage.setItem("event", JSON.stringify(req.data))
+              navigate("/")
+            } else {
+              alert(
+                "Houve um erro ao selecionar o evento. Tente novamente mais tarde"
+              )
+            }
+          } catch (error) {
             alert(
               "Houve um erro ao selecionar o evento. Tente novamente mais tarde"
             )
           }
-        } catch (error) {
-          alert(
-            "Houve um erro ao selecionar o evento. Tente novamente mais tarde"
-          )
         }
+      } else {
+        const message =
+          "Houve um erro ao carregar as informações. Tente novamente mais tarde"
+        alert(message)
       }
     } else {
       alert(events.error)
@@ -62,7 +72,7 @@ const EventSelect = () => {
 
   return (
     <S.Page>
-      <Header />
+      <Header customData={organizerData} />
 
       <Container fullHeight={true}>
         <S.Main>
@@ -91,7 +101,7 @@ const EventSelect = () => {
         </S.Main>
       </Container>
 
-      <Footer />
+      <Footer customData={organizerData} />
     </S.Page>
   )
 }

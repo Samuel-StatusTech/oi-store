@@ -6,8 +6,13 @@ import { ReactComponent as BurguerIcon } from "../../assets/icons/burguer.svg"
 
 import getStore from "../../store"
 import { useEffect, useRef, useState } from "react"
+import { TOrganizer } from "../../utils/@types/data/organizer"
 
-const Header = () => {
+type Props = {
+  customData?: TOrganizer
+}
+
+const Header = ({ customData }: Props) => {
   const wrapperRef = useRef<HTMLDivElement | null>(null)
 
   const navigate = useNavigate()
@@ -32,7 +37,7 @@ const Header = () => {
     toggleSideMenu()
     navigate(to, {
       state: {
-        logoWebstoreUrl: event?.logoWebstoreUrl,
+        logoWebstoreUrl: event?.logoWebstoreUrl ?? customData?.webstoreLogoUrl,
       },
     })
   }
@@ -99,8 +104,11 @@ const Header = () => {
         <S.Component>
           <S.LogoArea>
             <Link to={"/eventSelect"}>
-              {event?.logoWebstore ? (
-                <img src={event?.logoWebstore} alt={event?.corporateName} />
+              {(event ?? customData)?.logoWebstore ? (
+                <img
+                  src={(event ?? customData)?.logoWebstore}
+                  alt={(event ?? customData)?.corporateName}
+                />
               ) : (
                 <span>Início</span>
               )}

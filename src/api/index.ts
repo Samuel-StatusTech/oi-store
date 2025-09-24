@@ -107,12 +107,15 @@ const getEvents: TApi["get"]["events"] = async () => {
           if (list) {
             resolve({
               ok: true,
-              data: list
-                .filter((ev: any) => Boolean(ev.is_ecommerce))
-                .map((ev: any) => ({
-                  ...ev,
-                  dk: res.data.dk,
-                })),
+              data: {
+                organizer: res.data.info,
+                events: list
+                  .filter((ev: any) => Boolean(ev.is_ecommerce))
+                  .map((ev: any) => ({
+                    ...ev,
+                    dk: res.data.dk,
+                  }))
+              },
             })
           } else {
             reject({
