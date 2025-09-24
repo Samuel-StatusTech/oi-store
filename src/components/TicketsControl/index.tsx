@@ -125,6 +125,7 @@ const TicketsControl = ({
             ptickets.push({
               price_sell: t.price_sell,
               batch_id: t.batch_id,
+              customer_name: user.name,
               id: t.id,
               tax_value: taxPerTicket,
               ticketName: t.name,
