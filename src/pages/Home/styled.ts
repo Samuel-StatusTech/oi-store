@@ -110,7 +110,7 @@ export const Blocks = styled.div`
 // Description
 export const DescriptionWrapper = styled.div`
   background-color: #fafafa;
-  padding: 48px 0;
+  padding: 0 0 48px;
 `
 
 export const DescriptionSection = styled.div`

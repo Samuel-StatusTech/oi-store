@@ -88,14 +88,6 @@ const Home = () => {
     }
   }
 
-  const getPhone = () => {
-    let str = ""
-
-    str = event?.phone.replace(/(\d{2})(\d{4,5})(\d{4})/g, "($1) $2-$3") ?? ""
-
-    return str
-  }
-
   useEffect(() => {
     localStorage.removeItem("payed")
     if (event) {
@@ -206,11 +198,6 @@ const Home = () => {
           ) : (
             <></>
           )}
-
-          <S.DescriptionSection>
-            <S.DescTitle>Telefone</S.DescTitle>
-            <S.DescSubText>{getPhone()}</S.DescSubText>
-          </S.DescriptionSection>
         </Container>
       </S.DescriptionWrapper>
 
