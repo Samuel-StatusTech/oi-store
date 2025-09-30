@@ -3,13 +3,11 @@ import { useCallback, useEffect, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { TShoppingTicket } from "../../utils/@types/data/ticket"
 import { clockdown } from "../../utils/tb/timer"
-import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
 import * as S from "./styled"
 
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
 import Container from "../../components/Container"
-import BlockInfo from "../../components/BlockInfo"
 import Feedback from "../../components/Feedback"
 
 import { ReactComponent as DownloadIcon } from "../../assets/icons/download.svg"
@@ -20,8 +18,6 @@ import { ReactComponent as FileIcon } from "../../assets/icons/file_icon.svg"
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
 
-import calendar from "../../assets/icons/calendar.png"
-import location from "../../assets/icons/pin.png"
 import getStore from "../../store"
 import { Api } from "../../api"
 import { getOrderData } from "../../utils/tb/order"
@@ -227,10 +223,10 @@ const PaymentPix = () => {
             handleOrderUpdate(socket, socketData)
           })
 
-          // Disconnect after 5 minutes
+          // Disconnect after 15 minutes
           setTimeout(() => {
             socket.disconnect()
-          }, 300000)
+          }, 900000)
         }
       }
     }
@@ -384,7 +380,7 @@ const PaymentPix = () => {
     }
   }
 
-  const runTimer = (seconds = 300) => {
+  const runTimer = (seconds = 900) => {
     const timer: any = clockdown(
       seconds,
       restartTimer,
@@ -703,65 +699,6 @@ const PaymentPix = () => {
               </S.PixArea>
             )}
           </S.Block>
-
-          {!payed && (
-            <S.Block $k={1}>
-              <S.BlockTitle $k={3}>Pedido iniciado</S.BlockTitle>
-
-              <S.EventInfo>
-                {event?.event_banner && (
-                  <img src={event?.event_banner} alt={""} />
-                )}
-
-                <div className="eventInfos">
-                  <S.BlockTitle $k={4.5}>{event?.name}</S.BlockTitle>
-                  <BlockInfo
-                    k={5}
-                    small={true}
-                    icon={<img src={calendar} alt={""} width={40} />}
-                    description={[
-                      event?.date_ini && event?.date_end
-                        ? getDatePeriod(
-                            event?.date_ini as string,
-                            event?.date_end as string
-                          )
-                        : "",
-                      event?.time_ini
-                        ? event?.date_ini
-                          ? getHours(
-                              new Date(
-                                event?.date_ini.slice(
-                                  0,
-                                  event?.date_ini.indexOf("T")
-                                ) +
-                                  "T" +
-                                  event?.time_ini +
-                                  ".000Z"
-                              )
-                            )
-                          : event?.time_ini
-                          ? event.time_ini.slice(0, 5)
-                          : "Dia todo"
-                        : event?.date_ini && event?.date_end
-                        ? "Dia todo"
-                        : "",
-                    ]}
-                  />
-                  <BlockInfo
-                    k={6}
-                    small={true}
-                    icon={<img src={location} alt={""} width={40} />}
-                    description={[
-                      `${event?.local}. ${event?.address}`,
-                      `${event?.city ?? ""}${
-                        event?.uf ? ` - ${event?.uf}` : ""
-                      }`,
-                    ]}
-                  />
-                </div>
-              </S.EventInfo>
-            </S.Block>
-          )}
         </S.Main>
       </Container>
 
