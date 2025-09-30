@@ -722,14 +722,11 @@ const Payment = () => {
 
   useEffect(() => {
     if (event?.nominal) {
-      let buyerFieldsOk =
-        !!form.buyer.name && !!form.buyer.phone && !!form.buyer.email
-
       let ticketsUsersOk = form.tickets.every((t) => !!t.person.name.trim())
 
-      setFieldsOk(buyerFieldsOk && ticketsUsersOk)
+      setFieldsOk(!checkErrors().has && ticketsUsersOk)
     } else {
-      setFieldsOk(!!form.buyer.name && !!form.buyer.phone && !!form.buyer.email)
+      setFieldsOk(!checkErrors().has)
     }
   }, [form.buyer, form.tickets])
 

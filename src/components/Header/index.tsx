@@ -61,7 +61,7 @@ const Header = ({ customData }: Props) => {
             className="logout"
             onClick={(e) => handleBtn(e, "/login")}
           >
-            {"Realizar logout"}
+            {"Sair"}
           </Link>
         ) : (
           <Link

@@ -30,7 +30,7 @@ const downloadTickets = async (
 
       // ---
 
-      const filename = `Meus Tickets para ${eventData.name.trim()}.pdf`
+      const filename = `Meus Ingressos para ${eventData.name.trim()}.pdf`
 
       let logo = eventData.logoWebstore
         ? await resizeImageToFit(eventData.logoWebstore)

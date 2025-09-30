@@ -557,7 +557,7 @@ const PaymentPix = () => {
 
         if (file instanceof File) {
           const data = {
-            title: `Meus Tickets para ${event.name}`,
+            title: `Meus Ingressos para ${event.name}`,
             files: [file],
           }
 

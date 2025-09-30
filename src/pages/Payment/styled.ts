@@ -314,6 +314,9 @@ export const Button = styled.button<{ $disabled: boolean }>`
   width: fit-content;
   align-self: flex-end;
   transition: box-shadow 0.3s;
+  font-size: 16px;
+  font-weight: 500;
+  font-family: "Poppins";
 
   &:hover {
     box-shadow: 0 2px 8px 2px rgba(0, 0, 0, 0.24);

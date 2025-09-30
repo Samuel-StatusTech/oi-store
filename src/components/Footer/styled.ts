@@ -69,7 +69,6 @@ export const CopyArea = styled.div`
   justify-content: center;
   background-color: rgb(42, 42, 42);
   padding: 6px 0;
-  gap: 4px;
 
   @media (max-width: ${({ theme }) => theme.bp.medium}px) {
     flex-direction: column;

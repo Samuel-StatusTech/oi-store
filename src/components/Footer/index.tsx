@@ -16,10 +16,7 @@ const Footer = ({ customData }: Props) => {
       <S.CopyArea>
         <S.CopyItem>
           Ingressos vendidos sob responsabilidade de{" "}
-          {(event ?? customData)?.corporateName} -
-        </S.CopyItem>
-        <S.CopyItem>
-          CNPJ/CPF {formatCNPJ((event ?? customData)?.CNPJ ?? "")}
+          {(event ?? customData)?.corporateName} - CNPJ/CPF {formatCNPJ((event ?? customData)?.CNPJ ?? "")}
         </S.CopyItem>
       </S.CopyArea>
     </S.Component>

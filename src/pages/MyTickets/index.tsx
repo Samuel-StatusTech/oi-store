@@ -104,7 +104,7 @@ const MyTickets = () => {
 
       <Container fullHeight={true}>
         <S.Main>
-          <S.PageTitle>Meus tickets</S.PageTitle>
+          <S.PageTitle>Meus ingressos</S.PageTitle>
 
           {loading ? (
             <div style={{ width: 256, margin: "0 auto" }}>
