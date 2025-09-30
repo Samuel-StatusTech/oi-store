@@ -4,10 +4,6 @@ import * as S from "./styled"
 import Header from "../../components/Header"
 import Footer from "../../components/Footer"
 import Container from "../../components/Container"
-import BlockInfo from "../../components/BlockInfo"
-
-import calendar from "../../assets/icons/calendar.png"
-import location from "../../assets/icons/pin.png"
 
 import pixImage from "../../assets/icons/payment/ic-pix.png"
 import cardVisa from "../../assets/icons/payment/ic-visa.png"
@@ -19,9 +15,9 @@ import cardDiscover from "../../assets/icons/payment/ic-discover.png"
 import OrderResume from "../../components/OrderResume"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { TForm, TTicketForm, initialForm } from "../../utils/placeData/form"
-import { Link, useLocation, useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 import { formatPhone } from "../../utils/masks/phone"
-import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
+import { getDatePeriod } from "../../utils/tb/getDatePeriod"
 import getStore from "../../store"
 import { formatCardDate } from "../../utils/masks/date"
 import { formatCardCode } from "../../utils/masks/cardcode"
@@ -32,6 +28,7 @@ import Feedback from "../../components/Feedback"
 import { TUser } from "../../utils/@types/data/user"
 import ValidateCodeModal from "../../components/Modal/ValidateCode"
 import { TEventData } from "../../utils/@types/data/event"
+import { isPhoneNumberValid } from "../../utils/tb/phone/isValidPhone"
 
 type MProps = {
   checked: boolean
@@ -112,7 +109,7 @@ const Input = ({
 const Method = ({ checked, type, onSelect }: MProps) => {
   return (
     <S.Method $checked={checked} onClick={() => onSelect(type)}>
-      <S.MTitle>{methodsInfos[type].title}</S.MTitle>
+      {/* <S.MTitle>{methodsInfos[type].title}</S.MTitle> */}
 
       {type === "pix" ? (
         <img src={methodsInfos[type].img} alt={""} />
@@ -126,9 +123,9 @@ const Method = ({ checked, type, onSelect }: MProps) => {
         </S.List>
       )}
 
-      <S.Recommended $visible={methodsInfos[type].targeted}>
+      {/* <S.Recommended $visible={methodsInfos[type].targeted}>
         Recomendado
-      </S.Recommended>
+      </S.Recommended> */}
     </S.Method>
   )
 }
@@ -153,7 +150,6 @@ const Payment = () => {
     ? JSON.parse(sessionStorage.getItem("user") as string)
     : null
 
-  const [termsAgreed, setTermsAgreed] = useState(false)
   const [showingCodeModal, setShowingCodeModal] = useState(false)
 
   const [method, setMethod] = useState<"" | "pix" | "credit">("pix")
@@ -182,8 +178,6 @@ const Payment = () => {
     buyerEmail: false,
     ticketsIds: [],
   })
-
-  // Fns..
 
   const handleSelect = (newMethod: "pix" | "credit") => {
     if (method === newMethod) setMethod("")
@@ -358,56 +352,52 @@ const Payment = () => {
     }
   }
 
-  const getIniHour = () => {
-    let str = event?.date_ini
-      ? getHours(
-          new Date(
-            event?.date_ini.slice(0, event?.date_ini.indexOf("T")) +
-              "T" +
-              event?.time_ini +
-              ".000Z"
-          )
-        )
-      : event?.time_ini
-      ? event.time_ini.slice(0, 5)
-      : "Dia todo"
-
-    return str
-  }
-
   const checkErrors = () => {
-    let hasError = false
+    try {
+      let hasError = false
 
-    const nameField =
-      form.buyer.name.length < 1 || form.buyer.name.trim().split(" ").length < 2
-    const phoneField = form.buyer.phone.replace(/\D/g, "").length < 11
-    const emailField =
-      form.buyer.email.length < 1 || !validEmail(form.buyer.email)
+      const nameField =
+        form.buyer.name.length < 1 ||
+        form.buyer.name.trim().split(" ").length < 2
+      const phoneField = isPhoneNumberValid(form.buyer.phone)
+      const emailField =
+        form.buyer.email.length < 1 || !validEmail(form.buyer.email)
 
-    let ticketsIds: number[] = []
+      let ticketsIds: number[] = []
 
-    const nominalsErrors =
-      event?.nominal &&
-      form.tickets.some((t, k) => {
-        const status = t.person.name.length < 1
+      const nominalsErrors =
+        event?.nominal &&
+        form.tickets.some((t, k) => {
+          const status = t.person.name.length < 1
 
-        if (t.person.name.trim().split(" ").length < 2) ticketsIds.push(k)
+          if (t.person.name.trim().split(" ").length < 2) ticketsIds.push(k)
 
-        return status
-      })
+          return status
+        })
 
-    if (nameField || emailField || phoneField) hasError = true
+      if (nameField || emailField || phoneField) hasError = true
 
-    if (nominalsErrors) hasError = true
+      if (nominalsErrors) hasError = true
 
-    return {
-      has: hasError,
-      fields: {
-        name: nameField,
-        phone: phoneField,
-        email: emailField,
-        ticketsIds: ticketsIds,
-      },
+      return {
+        has: hasError,
+        fields: {
+          name: nameField,
+          phone: phoneField,
+          email: emailField,
+          ticketsIds: ticketsIds,
+        },
+      }
+    } catch (error) {
+      return {
+        has: true,
+        fields: {
+          name: true,
+          phone: true,
+          email: true,
+          ticketsIds: [],
+        },
+      }
     }
   }
 
@@ -416,7 +406,7 @@ const Payment = () => {
       await Api.post.login
         .requestCode({
           phone: form.buyer.phone.replace(/\D/g, ""),
-          avoidSms: true
+          avoidSms: true,
         })
         .then((res) => {
           resolve(res)
@@ -762,31 +752,6 @@ const Payment = () => {
       <Container>
         <S.Main>
           <S.EventResume>
-            <S.EventData>
-              <S.EventName>{event?.name}</S.EventName>
-              <BlockInfo
-                k={3}
-                small={true}
-                icon={<img src={calendar} alt={""} width={40} />}
-                description={[
-                  getDatePeriod(
-                    event?.date_ini as string,
-                    event?.date_end as string
-                  ),
-                  getIniHour(),
-                ]}
-              />
-              <BlockInfo
-                k={4}
-                small={true}
-                icon={<img src={location} alt={""} width={40} />}
-                description={[
-                  `${event?.address}`,
-                  `${event?.city} - ${event?.uf}`,
-                ]}
-              />
-            </S.EventData>
-
             <S.PaymentData>
               <span>Pagamento</span>
               <S.Methods>
@@ -798,180 +763,158 @@ const Payment = () => {
               </S.Methods>
             </S.PaymentData>
 
-            {method && (
-              <S.Form>
-                <S.FormBlock $k={1}>
-                  <span>Informações do(a) comprador(a)</span>
+            <S.Form>
+              <S.FormBlock $k={1}>
+                <span>Informações do(a) comprador(a)</span>
+
+                <S.FormLines>
+                  <S.FormLine>
+                    <Input
+                      label={"Nome e sobrenome"}
+                      value={form.buyer.name}
+                      onChange={(v: string) => {
+                        handleForm("name", v)
+                        clearFieldError("buyerName")
+                      }}
+                      error={formErrors.buyerName}
+                    />
+                  </S.FormLine>
+                  <S.FormLine>
+                    <Input
+                      label={"Telefone"}
+                      value={form.buyer.phone}
+                      onChange={(v: string) => {
+                        handleForm("phone", v)
+                        clearFieldError("buyerPhone")
+                      }}
+                      inputMode="numeric"
+                      enterKeyHint={"done"}
+                      error={formErrors.buyerPhone}
+                    />
+                    <Input
+                      label={"Email"}
+                      value={form.buyer.email}
+                      onChange={(v: string) => {
+                        handleForm("email", v)
+                        clearFieldError("buyerEmail")
+                      }}
+                      error={formErrors.buyerEmail}
+                    />
+                  </S.FormLine>
+                </S.FormLines>
+              </S.FormBlock>
+
+              {Boolean(event?.nominal) && (
+                <S.FormBlock $k={2}>
+                  <span>Informações dos participantes</span>
+
+                  {form.tickets.map((ticket, k) => (
+                    <S.TicketBlock key={k}>
+                      <S.TicketName>
+                        <span>Ingresso {k + 1}: </span>
+                        <span>{ticket.name}</span>
+                      </S.TicketName>
+
+                      {k === 0 && (
+                        <S.Checkbox htmlFor={`check-${k}`}>
+                          <input
+                            id={`check-${k}`}
+                            type="checkbox"
+                            checked={
+                              !!ticket.person.name &&
+                              ticket.person.name === form.buyer.name
+                            }
+                            onClick={() => {
+                              // eslint-disable-next-line react-hooks/rules-of-hooks
+                              usePayer(
+                                ticket,
+                                !(
+                                  !!ticket.person.name &&
+                                  ticket.person.name === form.buyer.name
+                                )
+                              )
+                            }}
+                          />
+                          <span>Utilizar dados do(a) comprador(a)</span>
+                        </S.Checkbox>
+                      )}
+
+                      <S.FormLines>
+                        <S.FormLine>
+                          <Input
+                            label={"Nome e sobrenome"}
+                            value={ticket.person.name}
+                            onChange={(v: string) => {
+                              handleTicketForm(ticket, "name", v)
+                              clearFieldError("ticketsIds", k)
+                            }}
+                            error={formErrors.ticketsIds.includes(k)}
+                          />
+                        </S.FormLine>
+                      </S.FormLines>
+                    </S.TicketBlock>
+                  ))}
+                </S.FormBlock>
+              )}
+
+              {method === "credit" && (
+                <S.FormBlock $k={3}>
+                  <span>Informações do pagamento</span>
+
+                  {renderFlag()}
 
                   <S.FormLines>
                     <S.FormLine>
                       <Input
-                        label={"Nome e sobrenome"}
-                        value={form.buyer.name}
-                        onChange={(v: string) => {
-                          handleForm("name", v)
-                          clearFieldError("buyerName")
-                        }}
-                        error={formErrors.buyerName}
+                        label={"Número do cartão"}
+                        value={form.card.number}
+                        onChange={(v: string) => handleCard("number", v)}
+                      />
+                      <Input
+                        label={"Data de validade"}
+                        value={form.card.date}
+                        onChange={(v: string) => handleCard("date", v)}
+                      />
+                      <Input
+                        label={"Código de serguraça"}
+                        value={form.card.code}
+                        onChange={(v: string) => handleCard("code", v)}
                       />
                     </S.FormLine>
+                  </S.FormLines>
+
+                  <S.FormLines>
                     <S.FormLine>
                       <Input
-                        label={"Telefone"}
-                        value={form.buyer.phone}
-                        onChange={(v: string) => {
-                          handleForm("phone", v)
-                          clearFieldError("buyerPhone")
-                        }}
-                        inputMode="numeric"
-                        enterKeyHint={"done"}
-                        error={formErrors.buyerPhone}
-                      />
-                      <Input
-                        label={"Email"}
-                        value={form.buyer.email}
-                        onChange={(v: string) => {
-                          handleForm("email", v)
-                          clearFieldError("buyerEmail")
-                        }}
-                        error={formErrors.buyerEmail}
+                        label={"Nome impresso no cartão"}
+                        value={form.card.name}
+                        onChange={(v: string) => handleCard("name", v)}
                       />
                     </S.FormLine>
                   </S.FormLines>
                 </S.FormBlock>
+              )}
 
-                {Boolean(event?.nominal) && (
-                  <S.FormBlock $k={2}>
-                    <span>Informações dos participantes</span>
+              {method === "credit" && (
+                <S.FormBlock $k={4}>
+                  <span>Endereço de faturamento</span>
 
-                    {form.tickets.map((ticket, k) => (
-                      <S.TicketBlock key={k}>
-                        <S.TicketName>
-                          <span>Ingresso {k + 1}: </span>
-                          <span>{ticket.name}</span>
-                        </S.TicketName>
+                  <S.FormLines>
+                    <S.FormLine>
+                      <Input
+                        label={"CEP"}
+                        value={form.card.address}
+                        onChange={(v: string) => handleCard("address", v)}
+                      />
+                    </S.FormLine>
+                  </S.FormLines>
+                </S.FormBlock>
+              )}
 
-                        {k === 0 && (
-                          <S.Checkbox htmlFor={`check-${k}`}>
-                            <input
-                              id={`check-${k}`}
-                              type="checkbox"
-                              checked={
-                                !!ticket.person.name &&
-                                ticket.person.name === form.buyer.name
-                              }
-                              onClick={() => {
-                                // eslint-disable-next-line react-hooks/rules-of-hooks
-                                usePayer(
-                                  ticket,
-                                  !(
-                                    !!ticket.person.name &&
-                                    ticket.person.name === form.buyer.name
-                                  )
-                                )
-                              }}
-                            />
-                            <span>Utilizar dados do(a) comprador(a)</span>
-                          </S.Checkbox>
-                        )}
-
-                        <S.FormLines>
-                          <S.FormLine>
-                            <Input
-                              label={"Nome e sobrenome"}
-                              value={ticket.person.name}
-                              onChange={(v: string) => {
-                                handleTicketForm(ticket, "name", v)
-                                clearFieldError("ticketsIds", k)
-                              }}
-                              error={formErrors.ticketsIds.includes(k)}
-                            />
-                          </S.FormLine>
-                        </S.FormLines>
-                      </S.TicketBlock>
-                    ))}
-                  </S.FormBlock>
-                )}
-
-                {method === "credit" && (
-                  <S.FormBlock $k={3}>
-                    <span>Informações do pagamento</span>
-
-                    {renderFlag()}
-
-                    <S.FormLines>
-                      <S.FormLine>
-                        <Input
-                          label={"Número do cartão"}
-                          value={form.card.number}
-                          onChange={(v: string) => handleCard("number", v)}
-                        />
-                        <Input
-                          label={"Data de validade"}
-                          value={form.card.date}
-                          onChange={(v: string) => handleCard("date", v)}
-                        />
-                        <Input
-                          label={"Código de serguraça"}
-                          value={form.card.code}
-                          onChange={(v: string) => handleCard("code", v)}
-                        />
-                      </S.FormLine>
-                    </S.FormLines>
-
-                    <S.FormLines>
-                      <S.FormLine>
-                        <Input
-                          label={"Nome impresso no cartão"}
-                          value={form.card.name}
-                          onChange={(v: string) => handleCard("name", v)}
-                        />
-                      </S.FormLine>
-                    </S.FormLines>
-                  </S.FormBlock>
-                )}
-
-                {method === "credit" && (
-                  <S.FormBlock $k={4}>
-                    <span>Endereço de faturamento</span>
-
-                    <S.FormLines>
-                      <S.FormLine>
-                        <Input
-                          label={"CEP"}
-                          value={form.card.address}
-                          onChange={(v: string) => handleCard("address", v)}
-                        />
-                      </S.FormLine>
-                    </S.FormLines>
-                  </S.FormBlock>
-                )}
-
-                {/* Terms */}
-
-                <S.Checkbox htmlFor={`check-terms`}>
-                  <input
-                    id={`check-terms`}
-                    type="checkbox"
-                    onChange={(value) => setTermsAgreed(value.target.checked)}
-                  />
-                  <div className={"terms"}>
-                    <span>Concordo com os </span>
-                    <Link to={""}> Termos de Serviço</Link>
-                    <span>as Diretrizes e a </span>
-                    <Link to={""}>Política de Privacidade</Link>
-                    <span>de {event?.corporateName}.</span>
-                  </div>
-                </S.Checkbox>
-
-                <S.Button
-                  $disabled={termsAgreed === false || !fieldsOk}
-                  onClick={termsAgreed ? handlePay : undefined}
-                >
-                  PAGAR
-                </S.Button>
-              </S.Form>
-            )}
+              <S.Button $disabled={!fieldsOk} onClick={handlePay}>
+                PAGAR
+              </S.Button>
+            </S.Form>
           </S.EventResume>
 
           <OrderResume

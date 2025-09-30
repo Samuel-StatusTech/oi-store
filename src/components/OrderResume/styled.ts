@@ -94,7 +94,7 @@ export const EventResume = styled.div<{ $expanded: boolean }>`
     flex-wrap: wrap;
   }
 
-  @media (max-width: 440px) {
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
     div:nth-child(1) {
       cursor: pointer;
 
@@ -124,23 +124,24 @@ export const ResumeText = styled.span`
 export const DateText = styled.span`
   font-weight: bold;
   font-size: 20px;
-  flex: 1;
   white-space: nowrap;
   text-transform: uppercase;
+  white-space: pre-line;
 
   opacity: 0;
   ${({ theme }) =>
-    theme.animations.types.fadeLeft +
-    theme.animations.durations.main +
-    theme.animations.delays.main(3)}
+    theme.animations.types.fadeLeft + theme.animations.durations.main}
 
   &:nth-child(2) {
     text-align: right;
-    ${({ theme }) => theme.animations.delays.main(4)}
+    ${({ theme }) => theme.animations.delays.main(3)}
   }
 
-  @media (max-width: 440px) {
-    white-space: pre-line;
+  &:nth-child(2) {
+    padding: 0 0 0 20px;
+    flex: 1;
+    text-align: right;
+    ${({ theme }) => theme.animations.delays.main(4)}
   }
 `
 
@@ -194,6 +195,10 @@ export const ReleaseBlock = styled.div`
   padding: 24px;
   color: #fff;
   gap: 24px;
+
+  @media (max-width: 380px) {
+    flex-direction: column;
+  }
 `
 
 export const RLeft = styled.div`
@@ -230,4 +235,9 @@ export const RRight = styled.div`
     theme.animations.types.fadeLeft +
     theme.animations.durations.main +
     theme.animations.delays.main(3)}
+
+  @media (max-width: 380px) {
+    border-left: none;
+    padding-left: 36px;
+  }
 `

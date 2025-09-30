@@ -20,17 +20,21 @@ export const Main = styled.div`
 export const EventResume = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 36px;
   flex: 3;
+  box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
+  padding: 24px;
+  border-radius: 12px;
+  height: fit-content;
 `
 
 export const EventData = styled.div`
   display: flex;
   flex-direction: column;
   gap: 12px;
-  box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
   padding: 24px;
-  border-radius: 12px;
+  border-radius: 12px; */
 
   opacity: 0;
   ${({ theme }) =>
@@ -56,12 +60,14 @@ export const EventName = styled.span`
 `
 
 export const PaymentData = styled.div`
+  width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
   gap: 12px;
-  box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
   padding: 24px;
-  border-radius: 12px;
+  border-radius: 12px; */
 
   span {
     font-size: 24px;
@@ -85,6 +91,7 @@ export const PaymentData = styled.div`
 export const Methods = styled.div`
   display: flex;
   gap: 48px;
+  width: 100%;
 `
 
 // Method
@@ -97,12 +104,11 @@ export const Method = styled.div<{ $checked: boolean }>`
   justify-items: center;
   gap: 24px;
   width: 100%;
-  max-width: 300px;
   // flex: 1;
   border: 1px solid
     ${({ $checked, theme }) => ($checked ? theme.colors.blue.main : "#ccc")};
   border-radius: 6px;
-  padding: 24px 24px 32px;
+  padding: 24px;
   cursor: pointer;
   transition: border-color 0.3s;
   overflow: hidden;
@@ -112,6 +118,18 @@ export const Method = styled.div<{ $checked: boolean }>`
     theme.animations.types.fadeLeft +
     theme.animations.durations.main +
     theme.animations.delays.main(4)}
+
+  & > img {
+    width: 120px;
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    width: 100%;
+
+    img {
+      width: 84px;
+    }
+  }
 `
 
 export const MTitle = styled.div``
@@ -153,9 +171,9 @@ export const Form = styled.div`
   display: flex;
   flex-direction: column;
   gap: 46px;
-  box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
+  /* box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
   padding: 24px;
-  border-radius: 12px;
+  border-radius: 12px; */
 
   opacity: 0;
   ${({ theme }) =>
@@ -170,8 +188,8 @@ export const FormBlock = styled.div<{ $k: number }>`
   gap: 36px;
 
   & > span {
-    font-size: 24px;
-    font-weight: bold;
+    font-size: 18px;
+    font-weight: 600;
     color: #000;
   }
 
@@ -299,5 +317,9 @@ export const Button = styled.button<{ $disabled: boolean }>`
 
   &:hover {
     box-shadow: 0 2px 8px 2px rgba(0, 0, 0, 0.24);
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    width: 100%;
   }
 `
