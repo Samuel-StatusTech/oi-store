@@ -34,7 +34,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
   })
   const [ticketsTotal, setTicketsTotal] = useState(0)
 
-  const [time, setTime] = useState("10:00")
+  const [time, setTime] = useState("15:00")
 
   const loadEventData = useCallback(async () => {
     if (event) {
@@ -76,8 +76,12 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
     }
   }
 
+  const onTicketsTimeout = () => {
+    navigate(-1)
+  }
+
   const runTimer = () => {
-    const timer = clockdown(600)
+    const timer = clockdown(900, onTicketsTimeout)
 
     timer.start()
 

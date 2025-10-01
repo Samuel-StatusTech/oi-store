@@ -81,6 +81,7 @@ type IProps = {
   inputMode?: string
   enterKeyHint?: string
   error?: boolean
+  tip?: string
 }
 
 const Input = ({
@@ -90,19 +91,23 @@ const Input = ({
   inputMode,
   enterKeyHint,
   error,
+  tip
 }: IProps) => {
   return (
-    <S.Label>
-      <S.Input
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={""}
-        inputMode={inputMode as any}
-        enterKeyHint={enterKeyHint as any}
-        $error={error}
-      />
-      <span>{label}</span>
-    </S.Label>
+    <S.InputWrapper>
+      <S.Label>
+        <S.Input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={""}
+          inputMode={inputMode as any}
+          enterKeyHint={enterKeyHint as any}
+          $error={error}
+        />
+        <span>{label}</span>
+      </S.Label>
+      {tip && <span className="inputTip">{tip}</span>}
+    </S.InputWrapper>
   )
 }
 
@@ -787,6 +792,7 @@ const Payment = () => {
                       inputMode="numeric"
                       enterKeyHint={"done"}
                       error={formErrors.buyerPhone}
+                      tip={"Ele será usado para acessar os ingressos"}
                     />
                     <Input
                       label={"Email"}
@@ -799,6 +805,10 @@ const Payment = () => {
                     />
                   </S.FormLine>
                 </S.FormLines>
+
+                <S.DisclaimerArea>
+                  <span>Lembre-se de usar informações verdadeiras, pois você só poderá acessar seus ingressos pelo telefone e email.</span>
+                </S.DisclaimerArea>
               </S.FormBlock>
 
               {Boolean(event?.nominal) && (

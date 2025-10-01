@@ -216,6 +216,18 @@ export const FormLine = styled.div`
   }
 `
 
+export const InputWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  max-width: 100%;
+  flex: 1;
+
+  & .inputTip {
+    font-size: 14px;
+    color: ${({ theme }) => theme.colors.black.secondary};
+  }
+`
+
 export const Label = styled.label`
   position: relative;
   max-width: 100%;
@@ -235,6 +247,17 @@ export const Label = styled.label`
     transform: translateY(-34px);
     font-size: 14px;
   }
+`
+
+export const DisclaimerArea = styled.div`
+  border: 1px solid ${({ theme }) => theme.colors.blue.main};
+  padding: 12px 6px;
+  font-size: 14px;
+  color: ${({ theme }) => theme.colors.blue.main};
+  border-radius: 4px;
+  width: 100%;
+  transition: border-color 0.3s;
+  box-sizing: border-box;
 `
 
 export const Input = styled.input<{ $error?: boolean }>`
@@ -325,4 +348,6 @@ export const Button = styled.button<{ $disabled: boolean }>`
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
     width: 100%;
   }
+
+  transition: background-color 0.3s;
 `
