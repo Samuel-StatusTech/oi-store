@@ -53,8 +53,10 @@ export const EventDataArea = styled.section`
   gap: 48px;
 
   @media (max-width: ${({ theme }) => theme.bp.medium}px) {
-    flex-direction: column;
+    flex-direction: column-reverse;
     z-index: unset;
+    margin-top: 24px;
+    gap: 24px;
   }
 `
 

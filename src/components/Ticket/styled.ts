@@ -58,6 +58,20 @@ export const Quantity = styled.div<{ $saledOut?: boolean }>`
 export const QntControl = styled.div`
   display: flex;
   align-items: center;
+  gap: 8px;
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    flex-direction: column-reverse;
+
+    &:has(> span) {
+      padding-top: 12px;
+    }
+  }
+`
+
+export const ControlsButtonsArea = styled.div`
+  display: flex;
+  align-items: center;
 
   span {
     min-width: 32px;
