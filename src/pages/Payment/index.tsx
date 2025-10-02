@@ -364,7 +364,7 @@ const Payment = () => {
       const nameField =
         form.buyer.name.length < 1 ||
         form.buyer.name.trim().split(" ").length < 2
-      const phoneField = isPhoneNumberValid(form.buyer.phone)
+      const phoneField = isPhoneNumberValid(form.buyer.phone, true)
       const emailField =
         form.buyer.email.length < 1 || !validEmail(form.buyer.email)
 
