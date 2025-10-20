@@ -14,7 +14,6 @@ type Props = {
   groups: { id: string; name: string }[]
   tickets: TTicketDisposal[]
   setTickets: (list: TTicketDisposal[]) => void
-  avoidAbsolute?: boolean
 }
 
 const TicketsControl = ({
@@ -22,7 +21,6 @@ const TicketsControl = ({
   tickets,
   setTickets,
   groups,
-  avoidAbsolute
 }: Props) => {
   const navigate = useNavigate()
 
@@ -169,7 +167,7 @@ const TicketsControl = ({
   }, [tickets])
 
   return (
-    <S.Component className="tickets_control" $avoidAbsolute={avoidAbsolute}>
+    <S.Component>
       <S.Top>
         <span>Ingressos</span>
       </S.Top>
