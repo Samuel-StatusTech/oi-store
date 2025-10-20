@@ -102,9 +102,22 @@ const Home = () => {
       <S.Hero>
         <img src={event?.event_banner} alt={""} className={"blured"} />
         <Container>
-          <S.ImageContainer>
-            <img src={event?.event_banner} alt={""} />
-          </S.ImageContainer>
+          <S.HeroContent>
+            <S.ImageContainer $hasBanner={!!event?.event_banner} $hasVerticalBanner={!!event?.event_banner_vertical}>
+              <img src={event?.event_banner} alt={""} className={`event_banner`} />
+              <img src={event?.event_banner_vertical} alt={""} className={`event_banner_vertical`} />
+            </S.ImageContainer>
+
+            <S.HeroTicketsControlWrapper>
+              <TicketsControl
+                showByGroup={groups.length > 1}
+                groups={groups}
+                tickets={tickets}
+                setTickets={setTickets}
+                avoidAbsolute
+              />
+            </S.HeroTicketsControlWrapper>
+          </S.HeroContent>
         </Container>
       </S.Hero>
 
@@ -112,61 +125,64 @@ const Home = () => {
         <S.EventDataArea>
           <S.MainData>
             <S.EventName>{event?.name}</S.EventName>
-            <S.Blocks>
-              <BlockInfo
-                k={3}
-                title="Data e Hora"
-                description={[
-                  getDatePeriod(
-                    event?.date_ini as string,
-                    event?.date_end as string
-                  ),
-                  event?.date_ini
-                    ? getHours(
-                        new Date(
-                          event?.date_ini.slice(
-                            0,
-                            event?.date_ini.indexOf("T")
-                          ) +
-                            "T" +
-                            event?.time_ini +
-                            ".000Z"
-                        )
-                      )
-                    : event?.time_ini
-                    ? event.time_ini.slice(0, 5)
-                    : "Dia todo",
-                ]}
-                icon={<img src={calendar} alt={""} width={84} />}
-              />
-              <BlockInfo
-                k={4}
-                title="Localização"
-                description={[
-                  `${event?.local}. ${event?.address}`,
-                  `${event?.city} - ${event?.uf}`,
-                ]}
-                icon={<img src={location} alt={""} width={84} />}
-              />
-            </S.Blocks>
-            {Boolean(event?.has_age) && (
-              <S.Blocks className="additional">
+            <S.BlocksWrapper>
+              <S.Blocks>
                 <BlockInfo
-                  title="Informações adicionais"
-                  description={["Faixa etária", String(event?.age)]}
-                  icon={
-                    <img
-                      src={userSafety}
-                      className="userSafety"
-                      alt={""}
-                      height={48}
-                      width={48}
-                    />
-                  }
+                  k={3}
+                  title="Data e Hora"
+                  description={[
+                    getDatePeriod(
+                      event?.date_ini as string,
+                      event?.date_end as string
+                    ),
+                    event?.date_ini
+                      ? getHours(
+                          new Date(
+                            event?.date_ini.slice(
+                              0,
+                              event?.date_ini.indexOf("T")
+                            ) +
+                              "T" +
+                              event?.time_ini +
+                              ".000Z"
+                          )
+                        )
+                      : event?.time_ini
+                      ? event.time_ini.slice(0, 5)
+                      : "Dia todo",
+                  ]}
+                  icon={<img src={calendar} alt={""} width={84} />}
+                />
+                <BlockInfo
+                  k={4}
+                  title="Localização"
+                  description={[
+                    `${event?.local}. ${event?.address}`,
+                    `${event?.city} - ${event?.uf}`,
+                  ]}
+                  icon={<img src={location} alt={""} width={84} />}
                 />
               </S.Blocks>
-            )}
+              {Boolean(event?.has_age) && (
+                <S.Blocks className="additional">
+                  <BlockInfo
+                    title="Informações adicionais"
+                    description={["Faixa etária", String(event?.age)]}
+                    icon={
+                      <img
+                        src={userSafety}
+                        className="userSafety"
+                        alt={""}
+                        height={48}
+                        width={48}
+                      />
+                    }
+                  />
+                </S.Blocks>
+              )}
+            </S.BlocksWrapper>
           </S.MainData>
+
 
           <TicketsControl
             showByGroup={groups.length > 1}

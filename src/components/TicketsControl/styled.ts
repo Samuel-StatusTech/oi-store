@@ -1,11 +1,11 @@
 import styled from "styled-components"
 
-export const Component = styled.aside`
+export const Component = styled.aside<{$avoidAbsolute?: boolean}>`
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 420px;
-  position: absolute;
+  position: ${({$avoidAbsolute}) => $avoidAbsolute ? "relative" : "absolute"};
   z-index: 3;
   top: 24px;
   right: 0;
@@ -14,8 +14,8 @@ export const Component = styled.aside`
   box-shadow: 0 4px 8px 4px rgba(0, 0, 0, 0.23);
   background-color: ${({ theme }) => theme.colors.white.main};
 
-  @media (max-width: ${({ theme }) => theme.bp.large}px) {
-    max-width: calc((100% / 5) * 2);
+  @media (min-width: ${({ theme }) => theme.bp.medium}px) {
+    flex: 1;
   }
 
   @media (max-width: ${({ theme }) => theme.bp.medium}px) {
@@ -84,6 +84,11 @@ export const Bottom = styled.div`
   flex-direction: column;
   padding: 12px;
   gap: 12px;
+
+  @media (min-width: ${({ theme }) => theme.bp.medium}px) {
+    flex: 1;
+    justify-content: end;
+  }
 `
 
 export const BottomFinal = styled.div`

@@ -32,7 +32,15 @@ export const Hero = styled.div`
   }
 `
 
-export const ImageContainer = styled.div`
+export const HeroContent = styled.div`
+  position: relative;
+  display: flex;
+  align-items: start;
+  gap: 24px;
+`
+
+export const ImageContainer = styled.div<{$hasBanner?: boolean; $hasVerticalBanner?: boolean}>`
+  flex: 1;
   max-height: 540px;
   display: flex;
   align-items: center;
@@ -43,14 +51,50 @@ export const ImageContainer = styled.div`
     width: 100%;
     max-width: 100%;
     max-height: 100%;
+
+    &.event_banner_vertical {
+      display: none;
+    }
+  }
+
+  @media (min-width: ${({theme}) => theme.bp.medium}px) {
+    max-height: 80svh;
+    
+    img {
+      &.event_banner {
+        display: none;
+      }
+      
+      &.event_banner_vertical {
+        display: inline-block;
+      }
+    }
   }
 `
 
+export const HeroTicketsControlWrapper = styled.div`
+  position: relative;
+  transform: translateY(-24px);
+  display: none;
+  align-self: stretch;
+  display: flex;
+  flex-direction: column;
+
+  @media (max-width: ${({theme}) => theme.bp.medium}px) {
+    display: none;
+  }
+`
 export const EventDataArea = styled.section`
   position: relative;
   display: flex;
   flex: 5;
   gap: 48px;
+
+  @media (min-width: ${({theme}) => theme.bp.medium}px) {
+    .tickets_control {
+      display: none;
+    }
+  }
 
   @media (max-width: ${({ theme }) => theme.bp.medium}px) {
     flex-direction: column-reverse;
@@ -65,11 +109,6 @@ export const MainData = styled.div`
   flex-direction: column;
   gap: 24px;
   width: 100%;
-  max-width: calc((100% / 5) * 3);
-
-  @media (max-width: ${({ theme }) => theme.bp.large}px) {
-    max-width: calc(((100% / 5) * 3) - 24px);
-  }
 
   @media (max-width: ${({ theme }) => theme.bp.medium}px) {
     max-width: 100%;
@@ -93,15 +132,23 @@ export const EventName = styled.h1`
   }
 `
 
+export const BlocksWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+`
+
 export const Blocks = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 24px;
   padding: 24px 0;
 
-  &.additional {
-    margin-top: -24px;
-    padding-top: 0;
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    &.additional {
+      margin-top: -24px;
+      padding-top: 0;
+    }
   }
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {

@@ -29,6 +29,7 @@ export type TEventData = {
   archived: number
   oid: number
   order_number: number
+  event_banner_vertical: string
   event_banner: string
   event_map: string
   address: string
@@ -83,6 +84,7 @@ export type TEventMin = {
   date_end: string
   status: number
   logo: null | string
+  event_banner_vertical: null | string
   event_banner: null | string
   city: string
   state: string
