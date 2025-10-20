@@ -481,6 +481,7 @@ const Payment = () => {
     navigate("/payment/pix", {
       state: {
         tickets: ptickets,
+        disposalTickets: tickets,
         buyer: form.buyer,
         taxTotal: taxes.value,
       },

@@ -141,7 +141,7 @@ const TicketsControl = ({
           email: user.email,
         }
 
-        const stateParams = { tickets: ptickets, buyer, taxTotal: +taxes.value }
+        const stateParams = { tickets: ptickets, disposalTickets: tickets, buyer, taxTotal: +taxes.value }
 
         localStorage.removeItem("payed")
 

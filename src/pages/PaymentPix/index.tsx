@@ -29,6 +29,7 @@ import { formatMoney } from "../../utils/tb/formatMoney"
 
 import pageTools from "../../utils/tb/pageTools/pix"
 import { TPaymentSession } from "../../utils/@types/data/paymentSession"
+import OrderResume from "../../components/OrderResume"
 
 const io = require("socket.io-client")
 
@@ -699,6 +700,15 @@ const PaymentPix = () => {
               </S.PixArea>
             )}
           </S.Block>
+
+          <OrderResume
+            hideEventData={true}
+            ticketsList={
+              lctn.state
+                ? lctn.state.disposalTickets ?? lctn.state.tickets
+                : []
+            }
+          />
         </S.Main>
       </Container>
 

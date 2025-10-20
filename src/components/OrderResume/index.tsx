@@ -15,12 +15,13 @@ import { useNavigate } from "react-router-dom"
 // import { clockdown } from "../../utils/tb/timer"
 
 type Props = {
-  datePeriod: string
+  hideEventData?: boolean
+  datePeriod?: string
   ticketsList: TTicketDisposal[]
-  setTickets: (list: TTicketDisposal[]) => void
+  setTickets?: (list: TTicketDisposal[]) => void
 }
 
-const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
+const OrderResume = ({ hideEventData = false, datePeriod, ticketsList }: Props) => {
   const navigate = useNavigate()
 
   const { event, controllers } = getStore()
@@ -126,10 +127,12 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
                   <S.ResumeText>Resumo do pedido</S.ResumeText>
                   <DropdownIcon />
                 </div>
-                <div>
-                  <S.DateText>Data</S.DateText>
-                  <S.DateText>{datePeriod}</S.DateText>
-                </div>
+                {!hideEventData && (
+                  <div>
+                    <S.DateText>Data</S.DateText>
+                    <S.DateText>{datePeriod}</S.DateText>
+                  </div>
+                )}
               </S.EventResume>
               <S.TicketsList>
                 {ticketsList.map((ticket, k) => (

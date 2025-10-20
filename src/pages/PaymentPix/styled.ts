@@ -8,9 +8,12 @@ export const Page = styled.div`
 
 export const Main = styled.div`
   display: flex;
-  flex-direction: column;
   gap: 24px;
   padding: 0 0 64px 0;
+
+  @media (max-width: ${({theme}) => theme.bp.medium}px) {
+    flex-direction: column;
+  }
 `
 
 export const Block = styled.div<{ $k: number }>`
