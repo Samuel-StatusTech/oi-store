@@ -3,7 +3,7 @@ import { useEffect, useCallback, useState } from "react"
 import { formatMoney } from "../../utils/tb/formatMoney"
 import * as S from "./styled"
 
-import clockIcon from "../../assets/icons/time.png"
+// import clockIcon from "../../assets/icons/time.png"
 import { ReactComponent as DropdownIcon } from "../../assets/icons/dropdown.svg"
 
 import Ticket from "../Ticket"
@@ -12,7 +12,7 @@ import { Api } from "../../api"
 import getStore from "../../store"
 import { eventHasTaxes, sumTaxes, sumTickets } from "../../utils/tb/taxes"
 import { useNavigate } from "react-router-dom"
-import { clockdown } from "../../utils/tb/timer"
+// import { clockdown } from "../../utils/tb/timer"
 
 type Props = {
   datePeriod: string
@@ -34,7 +34,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
   })
   const [ticketsTotal, setTicketsTotal] = useState(0)
 
-  const [time, setTime] = useState("15:00")
+  // const [time, setTime] = useState("15:00")
 
   const loadEventData = useCallback(async () => {
     if (event) {
@@ -76,6 +76,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
     }
   }
 
+  /*
   const onTicketsTimeout = () => {
     navigate(-1)
   }
@@ -94,7 +95,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
 
   useEffect(() => {
     runTimer()
-  }, [])
+  }, []) */
 
   useEffect(() => {
     loadEventData()
@@ -157,7 +158,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
       </S.Info>
 
       {/* Release block */}
-      <S.ReleaseBlock>
+      {/* <S.ReleaseBlock>
         <S.RLeft>
           <img src={clockIcon} alt={""} />
           <span>{time}</span>
@@ -167,7 +168,7 @@ const OrderResume = ({ datePeriod, ticketsList, setTickets }: Props) => {
             Após este tempo, os ingressos serão liberados para venda novamente
           </span>
         </S.RRight>
-      </S.ReleaseBlock>
+      </S.ReleaseBlock> */}
     </S.Component>
   )
 }

@@ -30,12 +30,6 @@ import ValidateCodeModal from "../../components/Modal/ValidateCode"
 import { TEventData } from "../../utils/@types/data/event"
 import { isPhoneNumberValid } from "../../utils/tb/phone/isValidPhone"
 
-type MProps = {
-  checked: boolean
-  type: "pix" | "credit"
-  onSelect: (method: "pix" | "credit") => void
-}
-
 const methodsInfos = {
   pix: {
     title: "Mais rápido e seguro",
@@ -111,29 +105,6 @@ const Input = ({
   )
 }
 
-const Method = ({ checked, type, onSelect }: MProps) => {
-  return (
-    <S.Method $checked={checked} onClick={() => onSelect(type)}>
-      {/* <S.MTitle>{methodsInfos[type].title}</S.MTitle> */}
-
-      {type === "pix" ? (
-        <img src={methodsInfos[type].img} alt={""} />
-      ) : (
-        <S.List>
-          {methodsInfos[type].list.map((c, k) => (
-            <S.CardItem href={c.link} key={k}>
-              <img src={c.icon} alt={""} width={48} />
-            </S.CardItem>
-          ))}
-        </S.List>
-      )}
-
-      {/* <S.Recommended $visible={methodsInfos[type].targeted}>
-        Recomendado
-      </S.Recommended> */}
-    </S.Method>
-  )
-}
 
 type TCardFlag =
   | null
@@ -157,7 +128,7 @@ const Payment = () => {
 
   const [showingCodeModal, setShowingCodeModal] = useState(false)
 
-  const [method, setMethod] = useState<"" | "pix" | "credit">("pix")
+  const [method] = useState<"" | "pix" | "credit">("pix")
   const [form, setForm] = useState<TForm>({
     ...initialForm,
     buyer: {
@@ -183,11 +154,6 @@ const Payment = () => {
     buyerEmail: false,
     ticketsIds: [],
   })
-
-  const handleSelect = (newMethod: "pix" | "credit") => {
-    if (method === newMethod) setMethod("")
-    else setMethod(newMethod)
-  }
 
   const handleForm = (field: keyof TForm["buyer"], value: string) => {
     if (!user && canBuy) setCanBuy(false)
@@ -756,13 +722,7 @@ const Payment = () => {
           <S.EventResume>
             <S.PaymentData>
               <span>Pagamento</span>
-              <S.Methods>
-                <Method
-                  checked={method === "pix"}
-                  type={"pix"}
-                  onSelect={handleSelect}
-                />
-              </S.Methods>
+              <img src={methodsInfos.pix.img} alt={""} />
             </S.PaymentData>
 
             <S.Form>

@@ -62,12 +62,8 @@ export const EventName = styled.span`
 export const PaymentData = styled.div`
   width: 100%;
   display: flex;
-  flex-direction: column;
   align-items: center;
   gap: 12px;
-  /* box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
-  padding: 24px;
-  border-radius: 12px; */
 
   span {
     font-size: 24px;
@@ -79,6 +75,10 @@ export const PaymentData = styled.div`
       theme.animations.types.fadeLeft +
       theme.animations.durations.main +
       theme.animations.delays.main(3)}
+  }
+
+  img {
+    max-width: 52px;
   }
 
   opacity: 0;

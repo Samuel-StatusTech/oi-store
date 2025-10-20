@@ -49,7 +49,7 @@ const PaymentPix = () => {
     ? (JSON.parse(sessionStorage.getItem("user") as string) as TUser)
     : null
 
-  const [time, setTime] = useState("05:00")
+  const [time, setTime] = useState("15:00")
   const [sid, setSid] = useState("")
   const [oid, setOid] = useState<any>(null)
 
@@ -131,7 +131,7 @@ const PaymentPix = () => {
           (new Date().getTime() - +paymentToRecover.paymentStartedAt) / 1000
         )
 
-        const remainingTime = 5 * 60 - runnedTime
+        const remainingTime = 15 * 60 - runnedTime
 
         const isPaymentRecoverable = remainingTime > 0
 
@@ -374,7 +374,7 @@ const PaymentPix = () => {
     if (!payed) {
       setQrCode("")
       setQrCode64("")
-      setTime("05:00")
+      setTime("15:00")
 
       getQR()
     }
