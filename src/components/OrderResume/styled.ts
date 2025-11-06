@@ -1,6 +1,6 @@
 import styled from "styled-components"
 
-export const Component = styled.div`
+export const Component = styled.div<{$fitContainer: boolean}>`
   flex: 2;
   display: flex;
   flex-direction: column;
@@ -8,7 +8,7 @@ export const Component = styled.div`
   border-radius: 6px;
   overflow: hidden;
   box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
-  height: fit-content;
+  ${({ $fitContainer }) => $fitContainer ? "align-self: stretch;" : "height: fit-content;"}
   min-width: 380px;
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {

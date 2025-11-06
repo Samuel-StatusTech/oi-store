@@ -704,6 +704,7 @@ const PaymentPix = () => {
           <OrderResume
             hideEventData={true}
             onlyPurchasingItems={true}
+            fitContainer={true}
             ticketsList={
               lctn.state
                 ? lctn.state.disposalTickets ?? lctn.state.tickets

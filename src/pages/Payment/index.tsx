@@ -339,9 +339,9 @@ const Payment = () => {
       const nominalsErrors =
         event?.nominal &&
         form.tickets.some((t, k) => {
-          const status = t.person.name.length < 1
+          const status = t.person.name.trim().split(" ").length < 2
 
-          if (t.person.name.trim().split(" ").length < 2) ticketsIds.push(k)
+          if (status) ticketsIds.push(k)
 
           return status
         })
@@ -498,10 +498,9 @@ const Payment = () => {
 
       if (method === "pix")
         if (user) {
-          let ptickets = getTicketsList(taxes.value)
 
           const stateParams = {
-            tickets: ptickets,
+            tickets: tickets,
             buyer: form.buyer,
             taxTotal: +taxes.value,
           }
