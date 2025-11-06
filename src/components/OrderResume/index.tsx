@@ -19,9 +19,10 @@ type Props = {
   datePeriod?: string
   ticketsList: TTicketDisposal[]
   setTickets?: (list: TTicketDisposal[]) => void
+  onlyPurchasingItems?: boolean
 }
 
-const OrderResume = ({ hideEventData = false, datePeriod, ticketsList }: Props) => {
+const OrderResume = ({ hideEventData = false, datePeriod, ticketsList, onlyPurchasingItems = false }: Props) => {
   const navigate = useNavigate()
 
   const { event, controllers } = getStore()
@@ -135,7 +136,7 @@ const OrderResume = ({ hideEventData = false, datePeriod, ticketsList }: Props) 
                 )}
               </S.EventResume>
               <S.TicketsList>
-                {ticketsList.map((ticket, k) => (
+                {(onlyPurchasingItems ? ticketsList.filter(i => i.qnt > 0) : ticketsList).map((ticket, k) => (
                   <Ticket ticket={ticket} key={k} />
                 ))}
               </S.TicketsList>

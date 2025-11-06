@@ -158,7 +158,7 @@ const PaymentPix = () => {
     alert("Ops, houve um erro. Tente novamente mais tarde")
     socket.off("disconnect")
     socket.disconnect()
-    navigate(-1)
+    returnPage()
     return
   }, [])
 
@@ -292,7 +292,7 @@ const PaymentPix = () => {
       await signPurchase(sid)
       getQR(sid)
     } else {
-      navigate(-1)
+      returnPage()
       return
     }
   }
@@ -703,6 +703,7 @@ const PaymentPix = () => {
 
           <OrderResume
             hideEventData={true}
+            onlyPurchasingItems={true}
             ticketsList={
               lctn.state
                 ? lctn.state.disposalTickets ?? lctn.state.tickets
