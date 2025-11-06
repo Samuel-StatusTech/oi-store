@@ -70,8 +70,14 @@ const MyTickets = () => {
         }))
 
         const sortedList = newList
-          .sort((a, b) => a.date.localeCompare(b.date))
-          .reverse()
+          .sort((a, b) => {
+            const aTime = new Date(a.date).getTime()
+            const bTime = new Date(b.date).getTime()
+
+            if (!Number.isNaN(aTime) && !Number.isNaN(new Date(b.date).getTime())) {
+              return aTime > bTime ? -1 : 1
+            } else return 0
+          })
 
         setList(sortedList)
       } else {
