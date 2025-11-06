@@ -330,7 +330,7 @@ const Payment = () => {
       const nameField =
         form.buyer.name.length < 1 ||
         form.buyer.name.trim().split(" ").length < 2
-      const phoneField = isPhoneNumberValid(form.buyer.phone, true)
+      const phoneField = !isPhoneNumberValid(form.buyer.phone, true)
       const emailField =
         form.buyer.email.length < 1 || !validEmail(form.buyer.email)
 
@@ -477,6 +477,7 @@ const Payment = () => {
     let ptickets = getTicketsList(taxes.value)
 
     localStorage.removeItem("payed")
+    localStorage.removeItem("paymentSession")
 
     navigate("/payment/pix", {
       state: {
@@ -484,6 +485,7 @@ const Payment = () => {
         disposalTickets: tickets,
         buyer: form.buyer,
         taxTotal: taxes.value,
+        isNewOrder: true,
       },
     })
   }
@@ -505,6 +507,7 @@ const Payment = () => {
           }
 
           localStorage.removeItem("payed")
+          localStorage.removeItem("paymentSession")
 
           navigate("/payment/pix", {
             state: stateParams,

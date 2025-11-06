@@ -6,7 +6,7 @@ const DIGITING_VALIDATION_REGEX =
 
 export function cleanPhoneNumber(phone: string) {
   if (!phone) return ""
-  return phone.replace(/[^\D]/g, "")
+  return phone.replace(/[^\d]/g, "")
 }
 
 export function isPhoneNumberValid(phone: string, isFinalValidation = true) {
