@@ -85,7 +85,7 @@ const Input = ({
   inputMode,
   enterKeyHint,
   error,
-  tip
+  tip,
 }: IProps) => {
   return (
     <S.InputWrapper>
@@ -104,7 +104,6 @@ const Input = ({
     </S.InputWrapper>
   )
 }
-
 
 type TCardFlag =
   | null
@@ -498,7 +497,6 @@ const Payment = () => {
 
       if (method === "pix")
         if (user) {
-
           const ptickets = getTicketsList(taxes.value)
 
           const stateParams = {
@@ -773,7 +771,10 @@ const Payment = () => {
                 </S.FormLines>
 
                 <S.DisclaimerArea>
-                  <span>Lembre-se de usar informações verdadeiras, pois você só poderá acessar seus ingressos pelo telefone e email.</span>
+                  <span>
+                    Lembre-se de usar informações verdadeiras, pois você só
+                    poderá acessar seus ingressos pelo telefone e email.
+                  </span>
                 </S.DisclaimerArea>
               </S.FormBlock>
 

@@ -320,7 +320,7 @@ export const Checkbox = styled.label`
 export const TicketBlock = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 24px;
 `
 
 export const TicketName = styled.div``
