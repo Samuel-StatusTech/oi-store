@@ -457,7 +457,7 @@ const Payment = () => {
       ptickets.push({
         price_sell: t.price_sell,
         batch_id: t.batch_id,
-        customer_name: form.buyer.name,
+        customer_name: tt?.person.name,
         id: t.id,
         tax_value: taxPerTicket,
         ticketName: t.name,
@@ -499,8 +499,11 @@ const Payment = () => {
       if (method === "pix")
         if (user) {
 
+          const ptickets = getTicketsList(taxes.value)
+
           const stateParams = {
-            tickets: tickets,
+            tickets: ptickets,
+            disposalTickets: tickets,
             buyer: form.buyer,
             taxTotal: +taxes.value,
           }

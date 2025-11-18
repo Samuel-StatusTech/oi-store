@@ -58,6 +58,7 @@ const PaymentPix = () => {
 
   const [requiringQr, setRequiringQr] = useState(false)
 
+  const [totalOrderAmount, setTotalOrderAmount] = useState(0)
   const [qrCode, setQrCode] = useState("")
   const [qrCode64, setQrCode64] = useState("")
   const [feedback, setFeedback] = useState<any>({ visible: false, message: "" })
@@ -206,7 +207,12 @@ const PaymentPix = () => {
   )
 
   const startSocket = async () => {
-    if (!lctn.state.tickets || !lctn.state.buyer) {
+    const paymentSession = localStorage.getItem("paymentSession")
+
+    const canStartSocket =
+      (!lctn.state.tickets || !lctn.state.buyer) && !paymentSession
+
+    if (canStartSocket) {
       return returnPage()
     } else {
       if (!payed) {
@@ -256,6 +262,7 @@ const PaymentPix = () => {
     try {
       if (!requiringQr && (socketId || sid)) {
         setRequiringQr(true)
+
         const orderData = getOrderData({
           tickets: lctn.state.tickets,
           buyer: lctn.state.buyer,
@@ -297,13 +304,17 @@ const PaymentPix = () => {
     }
   }
 
-  useEffect(() => {
+  const ignite = useCallback(async () => {
     const pendingPayment = localStorage.getItem("paymentSession")
 
     if (sid !== "" && !pendingPayment) {
       startPurchase()
     }
   }, [sid, localStorage])
+
+  useEffect(() => {
+    ignite()
+  }, [ignite])
 
   // ----- PAGE -----
 
@@ -583,6 +594,34 @@ const PaymentPix = () => {
     navigate("/", { replace: true, state: {} })
   }
 
+  useEffect(() => {
+    if (totalOrderAmount === 0) {
+      if (
+        lctn.state.tickets !== undefined &&
+        lctn.state.buyer !== undefined &&
+        lctn.state.taxTotal !== undefined &&
+        sid !== "" &&
+        user &&
+        event &&
+        event.dk &&
+        event.id
+      ) {
+        const orderValueAmount = pageTools.order.getOrderValue(
+          lctn.state.tickets,
+          lctn.state.buyer,
+          lctn.state.taxTotal,
+          sid,
+          user as TUser,
+          event?.dk as string,
+          event?.id as string
+        )
+
+        if (!Number.isNaN(orderValueAmount))
+          setTotalOrderAmount(orderValueAmount)
+      }
+    }
+  }, [lctn.state, sid, user, event, totalOrderAmount])
+
   return (
     <S.Page>
       <Feedback data={feedback} />
@@ -658,20 +697,7 @@ const PaymentPix = () => {
                         />
                       )}
 
-                      <span>
-                        {formatMoney(
-                          pageTools.order.getOrderValue(
-                            lctn.state.tickets,
-                            lctn.state.buyer,
-                            lctn.state.taxTotal,
-                            sid,
-                            user as TUser,
-                            event?.dk as string,
-                            event?.id as string
-                          ),
-                          true
-                        )}
-                      </span>
+                      <span>{formatMoney(totalOrderAmount, true)}</span>
 
                       <S.Button onClick={copyQRToClipboard}>
                         Copiar código
@@ -706,9 +732,7 @@ const PaymentPix = () => {
             onlyPurchasingItems={true}
             fitContainer={true}
             ticketsList={
-              lctn.state
-                ? lctn.state.disposalTickets ?? lctn.state.tickets
-                : []
+              lctn.state ? lctn.state.disposalTickets ?? lctn.state.tickets : []
             }
           />
         </S.Main>
