@@ -24,8 +24,9 @@ export const Box = styled.div<{
   width: fit-content;
   margin: 0 auto;
   display: flex;
-  padding: 6px 14px;
-  border-radius: 24px;
+  flex-direction: column;
+  padding: 16px 28px;
+  border-radius: 12px;
   background-color: ${({ $color, theme }) =>
     $color === "green"
       ? theme.colors.green.main
@@ -34,12 +35,27 @@ export const Box = styled.div<{
       : $color === "blue"
       ? "rgb(22, 66, 119)"
       : "#D8484A"};
-  box-shadow: 0 3px 16px rgba(0, 0, 0, 0.08);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
 
   span {
-    font-size: 12px;
+    font-size: 16px;
     color: ${({ theme }) => theme.colors.white.main};
-    text-align: center;
+    text-align: left;
+    white-space: pre-line;
+    line-height: 1.8;
+    display: block;
+    width: 100%;
+    font-weight: 500;
+  }
+
+  @media (min-width: ${({ theme }) => `${theme.bp.small + 1}px`}) {
+    padding: 20px 40px;
+    max-width: 600px;
+    
+    span {
+      font-size: 18px;
+      line-height: 1.8;
+    }
   }
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {

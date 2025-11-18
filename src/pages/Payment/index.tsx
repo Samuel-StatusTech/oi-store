@@ -100,7 +100,27 @@ const Input = ({
         />
         <span>{label}</span>
       </S.Label>
-      {tip && <span className="inputTip">{tip}</span>}
+      {tip && (
+        <span className="inputTip" style={{ marginTop: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+          <svg
+            width="20"
+            height="20"
+            viewBox="0 0 16 16"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            style={{ display: "inline-block", verticalAlign: "middle", flexShrink: 0 }}
+          >
+            <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" fill="none" />
+            <path
+              d="M8 6V8M8 10H8.01"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+            />
+          </svg>
+          {tip}
+        </span>
+      )}
     </S.InputWrapper>
   )
 }
@@ -329,7 +349,21 @@ const Payment = () => {
       const nameField =
         form.buyer.name.length < 1 ||
         form.buyer.name.trim().split(" ").length < 2
-      const phoneField = !isPhoneNumberValid(form.buyer.phone, true)
+      
+      // Validar se é celular válido (não fixo)
+      const cleanedPhone = form.buyer.phone.replace(/\D/g, "")
+      
+      // Remove código do país se presente (55)
+      let phoneWithoutCountry = cleanedPhone
+      if (cleanedPhone.startsWith("55") && cleanedPhone.length === 13) {
+        phoneWithoutCountry = cleanedPhone.slice(2)
+      }
+      
+      const phoneValid = isPhoneNumberValid(form.buyer.phone, true)
+      const isCellPhone = phoneWithoutCountry.length === 11 && phoneWithoutCountry.length >= 3 && phoneWithoutCountry[2] === "9"
+      
+      const phoneField = !phoneValid || !isCellPhone
+      
       const emailField =
         form.buyer.email.length < 1 || !validEmail(form.buyer.email)
 
@@ -345,9 +379,32 @@ const Payment = () => {
           return status
         })
 
+      let duplicateNames: number[] = []
+      if (event?.nominal && form.tickets.length > 1) {
+        const namesMap = new Map<string, number[]>()
+        
+        form.tickets.forEach((t, k) => {
+          const name = t.person.name.trim().toLowerCase()
+          if (name && name.split(" ").length >= 2) {
+            if (!namesMap.has(name)) {
+              namesMap.set(name, [])
+            }
+            namesMap.get(name)!.push(k)
+          }
+        })
+
+        namesMap.forEach((indices) => {
+          if (indices.length > 1) {
+            duplicateNames.push(...indices)
+          }
+        })
+      }
+
       if (nameField || emailField || phoneField) hasError = true
 
       if (nominalsErrors) hasError = true
+
+      if (duplicateNames.length > 0) hasError = true
 
       return {
         has: hasError,
@@ -356,6 +413,7 @@ const Payment = () => {
           phone: phoneField,
           email: emailField,
           ticketsIds: ticketsIds,
+          duplicateNames: duplicateNames,
         },
       }
     } catch (error) {
@@ -366,6 +424,7 @@ const Payment = () => {
           phone: true,
           email: true,
           ticketsIds: [],
+          duplicateNames: [],
         },
       }
     }
@@ -592,30 +651,46 @@ const Payment = () => {
       let newErrorValue = { ...formErrors }
 
       if (errors.fields.name) {
-        fieldsErrors.push("nome")
+        fieldsErrors.push("Nome")
         newErrorValue.buyerName = true
       }
       if (errors.fields.phone) {
-        fieldsErrors.push("telefone")
+        fieldsErrors.push("Celular válido")
         newErrorValue.buyerPhone = true
       }
       if (errors.fields.email) {
-        fieldsErrors.push("email")
+        fieldsErrors.push("E-mail")
         newErrorValue.buyerEmail = true
       }
+      // Inicializa o array de ticketsIds com erros de validação de nome/sobrenome
       if (errors.fields.ticketsIds.length > 0) {
-        fieldsErrors.push("nome e sobrenome")
+        fieldsErrors.push("Nome e sobrenome")
         newErrorValue.ticketsIds = errors.fields.ticketsIds
+      } else {
+        newErrorValue.ticketsIds = []
+      }
+      
+      // Adiciona erros de nomes duplicados, mesclando e removendo duplicatas
+      if (errors.fields.duplicateNames && errors.fields.duplicateNames.length > 0) {
+        fieldsErrors.push("Nomes duplicados nos participantes")
+        newErrorValue.ticketsIds = Array.from(
+          new Set([
+            ...newErrorValue.ticketsIds,
+            ...errors.fields.duplicateNames,
+          ])
+        )
       }
 
       setFormErrors(newErrorValue)
 
-      fieldsStr = fieldsErrors.join(", ")
+      // Formata os erros com bullets para melhor visualização
+      const formattedErrors = fieldsErrors.map((error) => `• ${error}`).join("\n")
+      fieldsStr = formattedErrors
 
       const f = {
         state: "expired",
         visible: true,
-        message: `Preencha os campos corretamente: ${fieldsStr}`,
+        message: `Preencha os campos corretamente:\n${fieldsStr}`,
       }
       setFeedback(f)
 
@@ -769,13 +844,7 @@ const Payment = () => {
                     />
                   </S.FormLine>
                 </S.FormLines>
-
-                <S.DisclaimerArea>
-                  <span>
-                    Lembre-se de usar informações verdadeiras, pois você só
-                    poderá acessar seus ingressos pelo telefone e email.
-                  </span>
-                </S.DisclaimerArea>
+                
               </S.FormBlock>
 
               {Boolean(event?.nominal) && (
