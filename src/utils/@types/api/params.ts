@@ -3,19 +3,25 @@ type TParams = {
   get: {
     qrcode: {
       order: {
-        items: {
-          name: string
-          quantity: number
-          unit_amount: number
-        }[]
-        qr_codes: {
-          amount: {
-            value: number
-          }
-        }[]
-        reference_id?: string
-        payment_method_id: string
         transaction_amount: number
+        payment_method_id: "pix"
+        payer: {
+          first_name: string
+          last_name: string
+          email: string
+        }
+        metadata: {
+          payer: {
+            phone: {
+              area_code: string
+              number: string
+            }
+          }
+          cCode: string
+          dk: string
+          eventId: string
+        }
+        buyerName?: string
       }
     }
     events: {}
@@ -44,7 +50,12 @@ type TParams = {
     }
     login: {
       requestCode: { phone: string; avoidSms?: boolean }
-      validateCode: { phone: string; code: string, email?: string, name?: string }
+      validateCode: {
+        phone: string
+        code: string
+        email?: string
+        name?: string
+      }
     }
     purchase: {
       sign: {

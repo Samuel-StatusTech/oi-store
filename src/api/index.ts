@@ -63,6 +63,7 @@ const getQrCode: TApi["get"]["qrcode"] = async ({ order }) => {
     try {
       const parsed: TParams["get"]["qrcode"]["order"] = {
         ...order,
+        buyerName: order.payer.first_name,
         transaction_amount: order.transaction_amount / 100,
       }
 
@@ -114,7 +115,7 @@ const getEvents: TApi["get"]["events"] = async () => {
                   .map((ev: any) => ({
                     ...ev,
                     dk: res.data.dk,
-                  }))
+                  })),
               },
             })
           } else {
@@ -212,7 +213,9 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
                 active: isTicketActive,
                 batch_id: activeBatchData.batch_id,
                 group_id: i.group_id ?? "",
-                group_name: i.group_name ? i.group_name.replace("-loja", "") : "",
+                group_name: i.group_name
+                  ? i.group_name.replace("-loja", "")
+                  : "",
                 quantity: activeBatchData.quantity,
                 price_sell: activeBatchData.price_sell,
               }
