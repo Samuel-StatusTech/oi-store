@@ -63,7 +63,7 @@ const getQrCode: TApi["get"]["qrcode"] = async ({ order }) => {
     try {
       const parsed: TParams["get"]["qrcode"]["order"] = {
         ...order,
-        buyerName: order.payer.first_name,
+        // buyerName: order.payer.first_name,
         transaction_amount: order.transaction_amount / 100,
       }
 

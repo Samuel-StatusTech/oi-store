@@ -442,6 +442,7 @@ const PaymentPix = () => {
         user_fone: user?.fone,
         event_id: event?.id as string,
         order_id: sId,
+        buyer_name: lctn.state.buyer ? lctn.state.buyer.name : "",
         products: lctn.state.tickets as any,
         payments: [
           {
