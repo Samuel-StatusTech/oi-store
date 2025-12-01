@@ -90,6 +90,8 @@ const Home = () => {
 
   useEffect(() => {
     localStorage.removeItem("payed")
+    localStorage.removeItem("paymentSession")
+
     if (event) {
       loadEventData()
       if (tickets.length === 0) fetchTickets()

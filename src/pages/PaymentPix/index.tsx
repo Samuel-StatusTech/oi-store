@@ -34,7 +34,8 @@ import OrderResume from "../../components/OrderResume"
 const io = require("socket.io-client")
 
 const socketUrl =
-  process.env.REACT_APP_SOCKET_URL || "https://api.oitickets.com.br"
+  // process.env.REACT_APP_SOCKET_URL || "https://api.oitickets.com.br"
+  "https://2c4759e0-740e-4f03-97ee-8ebdd080f607-00-22c0bty8cpink.spock.replit.dev:8080"
 
 const PaymentPix = () => {
   const lctn = useLocation()
@@ -207,34 +208,25 @@ const PaymentPix = () => {
   )
 
   const startSocket = async () => {
-    const paymentSession = localStorage.getItem("paymentSession")
+    if (!payed) {
+      const socket = instanceSocket()
 
-    const canStartSocket =
-      (!lctn.state.tickets || !lctn.state.buyer) && !paymentSession
+      if (socket) {
+        socket.on("connect", () => {
+          checkPendingPayment(socket)
+        })
+        socket.on("plugged", handlePlugged)
+        socket.on("connect_error", () => handleConnectError(socket))
 
-    if (canStartSocket) {
-      return returnPage()
-    } else {
-      if (!payed) {
-        const socket = instanceSocket()
+        // monitor payment
+        socket.on("orderUpdate", (socketData: any) => {
+          handleOrderUpdate(socket, socketData)
+        })
 
-        if (socket) {
-          socket.on("connect", () => {
-            checkPendingPayment(socket)
-          })
-          socket.on("plugged", handlePlugged)
-          socket.on("connect_error", () => handleConnectError(socket))
-
-          // monitor payment
-          socket.on("orderUpdate", (socketData: any) => {
-            handleOrderUpdate(socket, socketData)
-          })
-
-          // Disconnect after 15 minutes
-          setTimeout(() => {
-            socket.disconnect()
-          }, 900000)
-        }
+        // Disconnect after 15 minutes
+        setTimeout(() => {
+          socket.disconnect()
+        }, 900000)
       }
     }
   }
@@ -306,11 +298,12 @@ const PaymentPix = () => {
 
   const ignite = useCallback(async () => {
     const pendingPayment = localStorage.getItem("paymentSession")
+    const isNewOrder = lctn.state?.isNewOrder ?? false
 
-    if (sid !== "" && !pendingPayment) {
+    if ((!pendingPayment && sid !== "" && isNewOrder) && !pendingPayment) {
       startPurchase()
     }
-  }, [sid, localStorage])
+  }, [sid, localStorage, lctn])
 
   useEffect(() => {
     ignite()
@@ -543,11 +536,6 @@ const PaymentPix = () => {
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
-
-    if (!lctn.state.tickets) {
-      navigate("/", { replace: true, state: {} })
-      return
-    }
 
     try {
       loadEventData()

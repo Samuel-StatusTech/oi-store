@@ -53,7 +53,9 @@ const OrderResume = ({ hideEventData = false, datePeriod, ticketsList, onlyPurch
         alert("Erro ao carregar os tickets")
         navigate("/")
       }
-    } else navigate("/")
+    } else {
+      navigate("/")
+    }
   }, [])
 
   const sumValues = () => {

@@ -563,6 +563,7 @@ const Payment = () => {
             disposalTickets: tickets,
             buyer: form.buyer,
             taxTotal: +taxes.value,
+            isNewOrder: true,
           }
 
           localStorage.removeItem("payed")
