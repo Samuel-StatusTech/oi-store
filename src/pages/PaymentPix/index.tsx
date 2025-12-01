@@ -34,8 +34,7 @@ import OrderResume from "../../components/OrderResume"
 const io = require("socket.io-client")
 
 const socketUrl =
-  // process.env.REACT_APP_SOCKET_URL || "https://api.oitickets.com.br"
-  "https://2c4759e0-740e-4f03-97ee-8ebdd080f607-00-22c0bty8cpink.spock.replit.dev:8080"
+  process.env.REACT_APP_SOCKET_URL || "https://api.oitickets.com.br"
 
 const PaymentPix = () => {
   const lctn = useLocation()
@@ -300,7 +299,7 @@ const PaymentPix = () => {
     const pendingPayment = localStorage.getItem("paymentSession")
     const isNewOrder = lctn.state?.isNewOrder ?? false
 
-    if ((!pendingPayment && sid !== "" && isNewOrder) && !pendingPayment) {
+    if (!pendingPayment && sid !== "" && isNewOrder && !pendingPayment) {
       startPurchase()
     }
   }, [sid, localStorage, lctn])
