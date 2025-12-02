@@ -22,6 +22,17 @@ const MyTickets = () => {
   const [loading, setLoading] = useState(true)
   const [list, setList] = useState<any[]>([])
 
+  const getReadableOrderId = (orderId = "") => {
+    const readableCodeLength = 8
+    const orderIdLength = orderId.length
+    const hasValidOrderIdData = orderId && orderIdLength > 7
+
+    const slicedOrderId = hasValidOrderIdData ? orderId.slice(orderIdLength - readableCodeLength, orderIdLength) : (orderId ?? "")
+    const readableOrderId = slicedOrderId.toUpperCase()
+
+    return readableOrderId
+  }
+
   const getData = useCallback(async (eventInfo: any) => {
     setLoading(true)
 
@@ -65,7 +76,7 @@ const MyTickets = () => {
           eventBanner: (updatedEventInfo ?? eventInfo).event_banner as string,
           products: i.products.map((ip: any) => ({
             ...ip,
-            TRN: i.payments[0].transition_id,
+            TRN: getReadableOrderId(i.id),
           })),
         }))
 

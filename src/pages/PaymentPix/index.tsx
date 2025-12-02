@@ -65,6 +65,24 @@ const PaymentPix = () => {
 
   const [payed, setPayed] = useState(false)
 
+  useEffect(() => {
+    const savedPayed = localStorage.getItem("payed") === "true"
+    if (!savedPayed) {
+      startPurchase()
+    }
+  }, [])
+
+  const getReadableOrderId = (orderId = "") => {
+    const readableCodeLength = 8
+    const orderIdLength = orderId.length
+    const hasValidOrderIdData = orderId && orderIdLength > 7
+
+    const slicedOrderId = hasValidOrderIdData ? orderId.slice(orderIdLength - readableCodeLength, orderIdLength) : (orderId ?? "")
+    const readableOrderId = slicedOrderId.toUpperCase()
+
+    return readableOrderId
+  }
+
   // ----- EMAIL -----
 
   const handleEmail = async (purchaseInfo: {
@@ -499,7 +517,7 @@ const PaymentPix = () => {
         price_unit: t.price_unit,
         tax_value: t.tax_value,
         ticket_name: (t as any).ticket_name,
-        TRN: t.transition_id,
+        TRN: getReadableOrderId(t.order_id),
       }
 
       pdfTickets.push(dt)
