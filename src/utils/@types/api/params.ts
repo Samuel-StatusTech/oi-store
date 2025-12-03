@@ -60,6 +60,7 @@ type TParams = {
     purchase: {
       sign: {
         buyer_name: string
+        buyer_email: string
         user_fone: string
         order_id: string
         event_id: string

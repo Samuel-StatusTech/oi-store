@@ -177,7 +177,7 @@ const PaymentPix = () => {
     alert("Ops, houve um erro. Tente novamente mais tarde")
     socket.off("disconnect")
     socket.disconnect()
-    returnPage()
+    // returnPage()
     return
   }, [])
 
@@ -453,6 +453,7 @@ const PaymentPix = () => {
         event_id: event?.id as string,
         order_id: sId,
         buyer_name: lctn.state.buyer ? lctn.state.buyer.name : "",
+        buyer_email: lctn.state.buyer ? lctn.state.buyer.email : "",
         products: lctn.state.tickets as any,
         payments: [
           {

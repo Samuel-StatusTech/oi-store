@@ -10,7 +10,7 @@ axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 const backUrl = process.env.REACT_APP_BACKEND_URL
 const mailingUrl = process.env.REACT_APP_EMAIL_BACKEND_URL
 
-const checkTokenExpiration = (token: string) => {
+export const checkTokenExpiration = (token: string) => {
   try {
     const decoded = jwtDecode(token)
 
