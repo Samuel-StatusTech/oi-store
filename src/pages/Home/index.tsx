@@ -12,7 +12,7 @@ import userSafety from "../../assets/icons/user-safety.png"
 
 import TicketsControl from "../../components/TicketsControl"
 import Footer from "../../components/Footer"
-import { Api } from "../../api"
+import { Api, checkTokenExpiration } from "../../api"
 import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { parseDisposalTickets } from "../../utils/tb/ticketsToDisposal"
 import getStore from "../../store"
@@ -28,7 +28,7 @@ const Home = () => {
 
   const event = eventData ? (JSON.parse(eventData) as TEventData) : null
 
-  const { controllers } = getStore()
+  const { controllers, user } = getStore()
 
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
   const [groups, setGroups] = useState<{ id: string; name: string }[]>([])
@@ -88,9 +88,29 @@ const Home = () => {
     }
   }
 
+  const checkTokenTime = () => {
+    if (user) {
+      try {
+        const token = localStorage.getItem("token")
+
+        if (token) {
+          const isTokenExpired = checkTokenExpiration(token)
+          if (isTokenExpired) {
+            localStorage.removeItem("token")
+            controllers.user.clear()
+            sessionStorage.removeItem("token")
+            sessionStorage.removeItem("user")
+          }
+        }
+      } catch (error) {}
+    }
+  }
+
   useEffect(() => {
     localStorage.removeItem("payed")
     localStorage.removeItem("paymentSession")
+
+    checkTokenTime()
 
     if (event) {
       loadEventData()
@@ -104,9 +124,20 @@ const Home = () => {
       <S.Hero>
         <img src={event?.event_banner} alt={""} className={"blured"} />
         <Container>
-          <S.ImageContainer $hasBanner={!!event?.event_banner} $hasVerticalBanner={!!event?.event_banner_vertical}>
-            <img src={event?.event_banner} alt={""} className={`event_banner_vertical`} />
-            <img src={event?.event_banner_vertical} alt={""} className={`event_banner`} />
+          <S.ImageContainer
+            $hasBanner={!!event?.event_banner}
+            $hasVerticalBanner={!!event?.event_banner_vertical}
+          >
+            <img
+              src={event?.event_banner}
+              alt={""}
+              className={`event_banner_vertical`}
+            />
+            <img
+              src={event?.event_banner_vertical}
+              alt={""}
+              className={`event_banner`}
+            />
           </S.ImageContainer>
         </Container>
       </S.Hero>
@@ -170,7 +201,6 @@ const Home = () => {
               </S.Blocks>
             )}
           </S.MainData>
-
 
           <TicketsControl
             showByGroup={groups.length > 1}

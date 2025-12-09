@@ -10,27 +10,9 @@ import Payment from "../pages/Payment"
 import PaymentPix from "../pages/PaymentPix"
 import { useEffect } from "react"
 import getStore from "../store"
-import { checkTokenExpiration } from "../api"
 
 const Router = () => {
-  const { event, user } = getStore()
-
-  const checkTokenTime = () => {
-    if (user) {
-      try {
-        const token = localStorage.getItem("token")
-
-        if (token) {
-          const isTokenExpired = checkTokenExpiration(token)
-          if (isTokenExpired) localStorage.removeItem("token")
-        }
-      } catch (error) {}
-    }
-  }
-
-  useEffect(() => {
-    checkTokenTime()
-  }, [])
+  const { event } = getStore()
 
   useEffect(() => {
     window.document.title = event ? event.corporateName : "ListaPix"
