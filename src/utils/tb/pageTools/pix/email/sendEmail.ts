@@ -15,7 +15,7 @@ export const sendEmail = async (
     amount: number
     message: string
     sId: string
-    transaction_id: string
+    transition_id: string
     time: string
   },
   productsList: any[]
@@ -67,7 +67,7 @@ export const sendEmail = async (
       eventTime: startAt,
       eventLocal: event?.local,
 
-      purchaseCode: purchaseInfo?.transaction_id,
+      purchaseCode: purchaseInfo?.transition_id,
       purchaseTime: formatDate(
         purchaseInfo.time as string,
         "dd/MM/yyyy HH:mm:ss"

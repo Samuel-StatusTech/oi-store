@@ -77,7 +77,9 @@ const PaymentPix = () => {
     const orderIdLength = orderId.length
     const hasValidOrderIdData = orderId && orderIdLength > 7
 
-    const slicedOrderId = hasValidOrderIdData ? orderId.slice(orderIdLength - readableCodeLength, orderIdLength) : (orderId ?? "")
+    const slicedOrderId = hasValidOrderIdData
+      ? orderId.slice(orderIdLength - readableCodeLength, orderIdLength)
+      : orderId ?? ""
     const readableOrderId = slicedOrderId.toUpperCase()
 
     return readableOrderId
@@ -90,7 +92,7 @@ const PaymentPix = () => {
     amount: number
     message: string
     sId: string
-    transaction_id: string
+    transition_id: string
     time: string
   }) => {
     try {
@@ -121,6 +123,7 @@ const PaymentPix = () => {
           lctn.state.tickets,
           {
             ...purchaseInfo,
+            transition_id: getReadableOrderId(purchaseInfo.sId),
             time: new Date(req.data.products[0].date).toISOString(),
           },
           parsedData
@@ -518,6 +521,7 @@ const PaymentPix = () => {
         price_unit: t.price_unit,
         tax_value: t.tax_value,
         ticket_name: (t as any).ticket_name,
+        user_name: (t as any).user_name,
         TRN: getReadableOrderId(t.order_id),
       }
 
