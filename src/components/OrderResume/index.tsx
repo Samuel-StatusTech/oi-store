@@ -46,7 +46,7 @@ const OrderResume = ({ hideEventData = false, datePeriod, ticketsList, onlyPurch
 
         if (req.ok) {
           const data = req.data
-          sessionStorage.setItem("event", JSON.stringify(data))
+          localStorage.setItem("event", JSON.stringify(data))
           controllers.event.setData(data)
         }
       } catch (error) {

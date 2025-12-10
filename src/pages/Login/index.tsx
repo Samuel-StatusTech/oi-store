@@ -37,8 +37,8 @@ const Login = () => {
   useEffect(() => {
     setPhase("phone")
     store.controllers.user.clear()
-    sessionStorage.removeItem("token")
-    sessionStorage.removeItem("user")
+    localStorage.removeItem("token")
+    localStorage.removeItem("user")
   }, [])
 
   const fadePhases = () => {
@@ -81,7 +81,7 @@ const Login = () => {
         code,
       })
       if (login.ok) {
-        sessionStorage.setItem("user", JSON.stringify(login.data))
+        localStorage.setItem("user", JSON.stringify(login.data))
 
         // store.controllers.user.setData(login.data)
         navigate("/myTickets")

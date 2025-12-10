@@ -28,20 +28,20 @@ export const checkTokenExpiration = (token: string) => {
 
 axios.interceptors.request.use(function (config) {
   try {
-    const localToken = sessionStorage.getItem("token")
+    const localToken = localStorage.getItem("token")
 
     if (localToken) {
       if (localToken === "undefined") {
-        sessionStorage.removeItem("user")
-        sessionStorage.removeItem("token")
+        localStorage.removeItem("user")
+        localStorage.removeItem("token")
 
         window.location.reload()
       } else {
         const isTokenExpired = checkTokenExpiration(localToken)
 
         if (isTokenExpired) {
-          sessionStorage.removeItem("user")
-          sessionStorage.removeItem("token")
+          localStorage.removeItem("user")
+          localStorage.removeItem("token")
 
           window.location.reload()
         } else config.headers.Authorization = `Bearer ${localToken}`
@@ -349,7 +349,7 @@ const registerUser: TApi["post"]["register"] = async ({
           // store token ...
 
           if (res.data.token.token) {
-            sessionStorage.setItem("token", res.data.token.token)
+            localStorage.setItem("token", res.data.token.token)
 
             resolve({ ok: true, data: res.data })
           } else {
@@ -474,7 +474,7 @@ const validateCode: TApi["post"]["login"]["validateCode"] = async ({
             fone: res.data.roleData.fone,
           }
 
-          sessionStorage.setItem("token", res.data.token)
+          localStorage.setItem("token", res.data.token)
 
           resolve({ ok: true, data: uObj })
         })

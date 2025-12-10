@@ -11,8 +11,8 @@ function App() {
   const store = getStore()
 
   useEffect(() => {
-    const event = sessionStorage.getItem("event")
-    const user = sessionStorage.getItem("user")
+    const event = localStorage.getItem("event")
+    const user = localStorage.getItem("user")
 
     if (event) {
       if (!store.event) store.controllers.event.setData(JSON.parse(event))

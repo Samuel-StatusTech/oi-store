@@ -24,7 +24,7 @@ import { parseEmojis } from "../../utils/tb/text"
 const Home = () => {
   const navigate = useNavigate()
 
-  const eventData = sessionStorage.getItem("event")
+  const eventData = localStorage.getItem("event")
 
   const event = eventData ? (JSON.parse(eventData) as TEventData) : null
 
@@ -42,7 +42,7 @@ const Home = () => {
           const data = req.data
           if (data.is_ecommerce) {
             controllers.event.setData(req.data)
-            sessionStorage.setItem("event", JSON.stringify(req.data))
+            localStorage.setItem("event", JSON.stringify(req.data))
           } else {
             controllers.event.clear()
             navigate("/eventSelect")
@@ -98,8 +98,8 @@ const Home = () => {
           if (isTokenExpired) {
             localStorage.removeItem("token")
             controllers.user.clear()
-            sessionStorage.removeItem("token")
-            sessionStorage.removeItem("user")
+            localStorage.removeItem("token")
+            localStorage.removeItem("user")
           }
         }
       } catch (error) {}

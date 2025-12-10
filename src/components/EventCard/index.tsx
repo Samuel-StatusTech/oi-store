@@ -21,7 +21,7 @@ const EventCard = ({ k, data }: Props) => {
       const req = await Api.get.eventInfo({ eventId: data.id })
 
       if (req.ok) {
-        sessionStorage.setItem("event", JSON.stringify(req.data))
+        localStorage.setItem("event", JSON.stringify(req.data))
         navigate("/")
       } else {
         alert(

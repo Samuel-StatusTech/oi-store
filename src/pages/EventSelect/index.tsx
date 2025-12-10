@@ -39,7 +39,7 @@ const EventSelect = () => {
             const req = await Api.get.eventInfo({ eventId: parsed[0].id })
 
             if (req.ok) {
-              sessionStorage.setItem("event", JSON.stringify(req.data))
+              localStorage.setItem("event", JSON.stringify(req.data))
               navigate("/")
             } else {
               alert(
@@ -65,7 +65,7 @@ const EventSelect = () => {
   }, [navigate])
 
   useEffect(() => {
-    sessionStorage.removeItem("event")
+    localStorage.removeItem("event")
 
     getData()
   }, [store.controllers, getData])
