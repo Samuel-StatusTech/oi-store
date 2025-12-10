@@ -50,7 +50,10 @@ const MyTickets = () => {
 
           if (i.payments.length > 0) {
             const payment = i.payments[0]
-            const isPayed = payment.transition_id || payment.machine_data
+            const isPayed =
+              payment.transition_id ||
+              payment.machine_data ||
+              i.status === "validado"
 
             status = isPayed
           } else status = false

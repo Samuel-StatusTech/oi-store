@@ -4,6 +4,7 @@ import { TProduct } from "../utils/@types/data/product"
 import { jwtDecode } from "jwt-decode"
 import TParams from "../utils/@types/api/params"
 import { formatDate } from "date-fns"
+import getStore from "../store"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
@@ -30,10 +31,13 @@ axios.interceptors.request.use(function (config) {
   try {
     const localToken = localStorage.getItem("token")
 
+    const { controllers } = getStore.getState()
+
     if (localToken) {
       if (localToken === "undefined") {
         localStorage.removeItem("user")
         localStorage.removeItem("token")
+        controllers.user.clear()
 
         window.location.reload()
       } else {
@@ -42,6 +46,7 @@ axios.interceptors.request.use(function (config) {
         if (isTokenExpired) {
           localStorage.removeItem("user")
           localStorage.removeItem("token")
+          controllers.user.clear()
 
           window.location.reload()
         } else config.headers.Authorization = `Bearer ${localToken}`
@@ -268,9 +273,32 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({
             pms.push(
               axios
                 .get(`/${eventId}/ecommerce/orders/${id}`)
-                .then((res) => {
+                .then(async (res) => {
                   const purchase = res.data
-                  returnList.push(purchase)
+
+                  const someTicket =
+                    purchase.products.length > 0 ? purchase.products[0] : null
+
+                  if (someTicket) {
+                    const ticketDetailsReq = await axios.get(
+                      `/${eventId}/validate_ticket/${someTicket.qr_label}`
+                    )
+
+                    if (
+                      ticketDetailsReq.status === 200 &&
+                      ticketDetailsReq.data
+                    ) {
+                      const orderPaymentStatus =
+                        ticketDetailsReq.data.detail.status
+
+                      const fullPurchase = {
+                        ...purchase,
+                        status: orderPaymentStatus,
+                      }
+
+                      returnList.push(fullPurchase)
+                    }
+                  }
                 })
                 .catch(() => {
                   // throw new Error()
