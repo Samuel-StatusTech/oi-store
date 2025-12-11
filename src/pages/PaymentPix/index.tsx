@@ -30,6 +30,7 @@ import { formatMoney } from "../../utils/tb/formatMoney"
 import pageTools from "../../utils/tb/pageTools/pix"
 import { TPaymentSession } from "../../utils/@types/data/paymentSession"
 import OrderResume from "../../components/OrderResume"
+import { generateExternalReferenceFromOrderNumber } from "../../utils/tb/formatters/generateExternalReference"
 
 const io = require("socket.io-client")
 
@@ -52,7 +53,8 @@ const PaymentPix = () => {
 
   const [time, setTime] = useState("15:00")
   const [sid, setSid] = useState("")
-  const [oid, setOid] = useState<any>(null)
+  const [orderId, setOrderId] = useState<any>(null)
+  const [oOid, setOId] = useState<any>(null)
 
   const [buyedTickets, setBuyedTickets] = useState<TShoppingTicket[]>([])
 
@@ -186,14 +188,14 @@ const PaymentPix = () => {
 
   const handleOrderUpdate = useCallback(
     async (socket: any, data: any) => {
-      if (data.status === "approved" || data.status === "denied") {
+      if (data.status === "validado" || data.status === "denied") {
         let f = {
           state: data.status,
           visible: false,
           message: data.message,
         }
 
-        if (data.status === "approved") {
+        if (data.status === "validado") {
           const purchase = await confirmPurchase(data.sId, data.code)
 
           if (purchase.ok && !purchase.data.success) f.state = "denied"
@@ -206,7 +208,7 @@ const PaymentPix = () => {
         setTimeout(() => {
           setFeedback({ ...f, visible: false })
 
-          if (f.state === "approved") {
+          if (f.state === "validado") {
             setTimeout(() => {
               setPayed(true)
               localStorage.removeItem("paymentSession")
@@ -270,10 +272,14 @@ const PaymentPix = () => {
     }
   }
 
-  const getQR = async (socketId?: string) => {
+  const getQR = async (socketId?: string, orderOid?: number) => {
     try {
-      if (!requiringQr && (socketId || sid)) {
+      if (!requiringQr && (socketId || sid) && (orderOid || oOid)) {
         setRequiringQr(true)
+
+        const external_reference = generateExternalReferenceFromOrderNumber(
+          orderOid ?? oOid
+        )
 
         const orderData = getOrderData({
           tickets: lctn.state.tickets,
@@ -282,6 +288,7 @@ const PaymentPix = () => {
             ? Number(lctn.state.taxTotal)
             : 0,
           sid: socketId ?? sid,
+          external_reference: external_reference,
           user: user as TUser,
           dk: (event as TEventData).dk,
           eventId: (event as TEventData).id,
@@ -308,8 +315,8 @@ const PaymentPix = () => {
 
   const startPurchase = async () => {
     if (user && user.fone) {
-      await signPurchase(sid)
-      getQR(sid)
+      const orderNumber = await signPurchase(sid)
+      getQR(sid, orderNumber)
     } else {
       returnPage()
       return
@@ -437,58 +444,71 @@ const PaymentPix = () => {
     } else navigate("/eventSelect")
   }, [])
 
-  const signPurchase = useCallback(async (sId: string) => {
-    if (sId && event && event?.id && user) {
-      const orderData = getOrderData({
-        tickets: lctn.state.tickets,
-        buyer: lctn.state.buyer,
-        taxTotal: !Number.isNaN(+lctn.state.taxTotal)
-          ? Number(lctn.state.taxTotal)
-          : 0,
-        sid: sId,
-        user: user,
-        dk: event.dk,
-        eventId: event.id,
-      })
+  const signPurchase = useCallback(
+    async (sId: string): Promise<number | undefined> => {
+      let order_number
 
-      const sign = await Api.post.purchase.sign({
-        user_fone: user?.fone,
-        event_id: event?.id as string,
-        order_id: sId,
-        buyer_name: lctn.state.buyer ? lctn.state.buyer.name : "",
-        buyer_email: lctn.state.buyer ? lctn.state.buyer.email : "",
-        products: lctn.state.tickets as any,
-        payments: [
-          {
-            payment_type: "pix",
-            price: orderData?.transaction_amount as number,
-            transitionCode: null,
-            transitionId: null,
-          },
-        ],
-      })
+      if (sId && event && event?.id && user) {
+        const orderData = getOrderData({
+          tickets: lctn.state.tickets,
+          buyer: lctn.state.buyer,
+          taxTotal: !Number.isNaN(+lctn.state.taxTotal)
+            ? Number(lctn.state.taxTotal)
+            : 0,
+          sid: sId,
+          user: user,
+          dk: event.dk,
+          eventId: event.id,
+        })
 
-      if (sign.ok && sign.data.success) {
-        setOid(sign.data.order_id)
+        const sign = await Api.post.purchase.sign({
+          user_fone: user?.fone,
+          event_id: event?.id as string,
+          order_id: sId,
+          buyer_name: lctn.state.buyer ? lctn.state.buyer.name : "",
+          buyer_email: lctn.state.buyer ? lctn.state.buyer.email : "",
+          products: lctn.state.tickets as any,
+          payments: [
+            {
+              payment_type: "pix",
+              price: orderData?.transaction_amount as number,
+              transitionCode: null,
+              transitionId: null,
+            },
+          ],
+        })
 
-        const localPaymentSession = localStorage.getItem("paymentSession")
+        if (sign.ok && sign.data.success) {
+          order_number = sign.data.order_number
+          const order_id = sign.data.order_id
+          setOrderId(order_id)
+          setOId(order_number)
 
-        if (!localPaymentSession) {
-          const paymentSession: TPaymentSession = {
-            paymentId: sign.data.order_id,
-            socketId: sId,
-            qrCode: "",
-            qrCode64: "",
-            paymentStartedAt: new Date().getTime().toString(),
+          const localPaymentSession = localStorage.getItem("paymentSession")
+
+          if (!localPaymentSession) {
+            const paymentSession: TPaymentSession = {
+              paymentId: sign.data.order_id,
+              socketId: sId,
+              qrCode: "",
+              qrCode64: "",
+              paymentStartedAt: new Date().getTime().toString(),
+            }
+
+            localStorage.setItem(
+              "paymentSession",
+              JSON.stringify(paymentSession)
+            )
           }
 
-          localStorage.setItem("paymentSession", JSON.stringify(paymentSession))
+          loadPurchaseData(sign.data.order_id)
         }
-
-        loadPurchaseData(sign.data.order_id)
       }
-    }
-  }, [])
+
+      return order_number
+    },
+    []
+  )
 
   const parsePurchaseInfo = (p: any) => {
     let data: any = []
@@ -551,7 +571,7 @@ const PaymentPix = () => {
   const confirmPurchase = useCallback(async (sId: string, pcode: string) => {
     return await Api.post.purchase.confirm({
       order_id: sId,
-      order_number: oid,
+      order_number: orderId,
       payment_code: pcode,
     })
   }, [])

@@ -83,7 +83,7 @@ const Login = () => {
       if (login.ok) {
         localStorage.setItem("user", JSON.stringify(login.data))
 
-        // store.controllers.user.setData(login.data)
+        store.controllers.user.setData(login.data)
         navigate("/myTickets")
       } else setFailedCODE(true)
     } catch (error) {

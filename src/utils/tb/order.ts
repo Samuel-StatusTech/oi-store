@@ -1,3 +1,4 @@
+import TParams from "../@types/api/params"
 import { TTicket } from "../@types/data/ticket"
 import { TUser } from "../@types/data/user"
 
@@ -9,13 +10,25 @@ type Props = {
   }
   taxTotal: number
   sid: string
+  external_reference?: string
   user: TUser
   dk: any
   eventId: string
 }
 
-export const getOrderData = (props: Props) => {
-  const { tickets, buyer, taxTotal, sid, user, dk, eventId } = props
+export const getOrderData = (
+  props: Props
+): TParams["get"]["qrcode"]["order"] | null => {
+  const {
+    tickets,
+    buyer,
+    taxTotal,
+    sid,
+    external_reference,
+    user,
+    dk,
+    eventId,
+  } = props
 
   if (tickets) {
     const paymentValue =
@@ -39,7 +52,8 @@ export const getOrderData = (props: Props) => {
         unit_amount: taxTotal,
       })
 
-    const obj = {
+    const obj: TParams["get"]["qrcode"]["order"] = {
+      external_reference: external_reference ?? "",
       transaction_amount: paymentValue,
       payment_method_id: "pix",
       // description: "",
@@ -50,6 +64,7 @@ export const getOrderData = (props: Props) => {
         // type: "guest",
       },
       metadata: {
+        socketId: sid,
         payer: {
           phone: {
             area_code: phone.slice(0, 2),

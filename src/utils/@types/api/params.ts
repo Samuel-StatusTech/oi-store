@@ -3,6 +3,7 @@ type TParams = {
   get: {
     qrcode: {
       order: {
+        external_reference: string
         transaction_amount: number
         payment_method_id: "pix"
         payer: {
@@ -11,6 +12,7 @@ type TParams = {
           email: string
         }
         metadata: {
+          socketId: string
           payer: {
             phone: {
               area_code: string
