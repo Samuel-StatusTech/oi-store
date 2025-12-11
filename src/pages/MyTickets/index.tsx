@@ -13,6 +13,7 @@ import { Api } from "../../api"
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
 import { TEventData } from "../../utils/@types/data/event"
+import { generateExternalReferenceFromOrderNumber } from "../../utils/tb/formatters/generateExternalReference"
 
 const MyTickets = () => {
   const { controllers, user } = getStore()
@@ -21,19 +22,6 @@ const MyTickets = () => {
 
   const [loading, setLoading] = useState(true)
   const [list, setList] = useState<any[]>([])
-
-  const getReadableOrderId = (orderId = "") => {
-    const readableCodeLength = 8
-    const orderIdLength = orderId.length
-    const hasValidOrderIdData = orderId && orderIdLength > 7
-
-    const slicedOrderId = hasValidOrderIdData
-      ? orderId.slice(orderIdLength - readableCodeLength, orderIdLength)
-      : orderId ?? ""
-    const readableOrderId = slicedOrderId.toUpperCase()
-
-    return readableOrderId
-  }
 
   const getData = useCallback(async (eventInfo: any) => {
     setLoading(true)
@@ -84,7 +72,12 @@ const MyTickets = () => {
           eventBanner: (updatedEventInfo ?? eventInfo).event_banner as string,
           products: i.products.map((ip: any) => ({
             ...ip,
-            TRN: getReadableOrderId(i.id),
+            TRN:
+              i.payments.length > 0
+                ? generateExternalReferenceFromOrderNumber(
+                    i.payments[0].order_oid
+                  )
+                : "00000000",
           })),
         }))
 

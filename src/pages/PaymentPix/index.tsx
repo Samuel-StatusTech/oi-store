@@ -74,19 +74,6 @@ const PaymentPix = () => {
     }
   }, [])
 
-  const getReadableOrderId = (orderId = "") => {
-    const readableCodeLength = 8
-    const orderIdLength = orderId.length
-    const hasValidOrderIdData = orderId && orderIdLength > 7
-
-    const slicedOrderId = hasValidOrderIdData
-      ? orderId.slice(orderIdLength - readableCodeLength, orderIdLength)
-      : orderId ?? ""
-    const readableOrderId = slicedOrderId.toUpperCase()
-
-    return readableOrderId
-  }
-
   // ----- EMAIL -----
 
   const handleEmail = async (purchaseInfo: {
@@ -125,7 +112,9 @@ const PaymentPix = () => {
           lctn.state.tickets,
           {
             ...purchaseInfo,
-            transition_id: getReadableOrderId(purchaseInfo.sId),
+            transition_id: oOid
+              ? generateExternalReferenceFromOrderNumber(oOid)
+              : "00000000",
             time: new Date(req.data.products[0].date).toISOString(),
           },
           parsedData
@@ -542,7 +531,7 @@ const PaymentPix = () => {
         tax_value: t.tax_value,
         ticket_name: (t as any).ticket_name,
         user_name: (t as any).user_name,
-        TRN: getReadableOrderId(t.order_id),
+        TRN: oOid ? generateExternalReferenceFromOrderNumber(oOid) : "00000000",
       }
 
       pdfTickets.push(dt)
