@@ -30,7 +30,6 @@ import { formatMoney } from "../../utils/tb/formatMoney"
 import pageTools from "../../utils/tb/pageTools/pix"
 import { TPaymentSession } from "../../utils/@types/data/paymentSession"
 import OrderResume from "../../components/OrderResume"
-import { generateExternalReferenceFromOrderNumber } from "../../utils/tb/formatters/generateExternalReference"
 
 const io = require("socket.io-client")
 
@@ -54,7 +53,7 @@ const PaymentPix = () => {
   const [time, setTime] = useState("15:00")
   const [sid, setSid] = useState("")
   const [orderId, setOrderId] = useState<any>(null)
-  const [oOid, setOId] = useState<any>(null)
+  const [externalReference, setExternalReference] = useState<any>(null)
 
   const [buyedTickets, setBuyedTickets] = useState<TShoppingTicket[]>([])
 
@@ -91,8 +90,7 @@ const PaymentPix = () => {
       })
 
       if (req.ok) {
-        const payments = req.data.payments
-        const order_oid = payments[0]?.order_oid
+        const external_reference = req.data.extref
 
         const parsedData = parsePurchaseInfo(req.data)
 
@@ -115,9 +113,7 @@ const PaymentPix = () => {
           lctn.state.tickets,
           {
             ...purchaseInfo,
-            transition_id: order_oid
-              ? generateExternalReferenceFromOrderNumber(order_oid)
-              : "00000000",
+            transition_id: external_reference,
             time: new Date(req.data.products[0].date).toISOString(),
           },
           parsedData
@@ -264,14 +260,12 @@ const PaymentPix = () => {
     }
   }
 
-  const getQR = async (socketId?: string, orderOid?: number) => {
+  const getQR = async (socketId?: string, extref?: string) => {
     try {
-      if (!requiringQr && (socketId || sid) && (orderOid || oOid)) {
+      if (!requiringQr && (socketId || sid) && (extref || externalReference)) {
         setRequiringQr(true)
 
-        const external_reference = generateExternalReferenceFromOrderNumber(
-          orderOid ?? oOid
-        )
+        const external_reference = extref ?? externalReference
 
         const orderData = getOrderData({
           tickets: lctn.state.tickets,
@@ -307,8 +301,8 @@ const PaymentPix = () => {
 
   const startPurchase = async () => {
     if (user && user.fone) {
-      const orderNumber = await signPurchase(sid)
-      getQR(sid, orderNumber)
+      const extref = await signPurchase(sid)
+      getQR(sid, extref)
     } else {
       returnPage()
       return
@@ -437,8 +431,8 @@ const PaymentPix = () => {
   }, [])
 
   const signPurchase = useCallback(
-    async (sId: string): Promise<number | undefined> => {
-      let order_number
+    async (sId: string): Promise<string | undefined> => {
+      let extref
 
       if (sId && event && event?.id && user) {
         const orderData = getOrderData({
@@ -471,16 +465,16 @@ const PaymentPix = () => {
         })
 
         if (sign.ok && sign.data.success) {
-          order_number = sign.data.order_number
+          extref = sign.data.extref
           const order_id = sign.data.order_id
           setOrderId(order_id)
-          setOId(order_number)
+          setExternalReference(extref)
 
           const localPaymentSession = localStorage.getItem("paymentSession")
 
           if (!localPaymentSession) {
             const paymentSession: TPaymentSession = {
-              order_oid: order_number,
+              extref: extref,
               paymentId: sign.data.order_id,
               socketId: sId,
               qrCode: "",
@@ -498,7 +492,7 @@ const PaymentPix = () => {
         }
       }
 
-      return order_number
+      return extref
     },
     []
   )
@@ -509,9 +503,8 @@ const PaymentPix = () => {
     let pdfTickets: any[] = []
 
     const tickets = p.products as any[]
-    const payments = p.payments as any[]
 
-    const order_oid = payments[0]?.order_oid
+    const external_reference = p.extref
 
     tickets.forEach((t, k) => {
       const tid = generateTicketID(
@@ -538,9 +531,7 @@ const PaymentPix = () => {
         tax_value: t.tax_value,
         ticket_name: (t as any).ticket_name,
         user_name: (t as any).user_name,
-        TRN: order_oid
-          ? generateExternalReferenceFromOrderNumber(order_oid)
-          : "00000000",
+        TRN: external_reference,
       }
 
       pdfTickets.push(dt)

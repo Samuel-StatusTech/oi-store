@@ -1,5 +1,5 @@
 export type TPaymentSession = {
-  order_oid: number
+  extref: string
   socketId: string
   paymentId: string
   qrCode: string

@@ -13,7 +13,6 @@ import { Api } from "../../api"
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
 import { TEventData } from "../../utils/@types/data/event"
-import { generateExternalReferenceFromOrderNumber } from "../../utils/tb/formatters/generateExternalReference"
 
 const MyTickets = () => {
   const { controllers, user } = getStore()
@@ -72,12 +71,7 @@ const MyTickets = () => {
           eventBanner: (updatedEventInfo ?? eventInfo).event_banner as string,
           products: i.products.map((ip: any) => ({
             ...ip,
-            TRN:
-              i.payments.length > 0
-                ? generateExternalReferenceFromOrderNumber(
-                    i.payments[0].order_oid
-                  )
-                : "00000000",
+            TRN: i.extref,
           })),
         }))
 

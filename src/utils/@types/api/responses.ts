@@ -24,6 +24,7 @@ type TResponses = {
     purchaseInfo: Promise<
       TDefaultRes<{
         id: string
+        extref: string
         products: {
           opuid: string
           id: string
@@ -108,6 +109,7 @@ type TResponses = {
               success: true
               order_id: string
               order_number: number
+              extref: string
             }
           | {
               success: false
