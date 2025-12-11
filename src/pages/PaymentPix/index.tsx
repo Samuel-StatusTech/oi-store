@@ -68,7 +68,7 @@ const PaymentPix = () => {
   const [payed, setPayed] = useState(false)
 
   useEffect(() => {
-    const savedPayed = localStorage.getItem("payed") === "true"
+    const savedPayed = localStorage.getItem("payed") === "true" || payed
     if (!savedPayed) {
       startPurchase()
     }
@@ -91,6 +91,9 @@ const PaymentPix = () => {
       })
 
       if (req.ok) {
+        const payments = req.data.payments
+        const order_oid = payments[0]?.order_oid
+
         const parsedData = parsePurchaseInfo(req.data)
 
         setBuyedTickets(parsedData)
@@ -112,8 +115,8 @@ const PaymentPix = () => {
           lctn.state.tickets,
           {
             ...purchaseInfo,
-            transition_id: oOid
-              ? generateExternalReferenceFromOrderNumber(oOid)
+            transition_id: order_oid
+              ? generateExternalReferenceFromOrderNumber(order_oid)
               : "00000000",
             time: new Date(req.data.products[0].date).toISOString(),
           },
@@ -477,6 +480,7 @@ const PaymentPix = () => {
 
           if (!localPaymentSession) {
             const paymentSession: TPaymentSession = {
+              order_oid: order_number,
               paymentId: sign.data.order_id,
               socketId: sId,
               qrCode: "",
@@ -505,6 +509,9 @@ const PaymentPix = () => {
     let pdfTickets: any[] = []
 
     const tickets = p.products as any[]
+    const payments = p.payments as any[]
+
+    const order_oid = payments[0]?.order_oid
 
     tickets.forEach((t, k) => {
       const tid = generateTicketID(
@@ -531,7 +538,9 @@ const PaymentPix = () => {
         tax_value: t.tax_value,
         ticket_name: (t as any).ticket_name,
         user_name: (t as any).user_name,
-        TRN: oOid ? generateExternalReferenceFromOrderNumber(oOid) : "00000000",
+        TRN: order_oid
+          ? generateExternalReferenceFromOrderNumber(order_oid)
+          : "00000000",
       }
 
       pdfTickets.push(dt)
