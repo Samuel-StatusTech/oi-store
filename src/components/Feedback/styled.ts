@@ -4,6 +4,7 @@ export const Wrapper = styled.div<{
   $visible: boolean
 }>`
   position: fixed;
+  pointer-events: none;
   top: 100px;
   z-index: 50;
   right: 0;

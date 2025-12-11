@@ -2,7 +2,7 @@ import * as S from "./styled"
 
 type Props = {
   data: {
-    state: "approved" | "denied" | "expired" | "info"
+    state: "validado" | "denied" | "expired" | "info"
     visible: boolean
     message: string
   }
@@ -13,7 +13,7 @@ const Feedback = ({ data }: Props) => {
     <S.Wrapper $visible={data.visible}>
       <S.Box
         $color={
-          data.state === "approved"
+          data.state === "validado"
             ? "green"
             : data.state === "expired"
             ? "orange"
