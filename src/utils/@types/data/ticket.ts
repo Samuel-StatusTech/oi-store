@@ -35,6 +35,7 @@ export interface TShoppingTicket {
   opuid: string
   id: string
   name: string
+  buyer_name: string
   batch_name: string
   qr_data: string
   qr_label: string

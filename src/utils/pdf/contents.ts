@@ -146,11 +146,11 @@ const ticketData = (
           style: "purchaseDate",
         },
       ],
-      ...(ticket.user_name
+      ...(ticket.buyer_name
         ? [
             [
               {
-                text: `Comprado por ${ticket.user_name}`,
+                text: `Comprado por ${ticket.buyer_name}`,
                 style: "purchaseDate",
               },
             ],
