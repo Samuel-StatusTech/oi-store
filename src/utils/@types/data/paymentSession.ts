@@ -5,4 +5,5 @@ export type TPaymentSession = {
   qrCode: string
   qrCode64: string
   paymentStartedAt: string
+  amount: number
 }

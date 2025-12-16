@@ -14,6 +14,9 @@ type TApiGetters = {
   purchaseInfo: (
     p: TParams["get"]["purchaseInfo"]
   ) => TResponses["get"]["purchaseInfo"]
+  orderPaymentStatus: (
+    p: TParams["get"]["orderPaymentStatus"]
+  ) => TResponses["get"]["orderPaymentStatus"]
 }
 
 /*

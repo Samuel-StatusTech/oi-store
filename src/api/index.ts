@@ -573,6 +573,34 @@ const sendEmail: TApi["post"]["mail"]["sendEmail"] = async (mailInfo) => {
  * Purchase
  */
 
+const orderPaymentStatus: TApi["get"]["orderPaymentStatus"] = async ({
+  eventId,
+  orderId,
+}) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      await axios
+        .get(`/${eventId}/ecommerce/orders/${orderId}/status`)
+        .then((res) => {
+          const purchase = res.data
+
+          resolve({ ok: true, data: purchase })
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Algo deu errado. Tente novamente mais tarde.",
+          })
+        })
+    } catch (error) {
+      reject({
+        error:
+          "Erro ao monitorar status do pagamento. Tente novamente mais tarde",
+      })
+    }
+  })
+}
+
 const signPurchase: TApi["post"]["purchase"]["sign"] = async (data) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -698,6 +726,7 @@ export const Api: TApi = {
     myTickets: getMyTickets,
     products: getProducts,
     purchaseInfo: getPurchase,
+    orderPaymentStatus: orderPaymentStatus,
   },
   post: {
     register: registerUser,

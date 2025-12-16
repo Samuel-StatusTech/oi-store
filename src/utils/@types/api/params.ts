@@ -41,6 +41,10 @@ type TParams = {
       eventId: string
       orderId: string
     }
+    orderPaymentStatus: {
+      eventId: string
+      orderId: string
+    }
   }
 
   // Post

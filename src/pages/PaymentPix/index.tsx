@@ -64,6 +64,7 @@ const PaymentPix = () => {
   const [qrCode64, setQrCode64] = useState("")
   const [feedback, setFeedback] = useState<any>({ visible: false, message: "" })
 
+  const [isPoolingOrderStatus, setIsPoolingOrderStatus] = useState(false)
   const [payed, setPayed] = useState(false)
 
   useEffect(() => {
@@ -166,11 +167,88 @@ const PaymentPix = () => {
     setSid(socketId)
   }, [])
 
+  const startPoolingOrderStatus = useCallback(async () => {
+    try {
+      setIsPoolingOrderStatus(true)
+      const paymentSession = localStorage.getItem("paymentSession")
+      const paymentToRecover: TPaymentSession | null = paymentSession
+        ? JSON.parse(paymentSession)
+        : null
+
+      if (paymentToRecover) {
+        const req = await Api.get.purchaseInfo({
+          eventId: event?.id as string,
+          orderId: paymentToRecover.socketId,
+        })
+
+        if (req.ok) {
+          const { payments } = req.data
+
+          const status =
+            payments.length === 0 ? false : payments[0].transition_id !== null
+
+          if (status) {
+            const purchase = await confirmPurchase(
+              paymentToRecover.socketId,
+              paymentToRecover.paymentId
+            )
+
+            let f = {
+              state: "validado",
+              visible: false,
+              message: "Pagamento realizado com sucesso.",
+            }
+
+            if (purchase.ok) {
+              f.visible = true
+
+              setFeedback(f)
+
+              setTimeout(() => {
+                setFeedback({ ...f, visible: false })
+
+                setPayed(true)
+                localStorage.removeItem("paymentSession")
+
+                localStorage.setItem("payed", "true")
+
+                handleEmail({
+                  amount: paymentToRecover.amount,
+                  message: "",
+                  sId: paymentToRecover.socketId,
+                  status: "validado",
+                  time: new Date().toISOString(),
+                  transition_id: paymentToRecover.extref,
+                })
+              }, 3500)
+            }
+          } else {
+            const isPayed = localStorage.getItem("payed") === "true"
+            const isPaymentPage = window.location.href.endsWith("pix")
+
+            if (isPaymentPage && !isPayed) {
+              setTimeout(startPoolingOrderStatus, 4000)
+              return
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.log(error)
+    }
+
+    setIsPoolingOrderStatus(false)
+  }, [])
+
   const handleConnectError = useCallback((socket: any) => {
     alert("Ops, houve um erro. Tente novamente mais tarde")
     socket.off("disconnect")
     socket.disconnect()
     // returnPage()
+
+    // Start looping status monitoring
+    window.location.reload()
+
     return
   }, [])
 
@@ -241,7 +319,11 @@ const PaymentPix = () => {
     }
   }
 
-  const storeQrCodeIntoPaymentSession = (qrCode: string, qrCode64: string) => {
+  const storeDataIntoPaymentSession = (
+    qrCode: string,
+    qrCode64: string,
+    paymentAmount: number
+  ) => {
     const paymentSession = localStorage.getItem("paymentSession")
     const paymentToRecover: TPaymentSession | null = paymentSession
       ? JSON.parse(paymentSession)
@@ -253,6 +335,7 @@ const PaymentPix = () => {
           ...paymentToRecover,
           qrCode,
           qrCode64,
+          amount: paymentAmount,
         }
 
         localStorage.setItem("paymentSession", JSON.stringify(newData))
@@ -286,9 +369,10 @@ const PaymentPix = () => {
           if (qr.ok) {
             setQrCode(qr.data.qrcodes.code)
             setQrCode64(qr.data.qrcodes.base64)
-            storeQrCodeIntoPaymentSession(
+            storeDataIntoPaymentSession(
               qr.data.qrcodes.code,
-              qr.data.qrcodes.base64
+              qr.data.qrcodes.base64,
+              orderData.transaction_amount
             )
             runTimer()
           }
@@ -315,6 +399,8 @@ const PaymentPix = () => {
 
     if (!pendingPayment && sid !== "" && isNewOrder && !pendingPayment) {
       startPurchase()
+    } else {
+      if (!isPoolingOrderStatus) startPoolingOrderStatus()
     }
   }, [sid, localStorage, lctn])
 
@@ -480,6 +566,7 @@ const PaymentPix = () => {
               qrCode: "",
               qrCode64: "",
               paymentStartedAt: new Date().getTime().toString(),
+              amount: orderData?.transaction_amount as number,
             }
 
             localStorage.setItem(
@@ -505,6 +592,7 @@ const PaymentPix = () => {
     const tickets = p.products as any[]
 
     const external_reference = p.extref
+    const buyer_name = p.buyer_name
 
     tickets.forEach((t, k) => {
       const tid = generateTicketID(
@@ -531,6 +619,7 @@ const PaymentPix = () => {
         tax_value: t.tax_value,
         ticket_name: (t as any).ticket_name,
         user_name: (t as any).user_name,
+        buyer_name: buyer_name,
         TRN: external_reference,
       }
 

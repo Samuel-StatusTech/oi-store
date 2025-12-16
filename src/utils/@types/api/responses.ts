@@ -29,6 +29,7 @@ type TResponses = {
           opuid: string
           id: string
           name: string
+          buyer_name: string
           batch_name: string
           qr_data: string
           qr_label: string
@@ -53,6 +54,7 @@ type TResponses = {
         }[]
       }>
     >
+    orderPaymentStatus: Promise<TDefaultRes<{ status: "validado" | null }>>
   }
   post: {
     register: Promise<
