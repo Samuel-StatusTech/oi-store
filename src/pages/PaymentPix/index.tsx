@@ -398,7 +398,8 @@ const PaymentPix = () => {
     const isNewOrder = lctn.state?.isNewOrder ?? false
 
     if (!pendingPayment && sid !== "" && isNewOrder && !pendingPayment) {
-      startPurchase()
+      const savedPayed = localStorage.getItem("payed") === "true" || payed
+      if (!savedPayed) startPurchase()
     } else {
       if (!isPoolingOrderStatus) startPoolingOrderStatus()
     }
@@ -475,7 +476,9 @@ const PaymentPix = () => {
   }, [])
 
   const restartTimer = () => {
-    if (!payed) {
+    const savedPayed = localStorage.getItem("payed") === "true" || payed
+
+    if (!savedPayed) {
       setQrCode("")
       setQrCode64("")
       setTime("15:00")
