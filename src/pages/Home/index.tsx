@@ -122,7 +122,16 @@ const Home = () => {
     <S.Page>
       <Header />
       <S.Hero>
-        <img src={event?.event_banner} alt={""} className={"blured"} />
+        <img
+          src={event?.event_banner}
+          alt={""}
+          className={"blured blured-horizontal"}
+        />
+        <img
+          src={event?.event_banner_vertical}
+          alt={""}
+          className={"blured blured-vertical"}
+        />
         <Container>
           <S.ImageContainer
             $hasBanner={!!event?.event_banner}
@@ -131,12 +140,12 @@ const Home = () => {
             <img
               src={event?.event_banner}
               alt={""}
-              className={`event_banner_vertical`}
+              className={`event-banner`}
             />
             <img
               src={event?.event_banner_vertical}
               alt={""}
-              className={`event_banner`}
+              className={`event-banner-vertical`}
             />
           </S.ImageContainer>
         </Container>

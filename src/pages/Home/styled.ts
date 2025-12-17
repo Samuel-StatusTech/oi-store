@@ -30,34 +30,62 @@ export const Hero = styled.div`
       theme.animations.durations.main +
       theme.animations.delays.main(0)}
   }
+
+  img.blured-vertical {
+    display: none;
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    img.blured-horizontal {
+      display: none;
+    }
+
+    img.blured-vertical {
+      display: block;
+    }
+  }
 `
 
-export const ImageContainer = styled.div<{$hasBanner?: boolean; $hasVerticalBanner?: boolean}>`
-  max-height: 540px;
+export const ImageContainer = styled.div<{
+  $hasBanner?: boolean
+  $hasVerticalBanner?: boolean
+}>`
+  height: 64svh;
   display: flex;
   align-items: center;
+  justify-content: center;
   overflow: hidden;
   border-radius: 12px;
+  width: fit-content;
+  max-width: 100%;
+  place-self: center;
 
   img {
-    width: 100%;
+    width: auto;
     max-width: 100%;
+    height: 100%;
     max-height: 100%;
 
-    &.event_banner_vertical {
+    &.event-banner-vertical {
       display: none;
     }
   }
 
-  @media (min-width: ${({theme}) => theme.bp.small}px) {
-    max-height: 80svh;
-    
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    width: 100%;
+    height: fit-content;
+    max-height: 70svh;
+
     img {
-      &.event_banner {
+      width: 100%;
+      height: auto;
+      max-height: 70svh;
+
+      &.event-banner {
         display: none;
       }
-      
-      &.event_banner_vertical {
+
+      &.event-banner-vertical {
         display: inline-block;
       }
     }
