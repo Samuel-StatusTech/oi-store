@@ -23,6 +23,15 @@ export const sendEmail = async (
 ) => {
   try {
     // Mail Data
+
+    const eventDateText =
+      event.date_end === event.date_ini
+        ? formatDate(event.date_ini, "dd/MM/yyyy")
+        : `${formatDate(event.date_ini, "dd/MM/yyyy")} até ${formatDate(
+            event.date_end,
+            "dd/MM/yyyy"
+          )}`
+
     const startAt = event?.date_ini
       ? getHours(
           new Date(
@@ -64,7 +73,7 @@ export const sendEmail = async (
       logoWebstoreUrl: event?.logoWebstoreUrl ?? event?.logoFixed,
 
       eventName: event?.name,
-      eventDate: formatDate(event?.date_ini as string, "dd/MM/yyyy"),
+      eventDate: eventDateText,
       eventTime: startAt,
       eventLocal: event?.local,
 
