@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 import { useLocation, useNavigate } from "react-router-dom"
 import { TShoppingTicket } from "../../utils/@types/data/ticket"
 import { clockdown } from "../../utils/tb/timer"
@@ -64,6 +64,11 @@ const PaymentPix = () => {
   const [qrCode64, setQrCode64] = useState("")
   const [feedback, setFeedback] = useState<any>({ visible: false, message: "" })
 
+  const isPollingRef = useRef(false)
+  const isOrderConfirmingRef = useRef(false)
+  const isOrderConfirmedRef = useRef(false)
+
+  const [isOrderConfirmed, setIsOrderConfirmed] = useState(false)
   const [isPoolingOrderStatus, setIsPoolingOrderStatus] = useState(false)
   const [payed, setPayed] = useState(false)
 
@@ -107,6 +112,8 @@ const PaymentPix = () => {
           event?.id as string
         )
 
+        const targetEmail = (lctn.state.buyer?.email as string) ?? "seu email"
+
         pageTools.email.sendEmail(
           event as TEventData,
           user as TUser,
@@ -117,7 +124,8 @@ const PaymentPix = () => {
             transition_id: external_reference,
             time: new Date(req.data.products[0].date).toISOString(),
           },
-          parsedData
+          parsedData,
+          targetEmail
         )
       }
     } catch (error) {}
@@ -128,7 +136,10 @@ const PaymentPix = () => {
   const clearAndGetNewPurchase = () => {
     localStorage.removeItem("paymentSession")
     const savedPayed = localStorage.getItem("payed") === "true"
-    if (!savedPayed) {
+
+    if (savedPayed) {
+      keepShopping()
+    } else {
       startPurchase()
     }
   }
@@ -167,9 +178,11 @@ const PaymentPix = () => {
     setSid(socketId)
   }, [])
 
-  const startPoolingOrderStatus = useCallback(async () => {
+  const startPoolingOrderStatus = useCallback(async (retries = 0) => {
     try {
-      setIsPoolingOrderStatus(true)
+      // if (isPollingRef.current) return
+
+      isPollingRef.current = true
       const paymentSession = localStorage.getItem("paymentSession")
       const paymentToRecover: TPaymentSession | null = paymentSession
         ? JSON.parse(paymentSession)
@@ -227,10 +240,19 @@ const PaymentPix = () => {
             const isPaymentPage = window.location.href.endsWith("pix")
 
             if (isPaymentPage && !isPayed) {
-              setTimeout(startPoolingOrderStatus, 4000)
+              setTimeout(() => {
+                startPoolingOrderStatus(retries)
+              }, 4000)
+
               return
             }
           }
+        }
+      } else {
+        if (retries <= 3) {
+          setTimeout(() => {
+            startPoolingOrderStatus(retries + 1)
+          }, 3000)
         }
       }
     } catch (error) {
@@ -254,17 +276,29 @@ const PaymentPix = () => {
 
   const handleOrderUpdate = useCallback(
     async (socket: any, data: any) => {
-      if (data.status === "validado" || data.status === "denied") {
+      if (
+        (data.status === "validado" || data.status === "denied") &&
+        !isOrderConfirmed
+      ) {
         let f = {
           state: data.status,
           visible: false,
           message: data.message,
         }
 
+        let shouldEmail = false
+
         if (data.status === "validado") {
           const purchase = await confirmPurchase(data.sId, data.code)
 
-          if (purchase.ok && !purchase.data.success) f.state = "denied"
+          if (purchase.ok) {
+            if (!purchase.data.success) {
+              f.state = "denied"
+            } else {
+              shouldEmail = true
+              setIsOrderConfirmed(true)
+            }
+          }
 
           f.visible = true
         }
@@ -281,7 +315,9 @@ const PaymentPix = () => {
 
               localStorage.setItem("payed", "true")
 
-              handleEmail(data)
+              if (shouldEmail) {
+                handleEmail(data)
+              }
 
               socket.disconnect()
               socket.off("plugged", handlePlugged)
@@ -308,13 +344,8 @@ const PaymentPix = () => {
 
         // monitor payment
         socket.on("orderUpdate", (socketData: any) => {
-          handleOrderUpdate(socket, socketData)
-        })
-
-        // Disconnect after 15 minutes
-        setTimeout(() => {
           socket.disconnect()
-        }, 900000)
+        })
       }
     }
   }
@@ -397,13 +428,20 @@ const PaymentPix = () => {
     const pendingPayment = localStorage.getItem("paymentSession")
     const isNewOrder = lctn.state?.isNewOrder ?? false
 
-    if (!pendingPayment && sid !== "" && isNewOrder && !pendingPayment) {
+    if (!pendingPayment && sid !== "" && isNewOrder) {
       const savedPayed = localStorage.getItem("payed") === "true" || payed
-      if (!savedPayed) startPurchase()
+      if (savedPayed) keepShopping()
+      else {
+        await startPurchase()
+        startPoolingOrderStatus()
+      }
     } else {
-      if (!isPoolingOrderStatus) startPoolingOrderStatus()
+      if (pendingPayment) {
+        await startPurchase()
+        startPoolingOrderStatus()
+      }
     }
-  }, [sid, localStorage, lctn])
+  }, [sid, localStorage, lctn, isPoolingOrderStatus])
 
   useEffect(() => {
     ignite()
@@ -649,13 +687,27 @@ const PaymentPix = () => {
     }
   }
 
-  const confirmPurchase = useCallback(async (sId: string, pcode: string) => {
-    return await Api.post.purchase.confirm({
-      order_id: sId,
-      order_number: orderId,
-      payment_code: pcode,
-    })
-  }, [])
+  const confirmPurchase = async (sId: string, pcode: string) => {
+    if (!isOrderConfirmingRef.current && !isOrderConfirmedRef.current) {
+      isOrderConfirmingRef.current = true
+
+      const confirmation = await Api.post.purchase.confirm({
+        order_id: sId,
+        order_number: orderId,
+        payment_code: pcode,
+      })
+
+      if (confirmation.ok && confirmation.data.success) {
+        isOrderConfirmedRef.current = true
+      }
+
+      isOrderConfirmingRef.current = false
+
+      return confirmation
+    } else {
+      return { ok: false, data: { success: false } }
+    }
+  }
 
   useEffect(() => {
     window.scrollTo({ top: 0 })
@@ -705,6 +757,8 @@ const PaymentPix = () => {
   const keepShopping = () => {
     navigate("/", { replace: true, state: {} })
   }
+
+  // ----- CALCULATE ORDER TOTAL AMOUNT -----
 
   useEffect(() => {
     if (totalOrderAmount === 0) {

@@ -18,7 +18,8 @@ export const sendEmail = async (
     transition_id: string
     time: string
   },
-  productsList: any[]
+  productsList: any[],
+  targetEmail: string
 ) => {
   try {
     // Mail Data
@@ -76,7 +77,7 @@ export const sendEmail = async (
       purchaseItems: JSON.stringify(list),
       purchaseStatus: "Pago",
 
-      targetEmail: user?.email,
+      targetEmail: targetEmail,
     }
 
     await Api.post.mail.sendEmail(mailInfo)
