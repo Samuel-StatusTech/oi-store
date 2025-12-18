@@ -91,6 +91,10 @@ type TParams = {
         eventTime: string
         eventLocal: string
 
+        buyerName: string
+        organizerName: string
+        organizerDocument: string
+
         purchaseCode: string
         purchaseTime: string
         purchaseValue: string

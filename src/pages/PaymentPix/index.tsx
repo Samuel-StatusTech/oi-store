@@ -68,7 +68,6 @@ const PaymentPix = () => {
   const isOrderConfirmingRef = useRef(false)
   const isOrderConfirmedRef = useRef(false)
 
-  const [isOrderConfirmed, setIsOrderConfirmed] = useState(false)
   const [isPoolingOrderStatus, setIsPoolingOrderStatus] = useState(false)
   const [payed, setPayed] = useState(false)
 
@@ -113,6 +112,7 @@ const PaymentPix = () => {
         )
 
         const targetEmail = (lctn.state.buyer?.email as string) ?? "seu email"
+        const buyerName = lctn.state.buyer?.name as string
 
         pageTools.email.sendEmail(
           event as TEventData,
@@ -125,7 +125,8 @@ const PaymentPix = () => {
             time: new Date(req.data.products[0].date).toISOString(),
           },
           parsedData,
-          targetEmail
+          targetEmail,
+          buyerName
         )
       }
     } catch (error) {}
@@ -217,22 +218,22 @@ const PaymentPix = () => {
 
               setFeedback(f)
 
+              setPayed(true)
+              localStorage.removeItem("paymentSession")
+
+              localStorage.setItem("payed", "true")
+
+              handleEmail({
+                amount: paymentToRecover.amount,
+                message: "",
+                sId: paymentToRecover.socketId,
+                status: "validado",
+                time: new Date().toISOString(),
+                transition_id: paymentToRecover.extref,
+              })
+
               setTimeout(() => {
                 setFeedback({ ...f, visible: false })
-
-                setPayed(true)
-                localStorage.removeItem("paymentSession")
-
-                localStorage.setItem("payed", "true")
-
-                handleEmail({
-                  amount: paymentToRecover.amount,
-                  message: "",
-                  sId: paymentToRecover.socketId,
-                  status: "validado",
-                  time: new Date().toISOString(),
-                  transition_id: paymentToRecover.extref,
-                })
               }, 3500)
             }
           } else {
@@ -273,63 +274,6 @@ const PaymentPix = () => {
 
     return
   }, [])
-
-  const handleOrderUpdate = useCallback(
-    async (socket: any, data: any) => {
-      if (
-        (data.status === "validado" || data.status === "denied") &&
-        !isOrderConfirmed
-      ) {
-        let f = {
-          state: data.status,
-          visible: false,
-          message: data.message,
-        }
-
-        let shouldEmail = false
-
-        if (data.status === "validado") {
-          const purchase = await confirmPurchase(data.sId, data.code)
-
-          if (purchase.ok) {
-            if (!purchase.data.success) {
-              f.state = "denied"
-            } else {
-              shouldEmail = true
-              setIsOrderConfirmed(true)
-            }
-          }
-
-          f.visible = true
-        }
-
-        setFeedback(f)
-
-        setTimeout(() => {
-          setFeedback({ ...f, visible: false })
-
-          if (f.state === "validado") {
-            setTimeout(() => {
-              setPayed(true)
-              localStorage.removeItem("paymentSession")
-
-              localStorage.setItem("payed", "true")
-
-              if (shouldEmail) {
-                handleEmail(data)
-              }
-
-              socket.disconnect()
-              socket.off("plugged", handlePlugged)
-              socket.off("connect_error", handleConnectError)
-              socket.off("orderUpdate", handleOrderUpdate)
-            }, 400)
-          }
-        }, 3500)
-      }
-    },
-    [localStorage]
-  )
 
   const startSocket = async () => {
     if (!payed) {

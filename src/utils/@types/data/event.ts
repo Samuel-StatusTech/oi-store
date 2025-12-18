@@ -60,6 +60,7 @@ export type TEventData = {
   logoFixed: string
   logoWebstore: string
   logoWebstoreUrl: string
+  webstoreLogoUrl: string
   phone: string
   taxes: {
     credit: string | number

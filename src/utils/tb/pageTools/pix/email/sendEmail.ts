@@ -19,7 +19,8 @@ export const sendEmail = async (
     time: string
   },
   productsList: any[],
-  targetEmail: string
+  targetEmail: string,
+  buyerName: string
 ) => {
   try {
     // Mail Data
@@ -70,7 +71,12 @@ export const sendEmail = async (
     const mailInfo: any = {
       logo: await pageToolsPix.getLogoFile(event as TEventData),
       file: await pageToolsPix.getPdfFile(event as TEventData, productsList),
-      logoWebstoreUrl: event?.logoWebstoreUrl ?? event?.logoFixed,
+      logoWebstoreUrl: event?.logoWebstore ?? event?.logoWebstoreUrl,
+
+      buyerName: buyerName,
+
+      organizerName: event?.corporateName ?? "",
+      organizerDocument: event?.CNPJ ?? "",
 
       eventName: event?.name,
       eventDate: eventDateText,

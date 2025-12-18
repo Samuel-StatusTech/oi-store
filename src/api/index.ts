@@ -542,6 +542,10 @@ const sendEmail: TApi["post"]["mail"]["sendEmail"] = async (mailInfo) => {
       formData.append("eventTime", mailInfo.eventTime)
       formData.append("eventLocal", mailInfo.eventLocal)
 
+      formData.append("buyerName", mailInfo.buyerName)
+      formData.append("organizerName", mailInfo.organizerName)
+      formData.append("organizerDocument", mailInfo.organizerDocument)
+
       formData.append("purchaseCode", mailInfo.purchaseCode)
       formData.append("purchaseTime", mailInfo.purchaseTime)
       formData.append("purchaseValue", mailInfo.purchaseValue)
