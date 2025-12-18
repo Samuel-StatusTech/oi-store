@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode"
 import TParams from "../utils/@types/api/params"
 import { formatDate } from "date-fns"
 import getStore from "../store"
+import { checkEndingDate } from "../utils/tb/checkEndingDate"
 
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
@@ -111,16 +112,21 @@ const getEvents: TApi["get"]["events"] = async () => {
           const list = res.data.events
 
           if (list) {
+            const availableEvents = list
+              .filter(
+                (event: any) =>
+                  checkEndingDate(event) && Boolean(event.is_ecommerce)
+              )
+              .map((ev: any) => ({
+                ...ev,
+                dk: res.data.dk,
+              }))
+
             resolve({
               ok: true,
               data: {
                 organizer: res.data.info,
-                events: list
-                  .filter((ev: any) => Boolean(ev.is_ecommerce))
-                  .map((ev: any) => ({
-                    ...ev,
-                    dk: res.data.dk,
-                  })),
+                events: availableEvents,
               },
             })
           } else {

@@ -20,6 +20,7 @@ import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
 import { useNavigate } from "react-router-dom"
 import { TEventData } from "../../utils/@types/data/event"
 import { parseEmojis } from "../../utils/tb/text"
+import { checkEndingDate } from "../../utils/tb/checkEndingDate"
 
 const Home = () => {
   const navigate = useNavigate()
@@ -40,7 +41,10 @@ const Home = () => {
 
         if (req.ok) {
           const data = req.data
-          if (data.is_ecommerce) {
+
+          const isStillAvailable = checkEndingDate(data as any)
+
+          if (isStillAvailable && data.is_ecommerce) {
             controllers.event.setData(req.data)
             localStorage.setItem("event", JSON.stringify(req.data))
           } else {

@@ -3,6 +3,7 @@ import { TShoppingTicket } from "../@types/data/ticket"
 import { formatCNPJ } from "../masks/cnpj"
 import { getDateString } from "../tb/date"
 import { formatMoney } from "../tb/formatMoney"
+import { monthsRelations } from "../tb/getDatePeriod"
 
 export const reportTitle = [
   {
@@ -48,6 +49,20 @@ export const footer = (event: TEventData) => [
   },
 ]
 
+const formatdM = (date: string | number | Date) => {
+  let str = ""
+
+  const d = new Date(date)
+
+  // day
+  str = String(d.getDate()).padStart(2, "0")
+
+  // month
+  str += ` de ${monthsRelations[d.getMonth()]}`
+
+  return str
+}
+
 const ticketData = (
   event: TEventData,
   ticket: TShoppingTicket & {
@@ -73,6 +88,11 @@ const ticketData = (
       return str
     }
 
+    const eventDateText =
+      event.date_end === event.date_ini
+        ? formatdM(event.date_ini)
+        : `${formatdM(event.date_ini)} até ${formatdM(event.date_end)}`
+
     const eventInfo = {
       pageBreak: newPage ? "before" : undefined,
       style: "eventTable",
@@ -82,10 +102,7 @@ const ticketData = (
           [{ text: event.name, bold: true }],
           [
             {
-              text: `Data do evento: ${getDateString(
-                "dM",
-                event.date_ini as string
-              )}`,
+              text: `Data do evento: ${eventDateText}`,
             },
           ],
           [{ text: `Início do evento: ${getHours(event.date_ini as string)}` }],
@@ -142,7 +159,7 @@ const ticketData = (
       [{ text: "Ingresso", bold: true, style: "tableTitle" }],
       [
         {
-          text: `Comprado dia ${getDateString("pdf", ticket.date)}`,
+          text: `Comprado dia ${getDateString("full", ticket.date)}`,
           style: "purchaseDate",
         },
       ],
@@ -206,7 +223,7 @@ const ticketData = (
 
     tableBody.push([
       {
-        text: `TRN: ${ticket.TRN}`,
+        text: `Referência: ${ticket.TRN}`,
       },
     ])
 
