@@ -6,7 +6,9 @@ export const getLogoFile = async (
 ): Promise<File | string> => {
   let res: string | File = ""
 
-  res = event?.logoWebstore ? base64ToFile(event?.logoWebstore, "logo.png") : ""
+  const logo = event?.logoWebstore ?? event?.logoWebstoreUrl
+
+  res = logo ? base64ToFile(logo, "logo.png") : ""
 
   return res
 }
