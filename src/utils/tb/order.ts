@@ -48,7 +48,6 @@ export const getOrderData = (
       } else {
         itemsMap.set(t.id, {
           title: t.ticketName,
-          name: t.ticketName,
           quantity: 1,
           unit_amount: +(t.price_sell ?? "0"),
         })
@@ -60,7 +59,6 @@ export const getOrderData = (
     if (taxTotal > 0)
       items.push({
         title: "Taxas",
-        name: "Taxes",
         quantity: 1,
         unit_amount: taxTotal,
       })

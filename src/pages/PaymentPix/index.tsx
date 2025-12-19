@@ -256,8 +256,7 @@ const PaymentPix = () => {
           }, 3000)
         }
       }
-    } catch (error) {
-    }
+    } catch (error) {}
 
     setIsPoolingOrderStatus(false)
   }, [])
@@ -350,13 +349,32 @@ const PaymentPix = () => {
     }
   }
 
+  const checkIsRefreshAfterPayment = async () => {
+    let savedPayment = false
+
+    await new Promise((resolve) =>
+      setTimeout(() => {
+        const localPayed = localStorage.getItem("payed")
+        savedPayment = localPayed
+          ? localStorage.getItem("payed") === "true"
+          : false
+        resolve(true)
+      }, 500)
+    )
+
+    return savedPayment
+  }
+
   const ignite = useCallback(async () => {
     const pendingPayment: TPaymentSession | null =
       paymentSessionRef.current ?? localStorage.getItem("paymentSession")
         ? JSON.parse(localStorage.getItem("paymentSession") ?? "{}")
         : null
 
-    const isPayed = payedRef.current ?? payed
+    const savedPayment = localStorage.getItem("payed")
+
+    const isPayed =
+      payedRef.current ?? savedPayment ? savedPayment === "true" : payed
 
     const hasOngoingPurchase = !!pendingPayment
 
@@ -364,9 +382,16 @@ const PaymentPix = () => {
       if (hasOngoingPurchase) {
         checkPendingPayment()
       } else {
-        if (sid !== "") {
-          await startPurchase()
-          startPoolingOrderStatus()
+        const alreadyPayed = await checkIsRefreshAfterPayment()
+
+        if (alreadyPayed) {
+          goToMyTickets()
+          return
+        } else {
+          if (sid !== "") {
+            await startPurchase()
+            startPoolingOrderStatus()
+          }
         }
       }
     }
@@ -688,6 +713,10 @@ const PaymentPix = () => {
 
   const keepShopping = () => {
     navigate("/", { replace: true, state: {} })
+  }
+
+  const goToMyTickets = () => {
+    navigate("/mytickets", { replace: true, state: {} })
   }
 
   // ----- CALCULATE ORDER TOTAL AMOUNT -----
