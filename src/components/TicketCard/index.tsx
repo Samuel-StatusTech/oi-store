@@ -81,6 +81,20 @@ const TicketCard = ({ k, data }: Props) => {
     </S.Icons>
   )
 
+  // const renderEventDate = () => {
+  //   if (event) {
+  //     const eventDateText =
+  //       event.date_end === event.date_ini
+  //         ? formatDate(event.date_ini, "dd/MM/yyyy")
+  //         : `${formatDate(event.date_ini, "dd/MM/yyyy")} até ${formatDate(
+  //             event.date_end,
+  //             "dd/MM/yyyy"
+  //           )}`
+
+  //     return <S.EventDate>{eventDateText}</S.EventDate>
+  //   }
+  // }
+
   const renderPrice = () => (
     <S.EventDate>{formatMoney(+data.total_price, true)}</S.EventDate>
   )
@@ -100,6 +114,7 @@ const TicketCard = ({ k, data }: Props) => {
         <S.EventInfo>
           <S.CardBottom>
             <S.EventName>{getDate()}</S.EventName>
+            {/* {renderEventDate()} */}
             {renderPrice()}
           </S.CardBottom>
           <S.CardBottom>

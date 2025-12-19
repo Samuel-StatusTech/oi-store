@@ -13,9 +13,10 @@ import { Api } from "../../api"
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
 import { TEventData } from "../../utils/@types/data/event"
+import { formatDate } from "date-fns"
 
 const MyTickets = () => {
-  const { controllers, user } = getStore()
+  const { controllers, user, event } = getStore()
 
   const navigate = useNavigate()
 
@@ -110,6 +111,20 @@ const MyTickets = () => {
     }
   }, [controllers.event, getData, navigate, user])
 
+  const renderEventDate = () => {
+    if (event) {
+      const eventDateText =
+        event.date_end === event.date_ini
+          ? formatDate(event.date_ini, "dd/MM/yyyy")
+          : `${formatDate(event.date_ini, "dd/MM/yyyy")} até ${formatDate(
+              event.date_end,
+              "dd/MM/yyyy"
+            )}`
+
+      return eventDateText
+    }
+  }
+
   return (
     <S.Page>
       <Header />
@@ -117,6 +132,7 @@ const MyTickets = () => {
       <Container fullHeight={true}>
         <S.Main>
           <S.PageTitle>Meus ingressos</S.PageTitle>
+          <S.PageSubTitle>Data do evento: {renderEventDate()}</S.PageSubTitle>
 
           {loading ? (
             <div style={{ width: 256, margin: "0 auto" }}>

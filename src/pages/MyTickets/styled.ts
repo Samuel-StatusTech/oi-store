@@ -19,6 +19,13 @@ export const PageTitle = styled.h1<{ $align?: string }>`
   text-align: ${({ $align }) => $align ?? "left"};
 `
 
+export const PageSubTitle = styled.h1<{ $align?: string }>`
+  margin-top: -24px;
+  font-size: 16px;
+  font-weight: 500;
+  color: ${({ theme }) => theme.colors.black.secondary};
+`
+
 export const List = styled.div`
   display: grid;
   grid-template-columns: repeat(4, 1fr);
