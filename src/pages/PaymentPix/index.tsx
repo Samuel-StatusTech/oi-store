@@ -110,7 +110,8 @@ const PaymentPix = () => {
           sid,
           user as TUser,
           event?.dk as string,
-          event?.id as string
+          event?.id as string,
+          event?.name as string
         )
 
         const targetEmail = (lctn.state.buyer?.email as string) ?? "seu email"
@@ -317,6 +318,7 @@ const PaymentPix = () => {
           user: user as TUser,
           dk: (event as TEventData).dk,
           eventId: (event as TEventData).id,
+          eventName: (event as TEventData).name,
         })
 
         if (orderData) {
@@ -526,6 +528,7 @@ const PaymentPix = () => {
           user: user,
           dk: event.dk,
           eventId: event.id,
+          eventName: event.name,
         })
 
         const sign = await Api.post.purchase.sign({
@@ -745,7 +748,8 @@ const PaymentPix = () => {
           sid,
           user as TUser,
           event?.dk as string,
-          event?.id as string
+          event?.id as string,
+          event?.name as string
         )
 
         if (!Number.isNaN(orderValueAmount))

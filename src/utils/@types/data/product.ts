@@ -1,6 +1,7 @@
 export type TProduct = {
   id: string
   batch_id: string
+  batch_name: string
   name: string
   image: string
   price_sell: number

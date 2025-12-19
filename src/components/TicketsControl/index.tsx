@@ -129,6 +129,7 @@ const TicketsControl = ({
               id: t.id,
               tax_value: taxPerTicket,
               ticketName: t.name,
+              batchName: t.batch_name,
               ticket_name: "",
               quantity: 1,
             })

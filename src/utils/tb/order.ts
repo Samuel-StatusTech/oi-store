@@ -14,6 +14,7 @@ type Props = {
   user: TUser
   dk: any
   eventId: string
+  eventName: string
 }
 
 export const getOrderData = (
@@ -28,6 +29,7 @@ export const getOrderData = (
     user,
     dk,
     eventId,
+    eventName
   } = props
 
   if (tickets) {
@@ -47,9 +49,9 @@ export const getOrderData = (
         })
       } else {
         itemsMap.set(t.id, {
-          title: t.ticketName,
+          title: `${t.ticketName} - ${t.batchName} - ${eventName}`,
           quantity: 1,
-          unit_amount: +(t.price_sell ?? "0"),
+          unit_price: +(t.price_sell ?? "0"),
         })
       }
     })
@@ -67,7 +69,6 @@ export const getOrderData = (
       external_reference: external_reference ?? "",
       transaction_amount: paymentValue,
       payment_method_id: "pix",
-      // description: "",
       payer: {
         first_name: user.name,
         last_name: user.username,

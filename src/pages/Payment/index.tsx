@@ -519,6 +519,7 @@ const Payment = () => {
         id: t.id,
         tax_value: taxPerTicket,
         ticketName: t.name,
+        batchName: t.batch_name,
         ticket_name: tt?.person.name,
         quantity: 1,
       })
