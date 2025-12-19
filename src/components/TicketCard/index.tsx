@@ -74,7 +74,7 @@ const TicketCard = ({ k, data }: Props) => {
         <DownloadIcon />
         <span>Baixar</span>
       </div>
-      <div onClick={handleShare}>
+      <div onClick={handleShare} className="shareBtn">
         <ShareIcon />
         <span>Enviar</span>
       </div>

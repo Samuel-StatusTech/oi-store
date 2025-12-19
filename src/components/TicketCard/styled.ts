@@ -122,6 +122,12 @@ export const Icons = styled.div`
       opacity: 1;
     }
   }
+
+  @media (min-width: ${({ theme }) => theme.bp.medium}px) {
+    .shareBtn {
+      display: none;
+    }
+  }
 `
 
 export const EventDate = styled.span`

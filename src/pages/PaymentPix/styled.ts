@@ -11,7 +11,7 @@ export const Main = styled.div`
   gap: 24px;
   padding: 0 0 64px 0;
 
-  @media (max-width: ${({theme}) => theme.bp.medium}px) {
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
     flex-direction: column;
   }
 `
@@ -260,6 +260,12 @@ export const Icons = styled.div`
 
     &:hover {
       background-color: #eee;
+    }
+
+    @media (min-width: ${({ theme }) => theme.bp.medium}px) {
+      .shareBtn {
+        display: none;
+      }
     }
   }
 `
