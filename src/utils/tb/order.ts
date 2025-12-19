@@ -40,8 +40,6 @@ export const getOrderData = (
     let itemsMap = new Map()
 
     tickets.forEach((t: any) => {
-      console.log("Buyed ticket", t)
-
       if (itemsMap.has(t.id)) {
         itemsMap.set(t.id, {
           ...itemsMap.get(t.id),
@@ -75,8 +73,7 @@ export const getOrderData = (
       payer: {
         first_name: user.name,
         last_name: user.username,
-        email: user.email ?? "email@email.com",
-        // type: "guest",
+        email: "email@email.com",
       },
       metadata: {
         socketId: sid,

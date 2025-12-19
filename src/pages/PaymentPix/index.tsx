@@ -257,7 +257,6 @@ const PaymentPix = () => {
         }
       }
     } catch (error) {
-      console.log(error)
     }
 
     setIsPoolingOrderStatus(false)
