@@ -24,6 +24,7 @@ type TParams = {
           eventId: string
         }
         buyerName?: string
+        items?: any[]
       }
     }
     events: {}

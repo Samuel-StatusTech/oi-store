@@ -37,16 +37,31 @@ export const getOrderData = (
 
     const phone = buyer.phone.replace(/\D/g, "")
 
-    let items = [
-      ...tickets.map((t) => ({
-        name: t.name,
-        quantity: 1,
-        unit_amount: +(t.price_sell ?? "0"),
-      })),
-    ]
+    let itemsMap = new Map()
+
+    tickets.forEach((t: any) => {
+      console.log("Buyed ticket", t)
+
+      if (itemsMap.has(t.id)) {
+        itemsMap.set(t.id, {
+          ...itemsMap.get(t.id),
+          quantity: itemsMap.get(t.id).quantity + 1,
+        })
+      } else {
+        itemsMap.set(t.id, {
+          title: t.ticketName,
+          name: t.ticketName,
+          quantity: 1,
+          unit_amount: +(t.price_sell ?? "0"),
+        })
+      }
+    })
+
+    let items: any = Array.from(itemsMap.values())
 
     if (taxTotal > 0)
       items.push({
+        title: "Taxas",
         name: "Taxes",
         quantity: 1,
         unit_amount: taxTotal,
@@ -75,7 +90,7 @@ export const getOrderData = (
         dk,
         eventId,
       },
-      // items
+      items,
     }
 
     return obj

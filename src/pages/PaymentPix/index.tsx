@@ -64,11 +64,13 @@ const PaymentPix = () => {
   const [qrCode64, setQrCode64] = useState("")
   const [feedback, setFeedback] = useState<any>({ visible: false, message: "" })
 
+  const payedRef = useRef(false)
+  const paymentSessionRef = useRef<TPaymentSession | null>(null)
   const isPollingRef = useRef(false)
   const isOrderConfirmingRef = useRef(false)
   const isOrderConfirmedRef = useRef(false)
 
-  const [isPoolingOrderStatus, setIsPoolingOrderStatus] = useState(false)
+  const [, setIsPoolingOrderStatus] = useState(false)
   const [payed, setPayed] = useState(false)
 
   useEffect(() => {
@@ -134,46 +136,42 @@ const PaymentPix = () => {
 
   // ----- MERCADOPAGO -----
 
-  const clearAndGetNewPurchase = () => {
+  const clearAndGetNewPurchase = async () => {
     localStorage.removeItem("paymentSession")
+    paymentSessionRef.current = null
     const savedPayed = localStorage.getItem("payed") === "true"
 
     if (savedPayed) {
       keepShopping()
     } else {
-      startPurchase()
+      await startPurchase()
+      startPoolingOrderStatus()
     }
   }
 
-  const checkPendingPayment = useCallback(
-    (socket: any) => {
-      const paymentSession = localStorage.getItem("paymentSession")
-      const paymentToRecover: TPaymentSession | null = paymentSession
-        ? JSON.parse(paymentSession)
-        : null
+  const checkPendingPayment = useCallback(() => {
+    const paymentSession = localStorage.getItem("paymentSession")
+    const paymentToRecover: TPaymentSession | null = paymentSession
+      ? JSON.parse(paymentSession)
+      : null
 
-      if (paymentToRecover) {
-        const runnedTime = Math.floor(
-          (new Date().getTime() - +paymentToRecover.paymentStartedAt) / 1000
-        )
+    if (paymentToRecover) {
+      const runnedTime = Math.floor(
+        (new Date().getTime() - +paymentToRecover.paymentStartedAt) / 1000
+      )
 
-        const remainingTime = 15 * 60 - runnedTime
+      const remainingTime = 15 * 60 - runnedTime
 
-        const isPaymentRecoverable = remainingTime > 0
+      const isPaymentRecoverable = remainingTime > 0
 
-        if (isPaymentRecoverable && paymentToRecover.qrCode) {
-          setQrCode(paymentToRecover.qrCode)
-          setQrCode64(paymentToRecover.qrCode64)
-          socket.emit("rejoinPaymentSession", {
-            paymentId: paymentToRecover.paymentId,
-            oldSocketId: paymentToRecover.socketId,
-          })
-          runTimer(remainingTime)
-        } else clearAndGetNewPurchase()
+      if (isPaymentRecoverable && paymentToRecover.qrCode) {
+        setQrCode(paymentToRecover.qrCode)
+        setQrCode64(paymentToRecover.qrCode64)
+        runTimer(remainingTime)
+        startPoolingOrderStatus()
       } else clearAndGetNewPurchase()
-    },
-    [localStorage, setQrCode, setQrCode64]
-  )
+    } else clearAndGetNewPurchase()
+  }, [localStorage, setQrCode, setQrCode64])
 
   const handlePlugged = useCallback((socketId: string) => {
     setSid(socketId)
@@ -219,7 +217,9 @@ const PaymentPix = () => {
               setFeedback(f)
 
               setPayed(true)
+              payedRef.current = true
               localStorage.removeItem("paymentSession")
+              paymentSessionRef.current = null
 
               localStorage.setItem("payed", "true")
 
@@ -263,31 +263,13 @@ const PaymentPix = () => {
     setIsPoolingOrderStatus(false)
   }, [])
 
-  const handleConnectError = useCallback((socket: any) => {
-    alert("Ops, houve um erro. Tente novamente mais tarde")
-    socket.off("disconnect")
-    socket.disconnect()
-    // returnPage()
-
-    // Start looping status monitoring
-    window.location.reload()
-
-    return
-  }, [])
-
   const startSocket = async () => {
     if (!payed) {
       const socket = instanceSocket()
 
       if (socket) {
-        socket.on("connect", () => {
-          checkPendingPayment(socket)
-        })
-        socket.on("plugged", handlePlugged)
-        socket.on("connect_error", () => handleConnectError(socket))
-
-        // monitor payment
-        socket.on("orderUpdate", (socketData: any) => {
+        socket.on("plugged", (socketData: any) => {
+          handlePlugged(socketData)
           socket.disconnect()
         })
       }
@@ -313,6 +295,7 @@ const PaymentPix = () => {
           amount: paymentAmount,
         }
 
+        paymentSessionRef.current = newData
         localStorage.setItem("paymentSession", JSON.stringify(newData))
       }
     }
@@ -369,23 +352,26 @@ const PaymentPix = () => {
   }
 
   const ignite = useCallback(async () => {
-    const pendingPayment = localStorage.getItem("paymentSession")
-    const isNewOrder = lctn.state?.isNewOrder ?? false
+    const pendingPayment: TPaymentSession | null =
+      paymentSessionRef.current ?? localStorage.getItem("paymentSession")
+        ? JSON.parse(localStorage.getItem("paymentSession") ?? "{}")
+        : null
 
-    if (!pendingPayment && sid !== "" && isNewOrder) {
-      const savedPayed = localStorage.getItem("payed") === "true" || payed
-      if (savedPayed) keepShopping()
-      else {
-        await startPurchase()
-        startPoolingOrderStatus()
-      }
-    } else {
-      if (pendingPayment) {
-        await startPurchase()
-        startPoolingOrderStatus()
+    const isPayed = payedRef.current ?? payed
+
+    const hasOngoingPurchase = !!pendingPayment
+
+    if (!isPayed) {
+      if (hasOngoingPurchase) {
+        checkPendingPayment()
+      } else {
+        if (sid !== "") {
+          await startPurchase()
+          startPoolingOrderStatus()
+        }
       }
     }
-  }, [sid, localStorage, lctn, isPoolingOrderStatus])
+  }, [sid, paymentSessionRef.current, payedRef.current, payed])
 
   useEffect(() => {
     ignite()
@@ -657,8 +643,11 @@ const PaymentPix = () => {
     window.scrollTo({ top: 0 })
 
     try {
-      loadEventData()
-      startSocket()
+      if (!lctn.state?.tickets) keepShopping()
+      else {
+        loadEventData()
+        startSocket()
+      }
     } catch (error) {}
   }, [])
 
@@ -705,6 +694,11 @@ const PaymentPix = () => {
   // ----- CALCULATE ORDER TOTAL AMOUNT -----
 
   useEffect(() => {
+    if (!lctn.state?.tickets) {
+      keepShopping()
+      return
+    }
+
     if (totalOrderAmount === 0) {
       if (
         lctn.state.tickets !== undefined &&
