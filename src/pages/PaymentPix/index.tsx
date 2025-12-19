@@ -11,7 +11,7 @@ import Container from "../../components/Container"
 import Feedback from "../../components/Feedback"
 
 import { ReactComponent as DownloadIcon } from "../../assets/icons/download.svg"
-import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
+// import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
 import { ReactComponent as CheckCircle } from "../../assets/icons/check_circle.svg"
 import { ReactComponent as FileIcon } from "../../assets/icons/file_icon.svg"
 
@@ -124,6 +124,7 @@ const PaymentPix = () => {
           lctn.state.tickets,
           {
             ...purchaseInfo,
+            taxTotal: lctn.state.taxTotal as number,
             transition_id: external_reference,
             time: new Date(req.data.products[0].date).toISOString(),
           },
@@ -682,6 +683,7 @@ const PaymentPix = () => {
     if (event) await downloadTickets(event, buyedTickets, true)
   }
 
+  /*
   const handleShare = async () => {
     try {
       if (event) {
@@ -700,6 +702,7 @@ const PaymentPix = () => {
       }
     } catch (error) {}
   }
+  */
 
   const handleSee = async () => {
     try {
@@ -793,10 +796,10 @@ const PaymentPix = () => {
                     <DownloadIcon />
                     <span>Baixar</span>
                   </div>
-                  <div onClick={handleShare} className="shareBtn">
+                  {/* <div onClick={handleShare} className="shareBtn">
                     <ShareIcon />
                     <span>Enviar</span>
-                  </div>
+                  </div> */}
                   <div onClick={handleSee}>
                     <FileIcon />
                     <span>Ver ingressos</span>

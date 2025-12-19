@@ -3,7 +3,7 @@ import { TShoppingTicket } from "../../utils/@types/data/ticket"
 import * as S from "./styled"
 
 import { ReactComponent as DownloadIcon } from "../../assets/icons/download.svg"
-import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
+// import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
 
 import getStore from "../../store"
 import downloadTickets from "../../utils/pdf"
@@ -28,6 +28,7 @@ const TicketCard = ({ k, data }: Props) => {
     if (event) await downloadTickets(event, tickets, true)
   }
 
+  /*
   const handleShare = async () => {
     try {
       if (event) {
@@ -67,6 +68,7 @@ const TicketCard = ({ k, data }: Props) => {
       }
     } catch (error) {}
   }
+  */
 
   const renderBtns = () => (
     <S.Icons className="iconsArea">
@@ -74,10 +76,10 @@ const TicketCard = ({ k, data }: Props) => {
         <DownloadIcon />
         <span>Baixar</span>
       </div>
-      <div onClick={handleShare} className="shareBtn">
+      {/* <div onClick={handleShare} className="shareBtn">
         <ShareIcon />
         <span>Enviar</span>
-      </div>
+      </div> */}
     </S.Icons>
   )
 

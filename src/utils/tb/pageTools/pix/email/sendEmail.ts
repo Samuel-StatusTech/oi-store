@@ -17,6 +17,7 @@ export const sendEmail = async (
     sId: string
     transition_id: string
     time: string
+    taxTotal: number
   },
   productsList: any[],
   targetEmail: string,
@@ -89,6 +90,7 @@ export const sendEmail = async (
         "dd/MM/yyyy HH:mm:ss"
       ),
       purchaseValue: purchaseValue,
+      purchaseTaxes: purchaseInfo.taxTotal,
       purchaseItems: JSON.stringify(list),
       purchaseStatus: "Pago",
 

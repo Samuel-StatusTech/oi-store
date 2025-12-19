@@ -99,6 +99,7 @@ type TParams = {
         purchaseCode: string
         purchaseTime: string
         purchaseValue: string
+        purchaseTaxes: string
         purchaseItems: string
         purchaseStatus: string
 
