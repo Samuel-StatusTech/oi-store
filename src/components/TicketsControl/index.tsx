@@ -8,6 +8,7 @@ import { memo, useCallback, useEffect, useState } from "react"
 import { eventHasTaxes, sumTaxes } from "../../utils/tb/taxes"
 import TicketsGroup from "../TicketsGroup"
 import Ticket from "../Ticket"
+import { checkEndingDate } from "../../utils/tb/checkEndingDate"
 
 type Props = {
   showByGroup: boolean
@@ -142,7 +143,13 @@ const TicketsControl = ({
           email: user.email,
         }
 
-        const stateParams = { tickets: ptickets, disposalTickets: tickets, buyer, taxTotal: +taxes.value, isNewOrder: true }
+        const stateParams = {
+          tickets: ptickets,
+          disposalTickets: tickets,
+          buyer,
+          taxTotal: +taxes.value,
+          isNewOrder: true,
+        }
 
         localStorage.removeItem("payed")
 
@@ -167,15 +174,33 @@ const TicketsControl = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [tickets])
 
+  const renderKeepOutSellsMessage = () => {
+    let message = ""
+
+    const isEventStillAvailable = checkEndingDate(event as any)
+
+    if (isEventStillAvailable) {
+      if (!Boolean(event?.keep_sells_online)) {
+        message =
+          event?.keep_out_sells_online_message ?? "Vendas online suspensas."
+      }
+    } else message = "Vendas online encerradas"
+
+    return message !== "" ? (
+      <S.KeepOutSellsOnlineMessage>{message}</S.KeepOutSellsOnlineMessage>
+    ) : null
+  }
+
   return (
     <S.Component>
       <S.Top>
         <span>Ingressos</span>
       </S.Top>
       <S.Tickets>
-        {Boolean(event?.keep_sells_online) ? (
-          showByGroup ? (
-            groups.map((g, gKey) => (
+        {!Boolean(event?.keep_sells_online) || !checkEndingDate(event as any)
+          ? renderKeepOutSellsMessage()
+          : showByGroup
+          ? groups.map((g, gKey) => (
               <TicketsGroup
                 group_name={g.name}
                 key={gKey}
@@ -184,18 +209,13 @@ const TicketsControl = ({
                 changeQnt={changeQnt}
               />
             ))
-          ) : (
-            tickets.map((t, k) => (
+          : tickets.map((t, k) => (
               <Ticket k={k} key={k} ticket={t} changeQnt={changeQnt} />
-            ))
-          )
-        ) : (
-          <S.KeepOutSellsOnlineMessage>
-            {event?.keep_out_sells_online_message ?? "Vendas online suspensas."}
-          </S.KeepOutSellsOnlineMessage>
-        )}
+            ))}
       </S.Tickets>
-      {Boolean(event?.keep_sells_online) && tickets.length > 0 ? (
+      {Boolean(event?.keep_sells_online) &&
+      checkEndingDate(event as any) &&
+      tickets.length > 0 ? (
         <S.Bottom>
           <S.TaxesResume>
             <S.TaxResume>

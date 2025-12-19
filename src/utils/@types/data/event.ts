@@ -74,6 +74,8 @@ export type TEventData = {
 
   has_age: number
   age: string | number
+  has_ending: number
+  ending: string
   keep_sells_online: boolean
   keep_out_sells_online_message?: string
 }
