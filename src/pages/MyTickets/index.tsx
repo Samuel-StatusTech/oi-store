@@ -39,7 +39,7 @@ const MyTickets = () => {
           if (i.payments.length > 0) {
             const payment = i.payments[0]
             const isPayed =
-              payment.transition_id ||
+              payment.transition_code ||
               payment.machine_data ||
               i.status === "validado" ||
               i.status === "cancelamento"

@@ -199,7 +199,7 @@ const PaymentPix = () => {
           const { payments } = req.data
 
           const status =
-            payments.length === 0 ? false : payments[0].transition_id !== null
+            payments.length === 0 ? false : payments[0].transition_code !== null
 
           if (status) {
             const purchase = await confirmPurchase(
@@ -245,7 +245,7 @@ const PaymentPix = () => {
             if (isPaymentPage && !isPayed) {
               setTimeout(() => {
                 startPoolingOrderStatus(retries)
-              }, 4000)
+              }, 14000)
 
               return
             }
