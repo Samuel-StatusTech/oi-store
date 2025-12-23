@@ -8,14 +8,6 @@ export const Component = styled.div<{ $k: number }>`
   transition: box-shadow 0.3s;
   box-shadow: 0 0 4px 2px rgba(0, 0, 0, 0.08);
 
-  & > div {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    text-decoration: none;
-    width: 100%;
-  }
-
   &:hover {
     box-shadow: 0 0 16px 4px rgba(0, 0, 0, 0.18);
   }
@@ -29,6 +21,33 @@ export const Component = styled.div<{ $k: number }>`
     theme.animations.types.fadeLeft +
     theme.animations.durations.main +
     theme.animations.delays.main($k)}
+`
+
+export const CancelledTag = styled.div<{ $showing: boolean }>`
+  display: ${({ $showing }) => ($showing ? "flex" : "none")};
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 10%;
+  right: 0px;
+  width: 100%;
+  background-color: red;
+  color: white;
+  font-weight: bold;
+  padding: 4px 40px;
+  transform: translate(35%, 40%) rotate(45deg);
+  box-shadow: 0 0 4px rgba(0, 0, 0, 0.3);
+  z-index: 1;
+  border-radius: 6px;
+`
+
+export const CardContent = styled.div<{ $isCancelled: boolean }>`
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  width: 100%;
+  filter: saturate(${({ $isCancelled }) => ($isCancelled ? 0 : 1)});
 `
 
 export const ImageContainer = styled.div`

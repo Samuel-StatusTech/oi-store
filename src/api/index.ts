@@ -268,7 +268,10 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({
 
           const ordersIds = new Set(
             list
-              .filter((shop: any) => shop.event_name === eventName)
+              .filter((shop: any) => {
+                const isForEvent = shop.qr_data.split("/")[0] === eventId
+                return isForEvent
+              })
               .map((shop: any) => shop.order_id)
           )
 

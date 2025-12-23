@@ -18,11 +18,13 @@ type Props = {
 const TicketCard = ({ k, data }: Props) => {
   const { event } = getStore()
 
+  const [isCancelled, setIsCancelled] = useState(false)
   const [tickets, setTickets] = useState<TShoppingTicket[]>([])
 
   useEffect(() => {
+    setIsCancelled(data.status === "cancelamento")
     if (Array.isArray(data.products)) setTickets(data.products)
-  }, [data.products])
+  }, [data])
 
   const handleDownload = async () => {
     if (event) await downloadTickets(event, tickets, true)
@@ -72,10 +74,12 @@ const TicketCard = ({ k, data }: Props) => {
 
   const renderBtns = () => (
     <S.Icons className="iconsArea">
-      <div onClick={handleDownload}>
-        <DownloadIcon />
-        <span>Baixar</span>
-      </div>
+      {!isCancelled && (
+        <div onClick={handleDownload}>
+          <DownloadIcon />
+          <span>Baixar</span>
+        </div>
+      )}
       {/* <div onClick={handleShare} className="shareBtn">
         <ShareIcon />
         <span>Enviar</span>
@@ -109,7 +113,10 @@ const TicketCard = ({ k, data }: Props) => {
 
   return (
     <S.Component $k={k}>
-      <div>
+      <S.CancelledTag $showing={isCancelled}>
+        <span>Cancelado</span>
+      </S.CancelledTag>
+      <S.CardContent $isCancelled={isCancelled}>
         <S.ImageContainer>
           <img src={data.eventBanner} alt={""} />
         </S.ImageContainer>
@@ -125,7 +132,7 @@ const TicketCard = ({ k, data }: Props) => {
             <S.TicketsQnt>Tickets: {data.quantity}</S.TicketsQnt>
           </S.CardBottom>
         </S.EventInfo>
-      </div>
+      </S.CardContent>
     </S.Component>
   )
 }
