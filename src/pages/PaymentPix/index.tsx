@@ -66,19 +66,12 @@ const PaymentPix = () => {
 
   const payedRef = useRef(false)
   const paymentSessionRef = useRef<TPaymentSession | null>(null)
-  const isPollingRef = useRef(false)
+
   const isOrderConfirmingRef = useRef(false)
   const isOrderConfirmedRef = useRef(false)
 
-  const [, setIsPoolingOrderStatus] = useState(false)
   const [payed, setPayed] = useState(false)
-
-  useEffect(() => {
-    const savedPayed = localStorage.getItem("payed") === "true" || payed
-    if (!savedPayed) {
-      startPurchase()
-    }
-  }, [])
+  const [expired, setExpired] = useState(false)
 
   // ----- EMAIL -----
 
@@ -138,19 +131,6 @@ const PaymentPix = () => {
 
   // ----- MERCADOPAGO -----
 
-  const clearAndGetNewPurchase = async () => {
-    localStorage.removeItem("paymentSession")
-    paymentSessionRef.current = null
-    const savedPayed = localStorage.getItem("payed") === "true"
-
-    if (savedPayed) {
-      keepShopping()
-    } else {
-      await startPurchase()
-      startPoolingOrderStatus()
-    }
-  }
-
   const checkPendingPayment = useCallback(() => {
     const paymentSession = localStorage.getItem("paymentSession")
     const paymentToRecover: TPaymentSession | null = paymentSession
@@ -170,26 +150,63 @@ const PaymentPix = () => {
         setQrCode(paymentToRecover.qrCode)
         setQrCode64(paymentToRecover.qrCode64)
         runTimer(remainingTime)
+
         startPoolingOrderStatus()
-      } else clearAndGetNewPurchase()
-    } else clearAndGetNewPurchase()
+      } else handleExpiredPayment()
+    }
   }, [localStorage, setQrCode, setQrCode64])
 
   const handlePlugged = useCallback((socketId: string) => {
     setSid(socketId)
   }, [])
 
+  const handleExpiredPayment = () => {
+    setExpired(true)
+    localStorage.setItem("expired", "true")
+    localStorage.removeItem("paymentSession")
+
+    let f = {
+      state: "expired",
+      visible: true,
+      message: "O tempo para pagamento expirou.",
+    }
+
+    setFeedback(f)
+
+    setTimeout(() => {
+      setFeedback({ ...f, visible: false })
+    }, 3500)
+  }
+
+  const checkPaymentValidity = (paymentToRecover: TPaymentSession) => {
+    let isValid = true
+
+    const runnedTime = Math.floor(
+      (new Date().getTime() - +paymentToRecover.paymentStartedAt) / 1000
+    )
+
+    const remainingTime = 15 * 60 - runnedTime
+
+    isValid = remainingTime > 0
+
+    return isValid
+  }
+
   const startPoolingOrderStatus = useCallback(async (retries = 0) => {
     try {
-      // if (isPollingRef.current) return
-
-      isPollingRef.current = true
       const paymentSession = localStorage.getItem("paymentSession")
       const paymentToRecover: TPaymentSession | null = paymentSession
         ? JSON.parse(paymentSession)
         : null
 
       if (paymentToRecover) {
+        const isValid = checkPaymentValidity(paymentToRecover)
+
+        if (!isValid) {
+          handleExpiredPayment()
+          return
+        }
+
         const req = await Api.get.purchaseInfo({
           eventId: event?.id as string,
           orderId: paymentToRecover.socketId,
@@ -245,7 +262,7 @@ const PaymentPix = () => {
             if (isPaymentPage && !isPayed) {
               setTimeout(() => {
                 startPoolingOrderStatus(retries)
-              }, 14000)
+              }, 4000)
 
               return
             }
@@ -259,8 +276,6 @@ const PaymentPix = () => {
         }
       }
     } catch (error) {}
-
-    setIsPoolingOrderStatus(false)
   }, [])
 
   const startSocket = async () => {
@@ -345,7 +360,8 @@ const PaymentPix = () => {
   const startPurchase = async () => {
     if (user && user.fone) {
       const extref = await signPurchase(sid)
-      getQR(sid, extref)
+      await getQR(sid, extref)
+      startPoolingOrderStatus()
     } else {
       returnPage()
       return
@@ -376,12 +392,16 @@ const PaymentPix = () => {
 
     const savedPayment = localStorage.getItem("payed")
 
+    const wasExpired = localStorage.getItem("expired") === "true"
+
     const isPayed =
       payedRef.current ?? savedPayment ? savedPayment === "true" : payed
 
     const hasOngoingPurchase = !!pendingPayment
 
-    if (!isPayed) {
+    if (wasExpired) {
+      handleExpiredPayment()
+    } else if (!isPayed) {
       if (hasOngoingPurchase) {
         checkPendingPayment()
       } else {
@@ -391,14 +411,13 @@ const PaymentPix = () => {
           goToMyTickets()
           return
         } else {
-          if (sid !== "") {
+          if (sid !== "" && expired === false) {
             await startPurchase()
-            startPoolingOrderStatus()
           }
         }
       }
     }
-  }, [sid, paymentSessionRef.current, payedRef.current, payed])
+  }, [sid, paymentSessionRef.current, payedRef.current, payed, expired])
 
   useEffect(() => {
     ignite()
@@ -478,7 +497,7 @@ const PaymentPix = () => {
       setQrCode64("")
       setTime("15:00")
 
-      getQR()
+      // getQR()
     }
   }
 
@@ -769,6 +788,36 @@ const PaymentPix = () => {
       <Container fullHeight={true}>
         <S.Main>
           <S.Block $k={2}>
+            {/* Expired */}
+            {expired && (
+              <S.Feedback $k={3}>
+                <span>Tempo esgotado!</span>
+                <CheckCircle />
+              </S.Feedback>
+            )}
+
+            {expired && (
+              <S.FeedbackIntructions $k={4}>
+                <span>
+                  O tempo para pagamento expirou. Por favor, inicie uma nova
+                  compra.
+                </span>
+              </S.FeedbackIntructions>
+            )}
+
+            {expired && (
+              <S.PayedArea>
+                <S.Button
+                  $outlined={true}
+                  $content={true}
+                  onClick={keepShopping}
+                >
+                  Iniciar nova compra
+                </S.Button>
+              </S.PayedArea>
+            )}
+
+            {/* Payed */}
             {payed && (
               <S.Feedback $k={3}>
                 <span>Tudo certo! Pedido Aprovado</span>
@@ -783,13 +832,13 @@ const PaymentPix = () => {
               </S.FeedbackIntructions>
             )}
 
-            {!payed && (
+            {!payed && !expired && (
               <S.BlockTitle $k={4}>
                 Agora só falta concluir o seu Pix.
               </S.BlockTitle>
             )}
 
-            {payed ? (
+            {payed && (
               <S.PayedArea>
                 <S.Icons className="iconsArea">
                   <div onClick={handleDownload}>
@@ -818,7 +867,9 @@ const PaymentPix = () => {
                   </span>
                 </S.FeedbackIntructions>
               </S.PayedArea>
-            ) : (
+            )}
+
+            {!expired && !payed && (
               <S.PixArea>
                 <S.PixInstructions>
                   <span>
@@ -871,7 +922,9 @@ const PaymentPix = () => {
             onlyPurchasingItems={true}
             fitContainer={true}
             ticketsList={
-              lctn.state ? lctn.state.disposalTickets ?? lctn.state.tickets : []
+              lctn.state.disposalTickets.length > 0
+                ? lctn.state.disposalTickets
+                : lctn.state.tickets
             }
           />
         </S.Main>

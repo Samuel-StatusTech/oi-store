@@ -109,6 +109,7 @@ const Home = () => {
 
   useEffect(() => {
     localStorage.removeItem("payed")
+    localStorage.removeItem("expired")
     localStorage.removeItem("paymentSession")
 
     checkTokenTime()
