@@ -117,7 +117,7 @@ const Home = () => {
     if (event) {
       loadEventData()
       if (tickets.length === 0) fetchTickets()
-    }
+    } else navigate("/eventSelect", { replace: true })
   }, [])
 
   return (
