@@ -177,14 +177,16 @@ const TicketsControl = ({
   const renderKeepOutSellsMessage = () => {
     let message = ""
 
-    const isEventStillAvailable = checkEndingDate(event as any)
+    if (event) {
+      const isEventStillAvailable = checkEndingDate(event as any)
 
-    if (isEventStillAvailable) {
-      if (!Boolean(event?.keep_sells_online)) {
-        message =
-          event?.keep_out_sells_online_message ?? "Vendas online suspensas."
-      }
-    } else message = "Vendas online encerradas"
+      if (isEventStillAvailable) {
+        if (!Boolean(event?.keep_sells_online)) {
+          message =
+            event?.keep_out_sells_online_message ?? "Vendas online suspensas."
+        }
+      } else message = "Vendas online encerradas"
+    }
 
     return message !== "" ? (
       <S.KeepOutSellsOnlineMessage>{message}</S.KeepOutSellsOnlineMessage>
@@ -197,7 +199,8 @@ const TicketsControl = ({
         <span>Ingressos</span>
       </S.Top>
       <S.Tickets>
-        {!Boolean(event?.keep_sells_online) || !checkEndingDate(event as any)
+        {!Boolean(event?.keep_sells_online) ||
+        (event && !checkEndingDate(event as any))
           ? renderKeepOutSellsMessage()
           : showByGroup
           ? groups.map((g, gKey) => (
