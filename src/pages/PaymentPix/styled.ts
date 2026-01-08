@@ -272,7 +272,7 @@ export const Icons = styled.div`
       display: none;
     }
 
-    @media (min-width: ${({ theme }) => theme.bp.medium}px) {
+    @media (max-width: ${({ theme }) => theme.bp.medium}px) {
       .shareBtn,
       .seeTickets {
         display: none;
