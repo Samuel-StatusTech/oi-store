@@ -282,7 +282,7 @@ const PaymentPix = () => {
   }, [])
 
   const startSocket = async () => {
-    if (!payed) {
+    if (!payed && !localStorage.getItem("paymentSession")) {
       const socket = instanceSocket()
 
       if (socket) {
@@ -744,13 +744,11 @@ const PaymentPix = () => {
       if (event) {
         const file = await downloadTickets(event, buyedTickets, false, true)
 
-        if (typeof file === "string") {
-          await Api.post.whatsapp.sendWhatsapp({
-            base64File: file as string,
-            fileName: `Meus Ingressos para ${event.name.trim()}.pdf`,
-            targetPhone: targetPhone,
-          })
-        }
+        await Api.post.whatsapp.sendWhatsapp({
+          base64File: file as string,
+          fileName: `Meus Ingressos para ${event.name.trim()}.pdf`,
+          targetPhone: targetPhone,
+        })
       }
     } catch (error) {}
   }
@@ -808,16 +806,17 @@ const PaymentPix = () => {
       <Feedback data={feedback} />
       <Header />
 
-      {isAskingWhatsappPhone && (
-        <AskPhoneNumberModal
-          handleClose={() => {
-            setIsAskingWhatsappPhone(false)
-          }}
-          handleConfirm={sendWhatsapp}
-          basePhone={lctn.state.buyer.phone}
-          shown={true}
-        />
-      )}
+      <AskPhoneNumberModal
+        handleClose={() => {
+          setIsAskingWhatsappPhone(false)
+        }}
+        handleConfirm={async (phone) => {
+          await sendWhatsapp(phone)
+          setIsAskingWhatsappPhone(false)
+        }}
+        basePhone={lctn.state.buyer.phone}
+        shown={isAskingWhatsappPhone}
+      />
 
       <Container fullHeight={true}>
         <S.Main>

@@ -8,13 +8,13 @@ import getStore from "../store"
 
 const backUrl = process.env.REACT_APP_BACKEND_URL
 const mailingUrl = process.env.REACT_APP_EMAIL_BACKEND_URL
-const whatsappUrl = process.env.REACT_APP_WHATSAPP_BASE_URL
+const whatsappUrl = process.env.REACT_APP_WHATSAPP_API_BASE_URL
+const whatsappClientToken = process.env.REACT_APP_WHATSAPP_API_CLIENT_TOKEN
 
-const whatsappApi = axiosInstance
+const whatsappApi = axiosInstance.create()
 whatsappApi.defaults.baseURL = whatsappUrl
 
-const axios = axiosInstance
-
+const axios = axiosInstance.create()
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
 export const checkTokenExpiration = (token: string) => {
@@ -597,15 +597,16 @@ const sendWhatsapp: TApi["post"]["whatsapp"]["sendWhatsapp"] = async ({
 
       await whatsappApi
         .post(
-          "/send-document",
+          "/send-document/pdf",
           {
             phone: formattedPhone,
-            document: base64File,
+            document: `data:application/pdf;base64,${base64File}`,
             fileName: fileName,
           },
           {
             headers: {
-              "Client-Token": "multipart/form-data",
+              Authorization: undefined,
+              "Client-Token": whatsappClientToken,
             },
           }
         )

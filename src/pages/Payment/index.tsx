@@ -101,16 +101,35 @@ const Input = ({
         <span>{label}</span>
       </S.Label>
       {tip && (
-        <span className="inputTip" style={{ marginTop: "4px", display: "flex", alignItems: "center", gap: "6px" }}>
+        <span
+          className="inputTip"
+          style={{
+            marginTop: "4px",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+          }}
+        >
           <svg
             width="20"
             height="20"
             viewBox="0 0 16 16"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            style={{ display: "inline-block", verticalAlign: "middle", flexShrink: 0 }}
+            style={{
+              display: "inline-block",
+              verticalAlign: "middle",
+              flexShrink: 0,
+            }}
           >
-            <circle cx="8" cy="8" r="7" stroke="currentColor" strokeWidth="1.5" fill="none" />
+            <circle
+              cx="8"
+              cy="8"
+              r="7"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              fill="none"
+            />
             <path
               d="M8 6V8M8 10H8.01"
               stroke="currentColor"
@@ -349,21 +368,24 @@ const Payment = () => {
       const nameField =
         form.buyer.name.length < 1 ||
         form.buyer.name.trim().split(" ").length < 2
-      
+
       // Validar se é celular válido (não fixo)
       const cleanedPhone = form.buyer.phone.replace(/\D/g, "")
-      
+
       // Remove código do país se presente (55)
       let phoneWithoutCountry = cleanedPhone
       if (cleanedPhone.startsWith("55") && cleanedPhone.length === 13) {
         phoneWithoutCountry = cleanedPhone.slice(2)
       }
-      
+
       const phoneValid = isPhoneNumberValid(form.buyer.phone, true)
-      const isCellPhone = phoneWithoutCountry.length === 11 && phoneWithoutCountry.length >= 3 && phoneWithoutCountry[2] === "9"
-      
+      const isCellPhone =
+        phoneWithoutCountry.length === 11 &&
+        phoneWithoutCountry.length >= 3 &&
+        phoneWithoutCountry[2] === "9"
+
       const phoneField = !phoneValid || !isCellPhone
-      
+
       const emailField =
         form.buyer.email.length < 1 || !validEmail(form.buyer.email)
 
@@ -382,7 +404,7 @@ const Payment = () => {
       let duplicateNames: number[] = []
       if (event?.nominal && form.tickets.length > 1) {
         const namesMap = new Map<string, number[]>()
-        
+
         form.tickets.forEach((t, k) => {
           const name = t.person.name.trim().toLowerCase()
           if (name && name.split(" ").length >= 2) {
@@ -671,9 +693,12 @@ const Payment = () => {
       } else {
         newErrorValue.ticketsIds = []
       }
-      
+
       // Adiciona erros de nomes duplicados, mesclando e removendo duplicatas
-      if (errors.fields.duplicateNames && errors.fields.duplicateNames.length > 0) {
+      if (
+        errors.fields.duplicateNames &&
+        errors.fields.duplicateNames.length > 0
+      ) {
         fieldsErrors.push("Nomes duplicados nos participantes")
         newErrorValue.ticketsIds = Array.from(
           new Set([
@@ -686,7 +711,9 @@ const Payment = () => {
       setFormErrors(newErrorValue)
 
       // Formata os erros com bullets para melhor visualização
-      const formattedErrors = fieldsErrors.map((error) => `• ${error}`).join("\n")
+      const formattedErrors = fieldsErrors
+        .map((error) => `• ${error}`)
+        .join("\n")
       fieldsStr = formattedErrors
 
       const f = {
@@ -831,7 +858,6 @@ const Payment = () => {
                         clearFieldError("buyerPhone")
                       }}
                       inputMode="numeric"
-                      enterKeyHint={"done"}
                       error={formErrors.buyerPhone}
                       tip={"Ele será usado para acessar os ingressos"}
                     />
@@ -842,11 +868,11 @@ const Payment = () => {
                         handleForm("email", v)
                         clearFieldError("buyerEmail")
                       }}
+                      enterKeyHint={"done"}
                       error={formErrors.buyerEmail}
                     />
                   </S.FormLine>
                 </S.FormLines>
-                
               </S.FormBlock>
 
               {Boolean(event?.nominal) && (

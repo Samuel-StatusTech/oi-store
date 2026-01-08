@@ -268,18 +268,18 @@ export const Icons = styled.div`
       background-color: #eee;
     }
 
-    .whatsappSharing {
+    &.whatsappSharing {
       display: none;
     }
 
     @media (max-width: ${({ theme }) => theme.bp.medium}px) {
-      .shareBtn,
-      .seeTickets {
+      &.shareBtn,
+      &.seeTickets {
         display: none;
       }
 
-      .whatsappSharing {
-        display: block;
+      &.whatsappSharing {
+        display: flex;
       }
     }
   }

@@ -22,27 +22,32 @@ const AskPhoneNumberModal = ({
   handleConfirm,
   handleClose,
 }: Props) => {
-  const [code, setCode] = useState(formatPhone(basePhone))
+  const [phone, setPhone] = useState(formatPhone(basePhone))
   const [canSend, setCanSend] = useState(true)
 
   const onConfirm = () => {
-    setCode("")
-    handleConfirm(code)
+    let finalPhone = phone
+    handleConfirm(finalPhone)
+    setPhone("")
   }
 
   useEffect(() => {
-    console.log(code.replace(/\D/g, ""))
-    setCanSend(code.replace(/\D/g, "").length === 11)
-  }, [code])
+    setPhone(formatPhone(basePhone))
+  }, [shown, basePhone])
+
+  useEffect(() => {
+    setCanSend(phone.replace(/\D/g, "").length === 11)
+  }, [phone])
 
   return (
     <Dialog open={shown} onClose={handleClose} fullWidth maxWidth="xs">
       <DialogTitle>Enviar para o Whatsapp</DialogTitle>
       <DialogContent>
         <Input
-          value={code}
+          inputMode={"numeric"}
+          value={phone}
           onChange={({ target }) =>
-            setCode(formatPhone(target.value).slice(0, 13))
+            setPhone(formatPhone(target.value).slice(0, 13))
           }
         />
       </DialogContent>

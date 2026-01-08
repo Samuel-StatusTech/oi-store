@@ -87,9 +87,9 @@ const downloadTickets = async (
       if (shouldDownload) pdf.download(filename)
       else {
         if (returnBase64) {
-          let result = ""
-          pdf.getBase64((res) => (result = res))
-          return result
+          pdf.getBase64((res) => {
+            resolve(res)
+          })
         } else {
           pdf.getBlob((blob) => {
             const file = new File([blob], filename, { type: "application/pdf" })
