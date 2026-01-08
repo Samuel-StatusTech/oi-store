@@ -111,6 +111,7 @@ type TParams = {
         targetPhone: string
         base64File: string
         fileName: string
+        caption: string
       }
     }
   }

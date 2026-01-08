@@ -32,6 +32,7 @@ import pageTools from "../../utils/tb/pageTools/pix"
 import { TPaymentSession } from "../../utils/@types/data/paymentSession"
 import OrderResume from "../../components/OrderResume"
 import AskPhoneNumberModal from "../../components/Modal/AskPhoneNumber"
+import { formatDate } from "date-fns"
 
 const io = require("socket.io-client")
 
@@ -744,10 +745,16 @@ const PaymentPix = () => {
       if (event) {
         const file = await downloadTickets(event, buyedTickets, false, true)
 
+        const hasMultipleTickets =
+          buyedTickets.reduce((sum, current) => sum + current.quantity, 0) > 1
+
         await Api.post.whatsapp.sendWhatsapp({
           base64File: file as string,
           fileName: `Meus Ingressos para ${event.name.trim()}.pdf`,
           targetPhone: targetPhone,
+          caption: `Olá, segue seu${hasMultipleTickets ? "(s)" : ""} ingresso${
+            hasMultipleTickets ? "(s)" : ""
+          } para o ${event.name} - ${formatDate(event.date_ini, "dd/MM/yyyy")}`,
         })
       }
     } catch (error) {}
@@ -889,8 +896,7 @@ const PaymentPix = () => {
                   <div onClick={handleWhatsapp} className="whatsappSharing">
                     <WhatsappIcon />
                     <span>
-                      Enviar para
-                      <br /> o Whatsapp
+                      Whatsapp
                     </span>
                   </div>
                 </S.Icons>

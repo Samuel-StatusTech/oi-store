@@ -590,6 +590,7 @@ const sendWhatsapp: TApi["post"]["whatsapp"]["sendWhatsapp"] = async ({
   targetPhone,
   base64File,
   fileName,
+  caption
 }) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -602,6 +603,7 @@ const sendWhatsapp: TApi["post"]["whatsapp"]["sendWhatsapp"] = async ({
             phone: formattedPhone,
             document: `data:application/pdf;base64,${base64File}`,
             fileName: fileName,
+            caption: caption
           },
           {
             headers: {

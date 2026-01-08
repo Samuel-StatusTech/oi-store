@@ -24,10 +24,13 @@ const AskPhoneNumberModal = ({
 }: Props) => {
   const [phone, setPhone] = useState(formatPhone(basePhone))
   const [canSend, setCanSend] = useState(true)
+  const [sending, setSending] = useState(false)
 
   const onConfirm = async () => {
     let finalPhone = phone
+    setSending(true)
     await handleConfirm(finalPhone)
+    setSending(false)
     setPhone("")
   }
 
@@ -57,8 +60,8 @@ const AskPhoneNumberModal = ({
         }}
       >
         <S.Button
-          $disabled={!canSend}
-          onClick={!canSend ? undefined : onConfirm}
+          $disabled={!canSend || sending}
+          onClick={!canSend || sending ? undefined : onConfirm}
         >
           Enviar
         </S.Button>
