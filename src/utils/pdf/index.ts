@@ -10,8 +10,9 @@ import { generateTicketID } from "../tb/qrcode"
 const downloadTickets = async (
   eventData: TEventData,
   tickets: TShoppingTicket[],
-  shouldDownload?: boolean
-): Promise<void | File> => {
+  shouldDownload?: boolean,
+  returnBase64?: boolean
+): Promise<void | File | string> => {
   pdfMake.vfs = pdfFonts.pdfMake.vfs
 
   return new Promise(async (resolve) => {
@@ -85,10 +86,16 @@ const downloadTickets = async (
 
       if (shouldDownload) pdf.download(filename)
       else {
-        pdf.getBlob((blob) => {
-          const file = new File([blob], filename, { type: "application/pdf" })
-          resolve(file)
-        })
+        if (returnBase64) {
+          let result = ""
+          pdf.getBase64((res) => (result = res))
+          return result
+        } else {
+          pdf.getBlob((blob) => {
+            const file = new File([blob], filename, { type: "application/pdf" })
+            resolve(file)
+          })
+        }
       }
     } catch (error) {}
   })

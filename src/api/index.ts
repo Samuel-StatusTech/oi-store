@@ -1,4 +1,4 @@
-import axios from "axios"
+import axiosInstance from "axios"
 import { TApi } from "../utils/@types/api"
 import { TProduct } from "../utils/@types/data/product"
 import { jwtDecode } from "jwt-decode"
@@ -6,10 +6,16 @@ import TParams from "../utils/@types/api/params"
 import { formatDate } from "date-fns"
 import getStore from "../store"
 
-axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
-
 const backUrl = process.env.REACT_APP_BACKEND_URL
 const mailingUrl = process.env.REACT_APP_EMAIL_BACKEND_URL
+const whatsappUrl = process.env.REACT_APP_WHATSAPP_BASE_URL
+
+const whatsappApi = axiosInstance
+whatsappApi.defaults.baseURL = whatsappUrl
+
+const axios = axiosInstance
+
+axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
 export const checkTokenExpiration = (token: string) => {
   try {
@@ -580,6 +586,47 @@ const sendEmail: TApi["post"]["mail"]["sendEmail"] = async (mailInfo) => {
   })
 }
 
+const sendWhatsapp: TApi["post"]["whatsapp"]["sendWhatsapp"] = async ({
+  targetPhone,
+  base64File,
+  fileName,
+}) => {
+  return new Promise(async (resolve, reject) => {
+    try {
+      const formattedPhone = `55${targetPhone}`.replace(/\D/g, "")
+
+      await whatsappApi
+        .post(
+          "/send-document",
+          {
+            phone: formattedPhone,
+            document: base64File,
+            fileName: fileName,
+          },
+          {
+            headers: {
+              "Client-Token": "multipart/form-data",
+            },
+          }
+        )
+        .then((res) => {
+          const status = !!res.data.messageId
+
+          if (Boolean(status)) resolve({ ok: true, data: res.data })
+          else throw new Error()
+        })
+        .catch(() => {
+          resolve({
+            ok: false,
+            error: "Algo deu errado. Tente novamente mais tarde.",
+          })
+        })
+    } catch (error) {
+      reject({ error: "Erro ao enviar email. Tente novamente mais tarde" })
+    }
+  })
+}
+
 /*
  * Purchase
  */
@@ -752,6 +799,9 @@ export const Api: TApi = {
     },
     mail: {
       sendEmail,
+    },
+    whatsapp: {
+      sendWhatsapp,
     },
   },
 }

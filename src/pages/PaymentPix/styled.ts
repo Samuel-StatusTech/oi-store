@@ -106,7 +106,9 @@ export const Feedback = styled.div<{ $k: number }>`
 
   svg {
     width: 32px;
+    min-width: 32px;
     height: 32px;
+    min-height: 32px;
   }
 
   opacity: 0;
@@ -114,6 +116,10 @@ export const Feedback = styled.div<{ $k: number }>`
     theme.animations.types.fadeTop +
     theme.animations.durations.main +
     theme.animations.delays.main($k)}
+
+  @media (min-width: ${({ theme }) => theme.bp.medium}px) {
+    gap: 12px;
+  }
 `
 
 export const FeedbackIntructions = styled.div<{ $k: number }>`
@@ -262,9 +268,18 @@ export const Icons = styled.div`
       background-color: #eee;
     }
 
+    .whatsappSharing {
+      display: none;
+    }
+
     @media (min-width: ${({ theme }) => theme.bp.medium}px) {
-      .shareBtn {
+      .shareBtn,
+      .seeTickets {
         display: none;
+      }
+
+      .whatsappSharing {
+        display: block;
       }
     }
   }

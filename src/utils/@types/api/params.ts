@@ -106,6 +106,13 @@ type TParams = {
         targetEmail: string
       }
     }
+    whatsapp: {
+      sendWhatsapp: {
+        targetPhone: string
+        base64File: string
+        fileName: string
+      }
+    }
   }
 }
 

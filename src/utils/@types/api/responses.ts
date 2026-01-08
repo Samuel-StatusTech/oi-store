@@ -142,6 +142,15 @@ type TResponses = {
         }>
       >
     }
+    whatsapp: {
+      sendWhatsapp: Promise<
+        TDefaultRes<{
+          zaapId: string
+          messageId: string
+          id: string
+        }>
+      >
+    }
   }
 }
 

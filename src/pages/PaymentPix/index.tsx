@@ -14,6 +14,7 @@ import { ReactComponent as DownloadIcon } from "../../assets/icons/download.svg"
 // import { ReactComponent as ShareIcon } from "../../assets/icons/share.svg"
 import { ReactComponent as CheckCircle } from "../../assets/icons/check_circle.svg"
 import { ReactComponent as FileIcon } from "../../assets/icons/file_icon.svg"
+import { ReactComponent as WhatsappIcon } from "../../assets/icons/whatsapp.svg"
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
@@ -30,6 +31,7 @@ import { formatMoney } from "../../utils/tb/formatMoney"
 import pageTools from "../../utils/tb/pageTools/pix"
 import { TPaymentSession } from "../../utils/@types/data/paymentSession"
 import OrderResume from "../../components/OrderResume"
+import AskPhoneNumberModal from "../../components/Modal/AskPhoneNumber"
 
 const io = require("socket.io-client")
 
@@ -57,6 +59,7 @@ const PaymentPix = () => {
 
   const [buyedTickets, setBuyedTickets] = useState<TShoppingTicket[]>([])
 
+  const [isAskingWhatsappPhone, setIsAskingWhatsappPhone] = useState(false)
   const [requiringQr, setRequiringQr] = useState(false)
 
   const [totalOrderAmount, setTotalOrderAmount] = useState(0)
@@ -64,14 +67,14 @@ const PaymentPix = () => {
   const [qrCode64, setQrCode64] = useState("")
   const [feedback, setFeedback] = useState<any>({ visible: false, message: "" })
 
-  const payedRef = useRef(false)
+  const payedRef = useRef(true)
   const paymentSessionRef = useRef<TPaymentSession | null>(null)
 
-  const isOrderConfirmingRef = useRef(false)
-  const isOrderConfirmedRef = useRef(false)
+  const isOrderConfirmingRef = useRef(true)
+  const isOrderConfirmedRef = useRef(true)
 
-  const [payed, setPayed] = useState(false)
-  const [expired, setExpired] = useState(false)
+  const [payed, setPayed] = useState(true)
+  const [expired, setExpired] = useState(true)
 
   // ----- EMAIL -----
 
@@ -736,6 +739,26 @@ const PaymentPix = () => {
     } catch (error) {}
   }
 
+  const sendWhatsapp = async (targetPhone: string) => {
+    try {
+      if (event) {
+        const file = await downloadTickets(event, buyedTickets, false, true)
+
+        if (typeof file === "string") {
+          await Api.post.whatsapp.sendWhatsapp({
+            base64File: file as string,
+            fileName: `Meus Ingressos para ${event.name.trim()}.pdf`,
+            targetPhone: targetPhone,
+          })
+        }
+      }
+    } catch (error) {}
+  }
+
+  const handleWhatsapp = async () => {
+    setIsAskingWhatsappPhone(true)
+  }
+
   const keepShopping = () => {
     navigate("/", { replace: true, state: {} })
   }
@@ -784,6 +807,17 @@ const PaymentPix = () => {
     <S.Page>
       <Feedback data={feedback} />
       <Header />
+
+      {isAskingWhatsappPhone && (
+        <AskPhoneNumberModal
+          handleClose={() => {
+            setIsAskingWhatsappPhone(false)
+          }}
+          handleConfirm={sendWhatsapp}
+          basePhone={lctn.state.buyer.phone}
+          shown={true}
+        />
+      )}
 
       <Container fullHeight={true}>
         <S.Main>
@@ -849,9 +883,13 @@ const PaymentPix = () => {
                     <ShareIcon />
                     <span>Enviar</span>
                   </div> */}
-                  <div onClick={handleSee}>
+                  <div onClick={handleSee} className="seeTickets">
                     <FileIcon />
                     <span>Ver ingressos</span>
+                  </div>
+                  <div onClick={handleWhatsapp} className="whatsappSharing">
+                    <WhatsappIcon />
+                    <span>Enviar para o Whatsapp</span>
                   </div>
                 </S.Icons>
                 <S.Button
@@ -917,16 +955,18 @@ const PaymentPix = () => {
             )}
           </S.Block>
 
-          <OrderResume
-            hideEventData={true}
-            onlyPurchasingItems={true}
-            fitContainer={true}
-            ticketsList={
-              lctn.state.disposalTickets.length > 0
-                ? lctn.state.disposalTickets
-                : lctn.state.tickets
-            }
-          />
+          {!payed && (
+            <OrderResume
+              hideEventData={true}
+              onlyPurchasingItems={true}
+              fitContainer={true}
+              ticketsList={
+                lctn.state.disposalTickets.length > 0
+                  ? lctn.state.disposalTickets
+                  : lctn.state.tickets
+              }
+            />
+          )}
         </S.Main>
       </Container>
 

@@ -49,6 +49,11 @@ type TApiPosters = {
       p: TParams["post"]["mail"]["sendEmail"]
     ) => TResponses["post"]["mail"]["sendEmail"]
   }
+  whatsapp: {
+    sendWhatsapp: (
+      p: TParams["post"]["whatsapp"]["sendWhatsapp"]
+    ) => TResponses["post"]["whatsapp"]["sendWhatsapp"]
+  }
 }
 
 export type TApi = {
