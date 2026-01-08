@@ -281,6 +281,10 @@ export const Icons = styled.div`
       &.whatsappSharing {
         display: flex;
       }
+
+      &:hover {
+        background-color: transparent;
+      }
     }
   }
 `

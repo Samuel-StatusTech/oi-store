@@ -12,7 +12,7 @@ import { formatPhone } from "../../../utils/masks/phone"
 type Props = {
   shown: boolean
   basePhone: string
-  handleConfirm: (code: string) => void
+  handleConfirm: (code: string) => Promise<void>
   handleClose: () => void
 }
 
@@ -25,9 +25,9 @@ const AskPhoneNumberModal = ({
   const [phone, setPhone] = useState(formatPhone(basePhone))
   const [canSend, setCanSend] = useState(true)
 
-  const onConfirm = () => {
+  const onConfirm = async () => {
     let finalPhone = phone
-    handleConfirm(finalPhone)
+    await handleConfirm(finalPhone)
     setPhone("")
   }
 
@@ -60,7 +60,7 @@ const AskPhoneNumberModal = ({
           $disabled={!canSend}
           onClick={!canSend ? undefined : onConfirm}
         >
-          Confirmar
+          Enviar
         </S.Button>
       </DialogActions>
     </Dialog>

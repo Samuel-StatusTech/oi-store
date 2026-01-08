@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useCallback, useEffect, useState } from "react"
 import * as S from "./styled"
 
@@ -6,7 +7,7 @@ import Footer from "../../components/Footer"
 import Container from "../../components/Container"
 
 import getStore from "../../store"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate, useNavigationType } from "react-router-dom"
 import TicketCard from "../../components/TicketCard"
 import { Api } from "../../api"
 
@@ -18,10 +19,20 @@ import { formatDate } from "date-fns"
 const MyTickets = () => {
   const { controllers, user, event } = getStore()
 
+  const lctn = useLocation()
   const navigate = useNavigate()
+  const navigationType = useNavigationType()
 
   const [loading, setLoading] = useState(true)
   const [list, setList] = useState<any[]>([])
+
+  useEffect(() => {
+    if (navigationType === "POP") {
+      if (lctn.state?.backRoute) {
+        navigate(lctn.state.backRoute, { replace: true })
+      }
+    }
+  }, [navigationType])
 
   const getData = useCallback(async (eventInfo: any) => {
     setLoading(true)

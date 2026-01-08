@@ -758,11 +758,11 @@ const PaymentPix = () => {
   }
 
   const keepShopping = () => {
-    navigate("/", { replace: true, state: {} })
+    navigate("/", { replace: true, state: { backRoute: "/eventSelect" } })
   }
 
   const goToMyTickets = () => {
-    navigate("/mytickets", { replace: true, state: {} })
+    navigate("/mytickets", { replace: true, state: { backRoute: "/" } })
   }
 
   // ----- CALCULATE ORDER TOTAL AMOUNT -----
@@ -888,7 +888,10 @@ const PaymentPix = () => {
                   </div>
                   <div onClick={handleWhatsapp} className="whatsappSharing">
                     <WhatsappIcon />
-                    <span>Enviar para o Whatsapp</span>
+                    <span>
+                      Enviar para
+                      <br /> o Whatsapp
+                    </span>
                   </div>
                 </S.Icons>
                 <S.Button

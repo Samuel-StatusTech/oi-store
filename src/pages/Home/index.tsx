@@ -17,12 +17,14 @@ import { TTicketDisposal } from "../../utils/@types/data/ticket"
 import { parseDisposalTickets } from "../../utils/tb/ticketsToDisposal"
 import getStore from "../../store"
 import { getDatePeriod, getHours } from "../../utils/tb/getDatePeriod"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate, useNavigationType } from "react-router-dom"
 import { TEventData } from "../../utils/@types/data/event"
 import { parseEmojis } from "../../utils/tb/text"
 
 const Home = () => {
+  const lctn = useLocation()
   const navigate = useNavigate()
+  const navigationType = useNavigationType()
 
   const eventData = localStorage.getItem("event")
 
@@ -32,6 +34,14 @@ const Home = () => {
 
   const [tickets, setTickets] = useState<TTicketDisposal[]>([])
   const [groups, setGroups] = useState<{ id: string; name: string }[]>([])
+
+  useEffect(() => {
+    if (navigationType === "POP") {
+      if (lctn.state?.backRoute) {
+        navigate(lctn.state.backRoute, { replace: true })
+      }
+    }
+  }, [navigationType])
 
   const loadEventData = async () => {
     if (event) {
