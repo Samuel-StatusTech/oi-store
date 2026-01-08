@@ -67,14 +67,14 @@ const PaymentPix = () => {
   const [qrCode64, setQrCode64] = useState("")
   const [feedback, setFeedback] = useState<any>({ visible: false, message: "" })
 
-  const payedRef = useRef(true)
+  const payedRef = useRef(false)
   const paymentSessionRef = useRef<TPaymentSession | null>(null)
 
-  const isOrderConfirmingRef = useRef(true)
-  const isOrderConfirmedRef = useRef(true)
+  const isOrderConfirmingRef = useRef(false)
+  const isOrderConfirmedRef = useRef(false)
 
-  const [payed, setPayed] = useState(true)
-  const [expired, setExpired] = useState(true)
+  const [payed, setPayed] = useState(false)
+  const [expired, setExpired] = useState(false)
 
   // ----- EMAIL -----
 
