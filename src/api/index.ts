@@ -68,13 +68,12 @@ const getSubdomainStatus: TApi["get"]["subdomainStatus"] = async () => {
   return new Promise(async (resolve) => {
     try {
       await axios
-        .get(`${backUrl}ecommerce/getInfo`, {
+        .get(`${backUrl}/ecommerce/getInfo`, {
           headers: {
             Authorization: undefined,
           },
         })
         .then((res) => {
-          console.log("Erro 1: ", res)
           const info = res.data
 
           if (info && info.success) {
@@ -84,7 +83,6 @@ const getSubdomainStatus: TApi["get"]["subdomainStatus"] = async () => {
           }
         })
         .catch((err) => {
-          console.log("Erro 2: ", err)
           resolve({ ok: false })
         })
     } catch (error) {
