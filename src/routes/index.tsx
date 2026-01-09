@@ -20,23 +20,17 @@ const Router = () => {
   const { event } = getStore()
 
   const [loading, setLoading] = useState(true)
-  const [isSubdomainValid, setIsSubdomainValid] = useState(false)
 
   useEffect(() => {
     if (!window.location.href.includes("404")) {
       try {
         setLoading(true)
-        Api.get
-          .subdomainStatus({})
-          .then((res) => {
-            setIsSubdomainValid(res.ok)
-            setLoading(false)
-          })
-          .catch(() => {
-            setLoading(false)
-          })
+        Api.get.subdomainStatus({}).then((res) => {
+          if (res.ok) setLoading(false)
+          else window.location.href = "404"
+        })
       } catch (error) {}
-    }
+    } else setLoading(false)
   }, [window.location.href])
 
   useEffect(() => {
@@ -65,7 +59,7 @@ const Router = () => {
     )
   }
 
-  return isSubdomainValid ? (
+  return (
     <BrowserRouter>
       <Routes>
         <Route path="/">
@@ -84,8 +78,6 @@ const Router = () => {
         </Route>
       </Routes>
     </BrowserRouter>
-  ) : (
-    <NotFoundPage />
   )
 }
 
