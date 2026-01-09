@@ -8,11 +8,6 @@ import getStore from "../store"
 
 const backUrl = process.env.REACT_APP_BACKEND_URL
 const mailingUrl = process.env.REACT_APP_EMAIL_BACKEND_URL
-const whatsappUrl = process.env.REACT_APP_WHATSAPP_API_BASE_URL
-const whatsappClientToken = process.env.REACT_APP_WHATSAPP_API_CLIENT_TOKEN
-
-const whatsappApi = axiosInstance.create()
-whatsappApi.defaults.baseURL = whatsappUrl
 
 const axios = axiosInstance.create()
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
@@ -590,30 +585,27 @@ const sendWhatsapp: TApi["post"]["whatsapp"]["sendWhatsapp"] = async ({
   targetPhone,
   base64File,
   fileName,
-  caption
+  caption,
 }) => {
   return new Promise(async (resolve, reject) => {
     try {
       const formattedPhone = `55${targetPhone}`.replace(/\D/g, "")
 
-      await whatsappApi
+      await axios
         .post(
-          "/send-document/pdf",
+          "/api/sendwhatsapp",
           {
             phone: formattedPhone,
             document: `data:application/pdf;base64,${base64File}`,
             fileName: fileName,
-            caption: caption
+            caption: caption,
           },
           {
-            headers: {
-              Authorization: undefined,
-              "Client-Token": whatsappClientToken,
-            },
+            baseURL: mailingUrl,
           }
         )
         .then((res) => {
-          const status = !!res.data.messageId
+          const status = res.data.sended
 
           if (Boolean(status)) resolve({ ok: true, data: res.data })
           else throw new Error()
@@ -625,7 +617,7 @@ const sendWhatsapp: TApi["post"]["whatsapp"]["sendWhatsapp"] = async ({
           })
         })
     } catch (error) {
-      reject({ error: "Erro ao enviar email. Tente novamente mais tarde" })
+      reject({ error: "Erro ao enviar o código. Tente novamente mais tarde" })
     }
   })
 }
