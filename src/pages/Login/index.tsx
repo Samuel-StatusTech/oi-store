@@ -1,57 +1,57 @@
-/* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useRef, useState } from "react"
+import React, { useEffect, useRef, useState } from "react"
+import {
+  Ticket,
+  ArrowRight,
+  Smartphone,
+  Lock,
+  Loader2,
+  CheckCircle2,
+  MessageCircle,
+} from "lucide-react"
+
 import * as S from "./styled"
-import { useLocation, useNavigate } from "react-router-dom"
-import { formatPhone } from "../../utils/masks/phone"
-import getStore from "../../store"
 import { Api } from "../../api"
+import getStore from "../../store"
+import { useNavigate } from "react-router-dom"
 
-const codeLength = 6
-
-const Login = () => {
-  const location = useLocation()
-  const navigate = useNavigate()
+export default function Login() {
+  const [step, setStep] = useState<1 | 2>(1)
+  const [phone, setPhone] = useState("")
+  const [otp, setOtp] = useState(["", "", "", "", "", ""])
+  const [isLoading, setIsLoading] = useState(false)
+  const [, setFailedCODE] = useState(false)
 
   const store = getStore()
+  const navigate = useNavigate()
 
-  const { logoWebstoreUrl } = location.state ?? {}
+  const otpInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
-  const [phase, setPhase] = useState<"phone" | "code">("phone")
-  const [changing, setChanging] = useState(false)
-  const [failedCODE, setFailedCODE] = useState(false)
+  /* ---------- ETAPA 1: TELEFONE ---------- */
 
-  const [loading, setLoading] = useState(false)
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.replace(/\D/g, "")
 
-  const [phone, setPhone] = useState("")
-  const [code, setCode] = useState("")
+    if (value.length > 11) value = value.slice(0, 11)
 
-  const code1 = useRef<HTMLInputElement | null>(null)
-  const code2 = useRef<HTMLInputElement | null>(null)
-  const code3 = useRef<HTMLInputElement | null>(null)
-  const code4 = useRef<HTMLInputElement | null>(null)
-  const code5 = useRef<HTMLInputElement | null>(null)
-  const code6 = useRef<HTMLInputElement | null>(null)
+    if (value.length > 2) {
+      value = `(${value.substring(0, 2)}) ${value.substring(2)}`
+    }
 
-  const refsRelations = [code1, code2, code3, code4, code5, code6]
+    if (value.length > 9) {
+      value = `${value.substring(0, 10)}-${value.substring(10)}`
+    } else if (value.length > 7) {
+      value = `${value.substring(0, 9)}-${value.substring(9)}`
+    }
 
-  useEffect(() => {
-    setPhase("phone")
-    store.controllers.user.clear()
-    localStorage.removeItem("token")
-    localStorage.removeItem("user")
-  }, [])
-
-  const fadePhases = () => {
-    setChanging(true)
-
-    setPhase(phase === "phone" ? "code" : "phone")
-
-    setTimeout(() => {
-      setChanging(false)
-    }, 400)
+    setPhone(value)
   }
 
-  const handleNext = async () => {
+  const handleSendCode = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (phone.length < 15) return
+
+    setIsLoading(true)
+
     try {
       const cleanPhone = phone.replace(/\D/g, "")
 
@@ -61,250 +61,228 @@ const Login = () => {
             phone: cleanPhone,
           })
           .then((res) => {
-            if (res.ok) {
-              setTimeout(() => {
-                fadePhases()
-                code1.current?.focus()
-              }, 400)
-            } else {
+            if (res.ok) setStep(2)
+            else {
               alert(res.error)
             }
           })
       } else alert("Digite um número válido")
     } catch (error) {}
+
+    setTimeout(() => {
+      setIsLoading(false)
+      setStep(2)
+    }, 1500)
   }
 
-  const handleCodeSubmit = async () => {
+  /* ---------- ETAPA 2: OTP ---------- */
+
+  useEffect(() => {
+    if (step === 2) {
+      otpInputRefs.current[0]?.focus()
+    }
+  }, [step])
+
+  const handleOtpChange = (index: number, value: string) => {
+    if (isNaN(Number(value))) return
+
+    const newOtp = [...otp]
+    newOtp[index] = value.slice(-1)
+    setOtp(newOtp)
+
+    if (value && index < 5) {
+      otpInputRefs.current[index + 1]?.focus()
+    }
+
+    const combined = newOtp.join("")
+    if (index === 5 && combined.length === 6) {
+      handleLogin(combined)
+    }
+  }
+
+  const handleOtpKeyDown = (
+    index: number,
+    e: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    if (e.key === "Backspace" && !otp[index] && index > 0) {
+      otpInputRefs.current[index - 1]?.focus()
+    }
+  }
+
+  const handleLogin = async (code: string) => {
+    setIsLoading(true)
+
     try {
       const login = await Api.post.login.validateCode({
         phone: phone.replace(/\D/g, ""),
         code,
       })
+
       if (login.ok) {
         localStorage.setItem("user", JSON.stringify(login.data))
 
         store.controllers.user.setData(login.data)
         navigate("/myTickets")
-      } else setFailedCODE(true)
+      } else {
+        alert(
+          "Código inválido. Verifique se o código e o telefone estão corretos e tente novamente."
+        )
+        setFailedCODE(true)
+      }
     } catch (error) {
       setFailedCODE(true)
     }
+
+    setIsLoading(false)
   }
 
-  const handleBack = async () => {
-    // check errors
-    fadePhases()
-    setTimeout(() => {
-      setFailedCODE(false)
-      setCode("")
-
-      setTimeout(() => {
-        document.getElementById("phoneInput")?.focus()
-      }, 400)
-    }, 200)
-  }
-
-  const handleClick = async () => {
-    // check errors
-
-    setLoading(true)
-
-    switch (phase) {
-      case "phone":
-        await handleNext()
-        break
-      case "code":
-        if (failedCODE) {
-          setFailedCODE(false)
-          setCode("")
-          setTimeout(() => {
-            code1.current?.focus()
-          }, 200)
-        } else await handleCodeSubmit()
-        break
-      default:
-        break
-    }
-
-    setLoading(false)
-  }
-
-  // fields control
-
-  const handlePhone = (v: string) => {
-    setPhone(formatPhone(v))
-  }
-
-  const handleCode = (v: string) => {
-    setCode(v)
-  }
-
-  const handleCodeNumber = (key: number, v: string) => {
-    const value = v[v.length - 1] ?? ""
-
-    let strPre = code.slice(0, key)
-    let strPos = code.slice(key + 1)
-
-    let str = strPre + value + strPos
-
-    switch (key) {
-      case 0:
-        code2.current?.focus()
-        break
-      case 1:
-        code3.current?.focus()
-        break
-      case 2:
-        code4.current?.focus()
-        break
-      case 3:
-        code5.current?.focus()
-        break
-      case 4:
-        code6.current?.focus()
-        break
-      case 5:
-        if (window.innerWidth < 800) code6.current?.blur()
-        break
-      default:
-        break
-    }
-
-    handleCode(str)
-  }
-
-  const renderCodeFields = () => {
-    let content: JSX.Element[] = []
-
-    for (let i = 0; i < codeLength; i++) {
-      content.push(
-        <S.Input
-          ref={refsRelations[i]}
-          type={document.body.clientWidth <= 520 ? "number" : "text"}
-          value={code[i] ?? ""}
-          onKeyDown={(e) => {
-            if (i === codeLength - 1 && e.key === "Enter") {
-              handleClick()
-            } else if (e.key === "Backspace") {
-              if (e.currentTarget.value === "") {
-                const isFirst = i === 0
-                if (!isFirst) refsRelations[i - 1].current?.focus()
-              }
-            }
-          }}
-          onChange={(e) => {
-            if (e.target.value === "") {
-              let nCode = code
-              nCode = nCode
-                .split("")
-                .map((l, li) => (li !== i ? l : ""))
-                .join("")
-
-              handleCode(nCode)
-            } else {
-              return !failedCODE
-                ? handleCodeNumber(i, e.target.value)
-                : undefined
-            }
-          }}
-          placeholder={""}
-          $small={true}
-          disabled={failedCODE}
-          autoCapitalize="none"
-        />
-      )
-    }
-
-    return content
+  const handleVerifyCode = (e: React.FormEvent) => {
+    e.preventDefault()
+    handleLogin(otp.join(""))
   }
 
   return (
-    <S.Page>
-      {logoWebstoreUrl && (
-        <S.LogoContainer>
-          <img src={logoWebstoreUrl} alt="" />
-        </S.LogoContainer>
-      )}
+    <S.Container>
+      <S.Wrapper>
+        {/* ---------- HEADER ---------- */}
+        <S.Header>
+          <S.HeaderIcon>
+            <Ticket size={32} color="#2563eb" />
+          </S.HeaderIcon>
 
-      <S.FormArea>
-        <S.FormTitle>Faça seu login</S.FormTitle>
+          <S.HeaderTitle>Fazer Login</S.HeaderTitle>
+          <S.HeaderSubtitle>
+            Entre com seu celular para acessar sua conta.
+          </S.HeaderSubtitle>
+        </S.Header>
 
-        <S.Phases>
-          <S.Phase $changing={changing} $phase={phase}>
-            <S.Inputs>
-              <S.Label $k={3}>
-                <S.Input
-                  id={"phoneInput"}
-                  className={"phoneInput"}
-                  type={"text"}
-                  value={phone}
-                  onKeyDown={(e) => {
-                    if (e.key === "Tab") e.preventDefault()
-                    if (e.key === "Enter") {
-                      e.preventDefault()
-                      handleClick()
-                    }
-                  }}
-                  onChange={(e) => handlePhone(e.target.value)}
-                  placeholder={""}
-                  inputMode="numeric"
-                  enterKeyHint="enter"
-                />
-                <span>Informe seu celular</span>
-              </S.Label>
-            </S.Inputs>
-          </S.Phase>
-          <S.Phase $changing={changing}>
-            <S.MessageArea>
-              <S.Message $failed={failedCODE}>
-                Digite abaixo o código enviado para o seu celular
-              </S.Message>
-              <S.Message $error={true} $failed={failedCODE}>
-                Verifique se seu código e telefone estão corretos
-              </S.Message>
-            </S.MessageArea>
-            <S.CodeArea>
-              <S.Label className="code">
-                <span>Código</span>
-              </S.Label>
-              <S.MultipleInputs>{renderCodeFields()}</S.MultipleInputs>
-            </S.CodeArea>
-          </S.Phase>
-        </S.Phases>
+        {/* ---------- CARD ---------- */}
+        <S.Card>
+          <S.ProgressBar>
+            <S.Progress step={step} />
+          </S.ProgressBar>
 
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            gap: 24,
-            justifyContent: "center",
-          }}
-        >
-          <S.Button
-            onClick={handleClick}
-            className={"fl ad-1 f"}
-            disabled={
-              loading ||
-              (phase === "phone"
-                ? phone.replace(/\D/g, "").length < 11
-                : code.length < codeLength)
-            }
-          >
-            {phase === "phone" ? "Próximo" : !failedCODE ? "Entrar" : "Ok"}
-          </S.Button>
-          {failedCODE && (
-            <S.Button
-              $noAnimate={true}
-              onClick={handleBack}
-              disabled={!failedCODE}
-            >
-              Trocar telefone
-            </S.Button>
+          {step === 1 ? (
+            /* ---------- ETAPA 1 ---------- */
+            <S.Form onSubmit={handleSendCode}>
+              <S.Field>
+                <S.Label>
+                  <Smartphone size={16} color="#60a5fa" />
+                  WhatsApp / Celular
+                </S.Label>
+
+                <S.InputWrapper>
+                  <S.Input
+                    type="tel"
+                    autoComplete="tel"
+                    placeholder="(00) 00000-0000"
+                    value={phone}
+                    onChange={handlePhoneChange}
+                    required
+                  />
+
+                  {phone.length === 15 && (
+                    <S.InputCheckIcon>
+                      <CheckCircle2 size={20} />
+                    </S.InputCheckIcon>
+                  )}
+                </S.InputWrapper>
+
+                <S.Hint>
+                  <MessageCircle size={14} color="#3b82f6" />
+                  <span>
+                    Enviaremos o código de acesso pelo <strong>WhatsApp</strong>
+                    .
+                  </span>
+                </S.Hint>
+              </S.Field>
+
+              <S.PrimaryButton
+                type="submit"
+                disabled={phone.length < 15 || isLoading}
+              >
+                {isLoading ? (
+                  <S.Loader>
+                    <Loader2 />
+                  </S.Loader>
+                ) : (
+                  <>
+                    Receber Código
+                    <ArrowRight size={20} />
+                  </>
+                )}
+              </S.PrimaryButton>
+            </S.Form>
+          ) : (
+            /* ---------- ETAPA 2 ---------- */
+            <S.Form onSubmit={handleVerifyCode}>
+              <S.Step2Header>
+                <S.Step2Icon>
+                  <MessageCircle size={24} />
+                </S.Step2Icon>
+
+                <S.Step2Title>Verifique seu WhatsApp</S.Step2Title>
+                <S.Step2Subtitle>
+                  Enviamos o código para{" "}
+                  <strong style={{ color: "#0f172a" }}>{phone}</strong>
+                </S.Step2Subtitle>
+
+                <S.EditPhoneButton type="button" onClick={() => setStep(1)}>
+                  Número errado? Corrigir
+                </S.EditPhoneButton>
+              </S.Step2Header>
+
+              <S.Field>
+                <S.Label style={{ justifyContent: "center" }}>
+                  <Lock size={16} color="#60a5fa" />
+                  Digite o código de 6 dígitos
+                </S.Label>
+
+                <S.OtpGroup>
+                  {otp.map((digit, index) => (
+                    <S.OtpInput
+                      key={index}
+                      ref={(el) => (otpInputRefs.current[index] = el)}
+                      type="text"
+                      inputMode="numeric"
+                      autoComplete="one-time-code"
+                      pattern="\d*"
+                      maxLength={1}
+                      value={digit}
+                      onChange={(e) => handleOtpChange(index, e.target.value)}
+                      onKeyDown={(e) => handleOtpKeyDown(index, e)}
+                    />
+                  ))}
+                </S.OtpGroup>
+              </S.Field>
+
+              <S.PrimaryButton
+                type="submit"
+                disabled={otp.join("").length < 6 || isLoading}
+              >
+                {isLoading ? (
+                  <>
+                    <S.Loader>
+                      <Loader2 />
+                    </S.Loader>
+                    Validando...
+                  </>
+                ) : (
+                  <>
+                    Entrar no Evento
+                    <ArrowRight size={20} />
+                  </>
+                )}
+              </S.PrimaryButton>
+
+              <S.OtpFooter>
+                <p>Não recebeu no WhatsApp?</p>
+                <S.ResendButton type="button">Reenviar código</S.ResendButton>
+              </S.OtpFooter>
+            </S.Form>
           )}
-        </div>
-      </S.FormArea>
-    </S.Page>
+        </S.Card>
+      </S.Wrapper>
+    </S.Container>
   )
 }
-
-export default Login

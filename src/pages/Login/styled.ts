@@ -1,239 +1,329 @@
-import styled from "styled-components"
+import styled, { keyframes } from "styled-components"
+/* ---------- Animações ---------- */
 
-export const Page = styled.div`
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  gap: 12px;
-  height: 100vh;
-  background-color: #f1fcfd;
-
-  @media (max-width: ${({ theme }) => theme.bp.small}px) {
-    margin-top: 0;
-  }
-`
-
-export const LogoContainer = styled.div`
-  display: flex;
-  align-items: center;
-  max-width: 320px;
-  height: fit-content;
-  overflow: hidden;
-  max-height: 180px;
-  margin: 0 32px;
-
-  img {
-    width: 80%;
-    max-height: 100%;
-    margin: auto;
+const fadeIn = keyframes`
+  from {
     opacity: 0;
-    object-fit: contain;
-    ${({ theme }) =>
-      theme.animations.types.fadeTop +
-      theme.animations.durations.main +
-      theme.animations.delays.main()}
+    transform: translateY(8px);
   }
-
-  @media (max-width: ${({ theme }) => theme.bp.small}px) {
-    max-width: calc(100% - 64px);
-    width: 100%;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 `
 
-export const FormArea = styled.div`
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-  padding: 24px;
-  border-radius: 16px;
-  box-shadow: 0 4px 16px 4px rgba(0, 0, 0, 0.1);
-  background-color: #fff;
-  max-width: 320px;
-  width: 100%;
-  opacity: 0;
-  ${({ theme }) =>
-    theme.animations.types.fadeTop +
-    theme.animations.durations.main +
-    theme.animations.delays.main()}
-  height: fit-content;
-  transition: height 0.3s;
-
-  @media (max-width: ${({ theme }) => theme.bp.small}px) {
-    box-shadow: unset;
-    margin: 0 32px;
-    border: 2px solid rgb(200, 200, 200, 0.5);
-    max-width: calc(100% - 64px);
-    box-sizing: border-box;
+const spin = keyframes`
+  to {
+    transform: rotate(360deg);
   }
 `
 
-export const FormTitle = styled.h1`
-  text-align: left;
-  font-size: 20px;
-  font-weight: 600;
-  color: #001e27;
-  opacity: 0;
-  ${({ theme }) =>
-    theme.animations.types.fadeRight +
-    theme.animations.durations.main +
-    theme.animations.delays.main(2)}
-`
+/* ---------- Layout Base ---------- */
 
-export const Phases = styled.div`
-  max-width: 360px;
-  overflow: hidden;
+export const Container = styled.div`
+  min-height: 100svh;
+  box-sizing: border-box;
+  background: linear-gradient(135deg, #f8fafc, #eff6ff);
   display: flex;
   align-items: center;
-  gap: 48px;
-
-  @media (max-width: ${({ theme }) => theme.bp.small}px) {
-    max-width: 100%;
-    box-sizing: border-box;
-  }
+  justify-content: center;
+  padding: 16px;
+  color: #0f172a;
 `
 
-export const Phase = styled.div<{
-  $changing?: boolean
-  $phase?: "phone" | "code"
-}>`
-  min-width: 100%;
-  opacity: ${({ $changing }) => ($changing ? 0 : 1)};
-  transition: opacity 0.2s, margin-left 0.8s, height 0.3s;
-  display: flex;
-  flex-direction: column;
-  height: fit-content;
-
-  &:nth-child(1) {
-    margin-left: ${({ $phase }) =>
-      $phase === "code" ? "calc(-100% - 48px)" : ""};
-  }
-`
-
-export const Inputs = styled.div`
+export const Wrapper = styled.div`
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
+  max-width: 420px;
 `
 
-export const MessageArea = styled.div`
-  position: relative;
-  display: grid;
-  place-items: center;
-`
+/* ---------- Header ---------- */
 
-export const Message = styled.span<{ $error?: boolean; $failed: boolean }>`
-  display: inline-block;
-  font-size: 14px;
+export const Header = styled.div`
   text-align: center;
-  color: ${({ $failed, theme }) => ($failed ? "red" : theme.colors.blue.main)};
-  transition: background-color 0.3s, height 0.3s, opacity 0.2s;
-  ${({ $error }) => ($error ? "width: 200px;" : "")}
-  margin-bottom: 24px;
-  height: auto;
-  opacity: ${({ $error, $failed }) =>
-    $error ? ($failed ? 1 : 0) : $failed ? 0 : 1};
-
-  position: ${({ $error }) => ($error ? "absolute" : "relative")};
-  ${({ $error }) =>
-    $error ? "top: 50%; left: 50%; transform: translate(-50%, -50%);" : ""}
+  margin-bottom: 32px;
 `
 
-export const Label = styled.label<{ $k?: number }>`
-  position: relative;
-  max-width: 100%;
-  opacity: 0;
-  ${({ theme, $k }) =>
-    theme.animations.types.fadeRight +
-    theme.animations.durations.main +
-    theme.animations.delays.main($k)}
-
-  span {
-    position: absolute;
-    left: 6px;
-    top: 10px;
-    font-size: 16px;
-    transition: transform 0.3s, font-size 0.3s;
-    color: rgb(150, 150, 150);
-  }
-
-  input:focus + span,
-  input:not(:placeholder-shown) + span {
-    transform: translateY(-34px);
-    font-size: 14px;
-  }
-`
-
-export const CodeArea = styled.div`
+export const HeaderIcon = styled.div`
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 16px;
+  background: #ffffff;
+  border-radius: 16px;
+  border: 1px solid #dbeafe;
   display: flex;
-  flex-direction: column;
-  gap: 42px;
-
-  & > label > span {
-    font-weight: 600;
-  }
-`
-
-export const MultipleInputs = styled.div`
-  display: flex;
-  justify-content: space-between;
-  gap: 24px;
-  @media (max-width: ${({ theme }) => theme.bp.small}px) {
-    gap: 12px;
-  }
-`
-
-export const Input = styled.input<{ $small?: boolean }>`
-  border: 1px solid #ccc;
-  outline: none;
-  padding: 12px 6px;
-  font-size: 16px;
-  color: ${({ theme }) => theme.colors.black.secondary};
-  border-radius: 4px;
-  width: 100%;
-  transition: border-color 0.3s;
-  box-sizing: border-box;
-  text-align: ${({ $small }) => ($small ? "center" : "left")};
-
-  &:focus {
-    border: 1px solid ${({ theme }) => theme.colors.blue.main};
-  }
-
-  &:disabled {
-    opacity: 0.7;
-    cursor: not-allowed;
-  }
-`
-
-export const Button = styled.button<{ $noAnimate?: boolean }>`
-  border-radius: 4px;
-  padding: 0.6rem 2.6rem;
-  width: fit-content;
-  margin: auto;
-  cursor: pointer;
-  outline: none;
-  border: none;
-  background-color: #001e27;
-  box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0);
-  transition: opacity 0.3s, box-shadow 0.3s, background-color 0.3s,
-    background-color 0.3s, filter 0.3s;
-  color: #fff;
-  font-size: 16px;
-  opacity: ${({ $noAnimate }) => ($noAnimate ? 1 : 0)};
-  ${({ $noAnimate, theme }) =>
-    $noAnimate
-      ? ""
-      : theme.animations.types.fadeRight +
-        theme.animations.durations.main +
-        theme.animations.delays.main(5)}
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.08);
+  transition: transform 0.5s ease;
 
   &:hover {
-    box-shadow: 0 2px 6px -2px rgba(0, 0, 0, 0.24);
+    transform: scale(1.05);
+  }
+`
+
+export const HeaderTitle = styled.h1`
+  font-size: 24px;
+  font-weight: 700;
+  color: #0f172a;
+`
+
+export const HeaderSubtitle = styled.p`
+  margin-top: 8px;
+  font-size: 14px;
+  color: #64748b;
+`
+
+/* ---------- Card ---------- */
+
+export const Card = styled.div`
+  position: relative;
+  background: #ffffff;
+  border-radius: 24px;
+  padding: 24px;
+  border: 1px solid #ffffff;
+  box-shadow: 0 20px 40px rgba(15, 23, 42, 0.06);
+  overflow: hidden;
+
+  @media (min-width: 640px) {
+    padding: 32px;
+  }
+`
+
+export const ProgressBar = styled.div`
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: #f1f5f9;
+`
+
+export const Progress = styled.div<{ step: 1 | 2 }>`
+  height: 100%;
+  width: ${({ step }) => (step === 1 ? "50%" : "100%")};
+  background: #3b82f6;
+  transition: width 0.5s ease;
+`
+
+/* ---------- Forms ---------- */
+
+export const Form = styled.form`
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  animation: ${fadeIn} 0.3s ease;
+`
+
+export const Field = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+`
+
+export const Label = styled.label`
+  font-size: 14px;
+  font-weight: 600;
+  color: #334155;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: 4px;
+`
+
+/* ---------- Input Telefone ---------- */
+
+export const InputWrapper = styled.div`
+  position: relative;
+`
+
+export const Input = styled.input`
+  width: 100%;
+  padding: 16px 20px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 18px;
+  font-weight: 500;
+  color: #1e293b;
+  transition: all 0.2s ease;
+
+  &::placeholder {
+    color: #94a3b8;
+  }
+
+  &:hover {
+    background: #ffffff;
+  }
+
+  &:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+`
+
+export const InputCheckIcon = styled.div`
+  position: absolute;
+  right: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #2563eb;
+`
+
+/* ---------- Hint WhatsApp ---------- */
+
+export const Hint = styled.div`
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: #475569;
+  background: rgba(219, 234, 254, 0.4);
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(191, 219, 254, 0.6);
+`
+
+/* ---------- Botões ---------- */
+
+export const PrimaryButton = styled.button`
+  width: 100%;
+  background: #0f172a;
+  color: #ffffff;
+  font-size: 18px;
+  font-weight: 700;
+  padding: 16px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: 0 10px 20px rgba(15, 23, 42, 0.12);
+  transition: all 0.2s ease;
+
+  &:hover:not(:disabled) {
+    background: #020617;
+    box-shadow: 0 14px 28px rgba(15, 23, 42, 0.18);
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.98);
   }
 
   &:disabled {
-    background-color: #ccc;
-    cursor: unset;
+    background: #e2e8f0;
+    color: #94a3b8;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+`
+
+export const Loader = styled.div`
+  animation: ${spin} 1s linear infinite;
+  display: flex;
+`
+
+/* ---------- Etapa 2 ---------- */
+
+export const Step2Header = styled.div`
+  text-align: center;
+  margin-bottom: 24px;
+`
+
+export const Step2Icon = styled.div`
+  width: 48px;
+  height: 48px;
+  background: #eff6ff;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 12px;
+  color: #2563eb;
+`
+
+export const Step2Title = styled.h3`
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+`
+
+export const Step2Subtitle = styled.p`
+  margin-top: 4px;
+  font-size: 14px;
+  color: #64748b;
+`
+
+export const EditPhoneButton = styled.button`
+  margin-top: 8px;
+  background: none;
+  border: none;
+  font-size: 12px;
+  color: #2563eb;
+  font-weight: 500;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 8px;
+`
+
+/* ---------- OTP ---------- */
+
+export const OtpGroup = styled.div`
+  display: flex;
+  gap: 4px;
+  justify-content: space-between;
+
+  @media (min-width: 640px) {
+    gap: 8px;
+  }
+`
+
+export const OtpInput = styled.input`
+  width: 100%;
+  height: 48px;
+  text-align: center;
+  font-size: 20px;
+  font-weight: 700;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+  caret-color: #2563eb;
+
+  @media (min-width: 640px) {
+    height: 64px;
+    font-size: 24px;
+  }
+
+  &:focus {
+    outline: none;
+    background: #ffffff;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.1);
+  }
+`
+
+/* ---------- Footer OTP ---------- */
+
+export const OtpFooter = styled.div`
+  text-align: center;
+  font-size: 14px;
+  color: #64748b;
+`
+
+export const ResendButton = styled.button`
+  margin-top: 4px;
+  background: none;
+  border: none;
+  color: #2563eb;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 8px;
+
+  &:hover {
+    text-decoration: underline;
   }
 `

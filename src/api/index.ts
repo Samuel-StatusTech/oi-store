@@ -9,6 +9,8 @@ import getStore from "../store"
 const backUrl = process.env.REACT_APP_BACKEND_URL
 const mailingUrl = process.env.REACT_APP_EMAIL_BACKEND_URL
 
+const mockDomain = process.env.REACT_APP_MOCK_DOMAIN ?? ""
+
 const axios = axiosInstance.create()
 axios.defaults.baseURL = "https://api.oitickets.com.br/api/v1"
 
@@ -33,6 +35,10 @@ axios.interceptors.request.use(function (config) {
     const localToken = localStorage.getItem("token")
 
     const { controllers } = getStore.getState()
+
+    if (process.env.NODE_ENV === "development") {
+      config.headers["X-Store-Domain"] = mockDomain
+    }
 
     if (localToken) {
       if (localToken === "undefined") {
