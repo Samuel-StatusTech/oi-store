@@ -1,6 +1,7 @@
 type TParams = {
   // Get
   get: {
+    subdomainStatus: {}
     qrcode: {
       order: {
         external_reference: string

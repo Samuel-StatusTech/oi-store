@@ -16,6 +16,7 @@ type TDefaultRes<T> =
 
 type TResponses = {
   get: {
+    subdomainStatus: Promise<{ ok: boolean }>
     qrcode: Promise<TDefaultRes<TQrPaymentData>>
     events: Promise<TDefaultRes<{ organizer: TOrganizer; events: TEventMin[] }>>
     eventInfo: Promise<TDefaultRes<TEventData>>

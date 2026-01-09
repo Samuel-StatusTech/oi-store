@@ -1,5 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom"
+import { useEffect, useState } from "react"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
 
 // Pages
 import EventSelect from "../pages/EventSelect"
@@ -8,17 +9,63 @@ import Login from "../pages/Login"
 import MyTickets from "../pages/MyTickets"
 import Payment from "../pages/Payment"
 import PaymentPix from "../pages/PaymentPix"
-import { useEffect } from "react"
+import NotFoundPage from "../pages/404"
+
 import getStore from "../store"
+import { Api } from "../api"
+import { DotLottieReact } from "@lottiefiles/dotlottie-react"
+import loadingAnimation from "../assets/animations/loading"
 
 const Router = () => {
   const { event } = getStore()
+
+  const [loading, setLoading] = useState(true)
+  const [isSubdomainValid, setIsSubdomainValid] = useState(false)
+
+  useEffect(() => {
+    if (!window.location.href.includes("404")) {
+      try {
+        setLoading(true)
+        Api.get
+          .subdomainStatus({})
+          .then((res) => {
+            setIsSubdomainValid(res.ok)
+            setLoading(false)
+          })
+          .catch(() => {
+            setLoading(false)
+          })
+      } catch (error) {}
+    }
+  }, [window.location.href])
 
   useEffect(() => {
     window.document.title = event ? event.corporateName : "ListaPix"
   }, [event])
 
-  return (
+  if (loading) {
+    return (
+      <div
+        style={{
+          width: "100svw",
+          height: "100svh",
+          display: "grid",
+          placeItems: "center",
+        }}
+      >
+        <div style={{ width: 256 }}>
+          <DotLottieReact
+            data={loadingAnimation}
+            loop
+            autoplay
+            width={"100%"}
+          />
+        </div>
+      </div>
+    )
+  }
+
+  return isSubdomainValid ? (
     <BrowserRouter>
       <Routes>
         <Route path="/">
@@ -32,10 +79,13 @@ const Router = () => {
             <Route path="" element={<Payment />} />
             <Route path="pix" element={<PaymentPix />} />
           </Route>
-          <Route path="*" element={<Navigate to={"/"} />} />
+          <Route path="404" element={<NotFoundPage />} />
+          <Route path="*" element={<NotFoundPage />} />
         </Route>
       </Routes>
     </BrowserRouter>
+  ) : (
+    <NotFoundPage />
   )
 }
 

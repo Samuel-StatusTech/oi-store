@@ -22,6 +22,7 @@
     "dayjs": "^1.11.11",
     "emoji-dictionary": "^1.0.12",
     "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.562.0",
     "pdfmake": "^0.2.10",
     "qrcode.react": "^3.1.0",
     "react": "^18.3.1",

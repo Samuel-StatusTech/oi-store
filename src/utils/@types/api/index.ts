@@ -6,6 +6,9 @@ import TResponses from "./responses"
  */
 
 type TApiGetters = {
+  subdomainStatus: (
+    p: TParams["get"]["subdomainStatus"]
+  ) => TResponses["get"]["subdomainStatus"]
   qrcode: (p: TParams["get"]["qrcode"]) => TResponses["get"]["qrcode"]
   events: (p: TParams["get"]["events"]) => TResponses["get"]["events"]
   eventInfo: (p: TParams["get"]["eventInfo"]) => TResponses["get"]["eventInfo"]

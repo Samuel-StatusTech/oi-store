@@ -61,6 +61,39 @@ axios.interceptors.request.use(function (config) {
 })
 
 /*
+ * Service check
+ */
+
+const getSubdomainStatus: TApi["get"]["subdomainStatus"] = async () => {
+  return new Promise(async (resolve) => {
+    try {
+      await axios
+        .get(`${backUrl}ecommerce/getInfo`, {
+          headers: {
+            Authorization: undefined,
+          },
+        })
+        .then((res) => {
+          console.log("Erro 1: ", res)
+          const info = res.data
+
+          if (info && info.success) {
+            resolve({ ok: true })
+          } else {
+            resolve({ ok: false })
+          }
+        })
+        .catch((err) => {
+          console.log("Erro 2: ", err)
+          resolve({ ok: false })
+        })
+    } catch (error) {
+      resolve({ ok: false })
+    }
+  })
+}
+
+/*
  * Getters
  */
 
@@ -773,6 +806,7 @@ const getPurchase: TApi["get"]["purchaseInfo"] = async ({
 
 export const Api: TApi = {
   get: {
+    subdomainStatus: getSubdomainStatus,
     qrcode: getQrCode,
     events: getEvents,
     eventInfo: getEventInfo,

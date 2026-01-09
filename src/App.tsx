@@ -18,7 +18,10 @@ function App() {
       if (!store.event) store.controllers.event.setData(JSON.parse(event))
       if (user && !store.user) store.controllers.user.setData(JSON.parse(user))
     } else {
-      if (!window.location.href.includes("eventSelect")) {
+      if (
+        !window.location.href.includes("eventSelect") &&
+        !window.location.href.includes("404")
+      ) {
         window.location.href = "/eventSelect"
       }
     }
