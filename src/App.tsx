@@ -22,7 +22,7 @@ function App() {
         !window.location.href.includes("eventSelect") &&
         !window.location.href.includes("404")
       ) {
-        // window.location.href = "/eventSelect"
+        window.location.href = "/eventSelect"
       }
     }
   }, [store.controllers.event, store.controllers.user, store.event, store.user])
