@@ -155,6 +155,7 @@ const PaymentPix = () => {
       if (isPaymentRecoverable) {
         setQrCode(paymentToRecover.qrCode)
         setQrCode64(paymentToRecover.qrCode64)
+        setTotalOrderAmount(paymentToRecover.amount)
         runTimer(remainingTime)
 
         startPoolingOrderStatus()
