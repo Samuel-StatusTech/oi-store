@@ -1,5 +1,5 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { BrowserRouter, Route, Routes } from "react-router-dom"
 
 // Pages
@@ -20,15 +20,15 @@ const Router = () => {
   const { event } = getStore()
 
   const [loading, setLoading] = useState(true)
-  const [alreadyChecked, setAlreadyChecked] = useState(false)
+  const alreadyCheckedRef = useRef(false)
 
   useEffect(() => {
     if (!window.location.href.includes("404")) {
       try {
-        if (!alreadyChecked) setLoading(true)
+        if (!alreadyCheckedRef.current) setLoading(true)
 
         Api.get.subdomainStatus({}).then((res) => {
-          setAlreadyChecked(true)
+          alreadyCheckedRef.current = true
 
           if (res.ok) setLoading(false)
           else window.location.href = "404"
@@ -37,7 +37,7 @@ const Router = () => {
     } else {
       if (loading) setLoading(false)
     }
-  }, [window.location.href, alreadyChecked])
+  }, [window.location.href])
 
   useEffect(() => {
     window.document.title = event ? event.corporateName : "ListaPix"
