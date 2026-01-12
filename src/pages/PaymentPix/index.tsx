@@ -68,6 +68,8 @@ const PaymentPix = () => {
   const [qrCode64, setQrCode64] = useState("")
   const [feedback, setFeedback] = useState<any>({ visible: false, message: "" })
 
+  const alreadyRequestingPaymentRef = useRef(false)
+
   const payedRef = useRef(false)
   const paymentSessionRef = useRef<TPaymentSession | null>(null)
 
@@ -148,9 +150,9 @@ const PaymentPix = () => {
 
       const remainingTime = 15 * 60 - runnedTime
 
-      const isPaymentRecoverable = remainingTime > 0
+      const isPaymentRecoverable = remainingTime > 0 // checkPaymentValidity
 
-      if (isPaymentRecoverable && paymentToRecover.qrCode) {
+      if (isPaymentRecoverable) {
         setQrCode(paymentToRecover.qrCode)
         setQrCode64(paymentToRecover.qrCode64)
         runTimer(remainingTime)
@@ -415,13 +417,26 @@ const PaymentPix = () => {
           goToMyTickets()
           return
         } else {
-          if (sid !== "" && expired === false) {
+          if (
+            sid !== "" &&
+            expired === false &&
+            !alreadyRequestingPaymentRef.current
+          ) {
+            alreadyRequestingPaymentRef.current = true
+
             await startPurchase()
           }
         }
       }
     }
-  }, [sid, paymentSessionRef.current, payedRef.current, payed, expired])
+  }, [
+    sid,
+    paymentSessionRef.current,
+    payedRef.current,
+    alreadyRequestingPaymentRef.current,
+    payed,
+    expired,
+  ])
 
   useEffect(() => {
     ignite()
@@ -895,9 +910,7 @@ const PaymentPix = () => {
                   </div>
                   <div onClick={handleWhatsapp} className="whatsappSharing">
                     <WhatsappIcon />
-                    <span>
-                      Whatsapp
-                    </span>
+                    <span>Whatsapp</span>
                   </div>
                 </S.Icons>
                 <S.Button

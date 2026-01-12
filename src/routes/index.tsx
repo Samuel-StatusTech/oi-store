@@ -20,18 +20,24 @@ const Router = () => {
   const { event } = getStore()
 
   const [loading, setLoading] = useState(true)
+  const [alreadyChecked, setAlreadyChecked] = useState(false)
 
   useEffect(() => {
     if (!window.location.href.includes("404")) {
       try {
-        setLoading(true)
+        if (!alreadyChecked) setLoading(true)
+
         Api.get.subdomainStatus({}).then((res) => {
+          setAlreadyChecked(true)
+
           if (res.ok) setLoading(false)
           else window.location.href = "404"
         })
       } catch (error) {}
-    } else setLoading(false)
-  }, [window.location.href])
+    } else {
+      if (loading) setLoading(false)
+    }
+  }, [window.location.href, alreadyChecked])
 
   useEffect(() => {
     window.document.title = event ? event.corporateName : "ListaPix"
