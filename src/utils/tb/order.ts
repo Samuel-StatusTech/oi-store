@@ -15,6 +15,7 @@ type Props = {
   dk: any
   eventId: string
   eventName: string
+  chargeClient: boolean
 }
 
 export const getOrderData = (
@@ -29,13 +30,19 @@ export const getOrderData = (
     user,
     dk,
     eventId,
-    eventName
+    eventName,
+    chargeClient,
   } = props
 
   if (tickets) {
-    const paymentValue =
-      tickets.reduce((sum, ticket) => sum + +(ticket.price_sell ?? "0"), 0) +
-      taxTotal
+    const ticketsReducedAmount = tickets.reduce(
+      (sum, ticket) => sum + +(ticket.price_sell ?? "0"),
+      0
+    )
+
+    const paymentValue = chargeClient
+      ? ticketsReducedAmount + taxTotal
+      : ticketsReducedAmount
 
     const phone = buyer.phone.replace(/\D/g, "")
 

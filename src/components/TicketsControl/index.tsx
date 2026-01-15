@@ -56,7 +56,12 @@ const TicketsControl = ({
 
       setTaxes(tax)
       setTicketsTotal(tTotal)
-      setTotal(tTotal > 0 ? tTotal + tax.value : 0)
+
+      const clientCharges = event?.eCommerce.chargeClient
+        ? tTotal + tax.value
+        : tTotal
+
+      setTotal(tTotal > 0 ? clientCharges : 0)
     }
   }, [calcTotal, event, tickets])
 

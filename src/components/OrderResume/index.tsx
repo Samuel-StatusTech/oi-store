@@ -23,7 +23,13 @@ type Props = {
   fitContainer?: boolean
 }
 
-const OrderResume = ({ hideEventData = false, datePeriod, ticketsList, onlyPurchasingItems = false, fitContainer = false }: Props) => {
+const OrderResume = ({
+  hideEventData = false,
+  datePeriod,
+  ticketsList,
+  onlyPurchasingItems = false,
+  fitContainer = false,
+}: Props) => {
   const navigate = useNavigate()
 
   const { event, controllers } = getStore()
@@ -139,7 +145,10 @@ const OrderResume = ({ hideEventData = false, datePeriod, ticketsList, onlyPurch
                 )}
               </S.EventResume>
               <S.TicketsList>
-                {(onlyPurchasingItems ? ticketsList.filter(i => i.qnt > 0) : ticketsList).map((ticket, k) => (
+                {(onlyPurchasingItems
+                  ? ticketsList.filter((i) => i.qnt > 0)
+                  : ticketsList
+                ).map((ticket, k) => (
                   <Ticket ticket={ticket} key={k} />
                 ))}
               </S.TicketsList>
@@ -159,7 +168,14 @@ const OrderResume = ({ hideEventData = false, datePeriod, ticketsList, onlyPurch
           )}
           <S.TotalItem $main={true}>
             <span>TOTAL</span>
-            <span>{formatMoney(ticketsTotal + taxes.value, true)}</span>
+            <span>
+              {formatMoney(
+                event?.eCommerce.chargeClient
+                  ? ticketsTotal + taxes.value
+                  : ticketsTotal,
+                true
+              )}
+            </span>
           </S.TotalItem>
         </S.Total>
       </S.Info>

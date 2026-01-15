@@ -9,7 +9,8 @@ export const getOrderValue = (
   user: TUser,
   dk: string,
   eventId: string,
-  eventName: string
+  eventName: string,
+  chargeClient: boolean
 ) => {
   const obj = getOrderData({
     tickets: currentTickets,
@@ -20,6 +21,7 @@ export const getOrderValue = (
     dk: dk,
     eventId: eventId,
     eventName: eventName,
+    chargeClient,
   })
 
   return obj ? obj.transaction_amount : 0
