@@ -270,18 +270,10 @@ export const Icons = styled.div`
       background-color: #eee;
     }
 
-    &.whatsappSharing {
-      display: none;
-    }
-
     @media (max-width: ${({ theme }) => theme.bp.medium}px) {
       &.shareBtn,
       &.seeTickets {
         display: none;
-      }
-
-      &.whatsappSharing {
-        display: flex;
       }
 
       &:hover {
