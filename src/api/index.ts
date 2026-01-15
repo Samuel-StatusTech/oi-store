@@ -260,7 +260,9 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
                 batch_name: activeBatchData.batch_name,
                 group_id: i.group_id ?? "",
                 group_name: i.group_name
-                  ? i.group_name.replace("-loja", "")
+                  ? i.group_name
+                    .replace("-loja", "")
+                    .replace(`-${eventId}`, "")
                   : "",
                 quantity: activeBatchData.quantity,
                 price_sell: activeBatchData.price_sell,
