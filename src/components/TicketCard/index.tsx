@@ -113,11 +113,11 @@ const TicketCard = ({ k, data }: Props) => {
 
   return (
     <S.Component $k={k}>
-      <S.CancelledTag $showing={isCancelled}>
+      <S.CancelledTag $showing={false}>
         <span>Cancelado</span>
       </S.CancelledTag>
-      <S.CardContent $isCancelled={isCancelled}>
-        <S.ImageContainer>
+      <S.CardContent>
+        <S.ImageContainer $isCancelled={isCancelled}>
           <img src={data.eventBanner} alt={""} />
         </S.ImageContainer>
         <S.EventInfo>
@@ -126,6 +126,11 @@ const TicketCard = ({ k, data }: Props) => {
             {/* {renderEventDate()} */}
             {renderPrice()}
           </S.CardBottom>
+          {isCancelled && (
+            <S.CardBottom $isCancelled={isCancelled}>
+              <S.CancelledLabel>Compra cancelada</S.CancelledLabel>
+            </S.CardBottom>
+          )}
           <S.CardBottom>
             {renderBtns()}
             {/* @ts-ignore */}

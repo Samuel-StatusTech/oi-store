@@ -41,7 +41,7 @@ export const CancelledTag = styled.div<{ $showing: boolean }>`
   border-radius: 6px;
 `
 
-export const CardContent = styled.div<{ $isCancelled: boolean }>`
+export const CardContent = styled.div<{ $isCancelled?: boolean }>`
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -50,12 +50,13 @@ export const CardContent = styled.div<{ $isCancelled: boolean }>`
   filter: saturate(${({ $isCancelled }) => ($isCancelled ? 0 : 1)});
 `
 
-export const ImageContainer = styled.div`
+export const ImageContainer = styled.div<{ $isCancelled?: boolean }>`
   width: 100%;
   aspect-ratio: 2;
   overflow: hidden;
   display: flex;
   align-items: center;
+  filter: saturate(${({ $isCancelled }) => ($isCancelled ? 0 : 1)});
 
   img {
     min-height: 100%;
@@ -78,9 +79,17 @@ export const EventName = styled.span`
   font-weight: bold;
 `
 
-export const CardBottom = styled.div`
+export const CancelledLabel = styled.span`
+  font-size: 20px;
+  color: #d8484a;
+  font-weight: bold;
+  text-align: center;
+`
+
+export const CardBottom = styled.div<{ $isCancelled?: boolean }>`
   display: flex;
-  justify-content: space-between;
+  justify-content: ${({ $isCancelled }) =>
+    $isCancelled ? "center" : "space-between"};
   align-items: center;
 
   &:nth-child(1) {
@@ -91,7 +100,8 @@ export const CardBottom = styled.div`
 
   @media (max-width: ${({ theme }) => theme.bp.xsmall}px) {
     flex-direction: column;
-    align-items: flex-start;
+    align-items: ${({ $isCancelled }) =>
+      $isCancelled ? "center" : "flex-start"};
   }
 `
 
