@@ -52,17 +52,15 @@ export const footer = (event: TEventData) => [
 const formatdM = (date: string | number | Date) => {
   let str = ""
 
-  const d = new Date(date)
+  const dt = new Date(date)
 
-  // day
-  str = String(d.getDate()).padStart(2, "0")
+  const d = String(dt.getUTCDate()).padStart(2, "0")
+  const m = dt.getUTCMonth()
 
-  // month
-  str += ` de ${monthsRelations[d.getMonth()]}`
+  str += `${d} de ${monthsRelations[m]}`
 
   return str
 }
-
 const ticketData = (
   event: TEventData,
   ticket: TShoppingTicket & {
@@ -77,16 +75,10 @@ const ticketData = (
   let body = []
 
   try {
-    const getHours = (date: string) => {
-      let str = ""
-
-      const d = new Date(date)
-
-      str = `${String(d.getHours()).padStart(2, "0")}:`
-      str += String(d.getMinutes()).padStart(2, "0")
-
-      return str
-    }
+    const hours = event.time_ini.slice(
+      0,
+      String(event.time_ini).lastIndexOf(":")
+    )
 
     const eventDateText =
       event.date_end === event.date_ini
@@ -105,7 +97,7 @@ const ticketData = (
               text: `Data do evento: ${eventDateText}`,
             },
           ],
-          [{ text: `Início do evento: ${getHours(event.date_ini as string)}` }],
+          [{ text: `Início do evento: ${hours}` }],
           [{ text: `Local: ${event.local}. ${event.city}, ${event?.uf}` }],
         ],
         widths: ["*"],
