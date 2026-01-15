@@ -842,7 +842,7 @@ const PaymentPix = () => {
       />
 
       <Container fullHeight={true}>
-        <S.Main>
+        <S.Main $justifyCenter={payed || expired}>
           <S.Block $k={2}>
             {/* Expired */}
             {expired && (

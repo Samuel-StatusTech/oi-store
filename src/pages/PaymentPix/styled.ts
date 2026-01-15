@@ -6,8 +6,10 @@ export const Page = styled.div`
   min-height: 100svh;
 `
 
-export const Main = styled.div`
+export const Main = styled.div<{ $justifyCenter: boolean }>`
   display: flex;
+  justify-content: ${({ $justifyCenter }) =>
+    $justifyCenter ? "center" : "unset"};
   gap: 24px;
   padding: 0 0 64px 0;
 
