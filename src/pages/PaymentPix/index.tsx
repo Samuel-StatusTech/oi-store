@@ -111,7 +111,7 @@ const PaymentPix = () => {
           event?.dk as string,
           event?.id as string,
           event?.name as string,
-          event?.eCommerce.chargeClient ?? false
+          event?.eCommerce.chargeClient ?? false,
         )
 
         const targetEmail = (lctn.state.buyer?.email as string) ?? "seu email"
@@ -130,7 +130,7 @@ const PaymentPix = () => {
           },
           parsedData,
           targetEmail,
-          buyerName
+          buyerName,
         )
       }
     } catch (error) {}
@@ -146,7 +146,7 @@ const PaymentPix = () => {
 
     if (paymentToRecover) {
       const runnedTime = Math.floor(
-        (new Date().getTime() - +paymentToRecover.paymentStartedAt) / 1000
+        (new Date().getTime() - +paymentToRecover.paymentStartedAt) / 1000,
       )
 
       const remainingTime = 15 * 60 - runnedTime
@@ -190,7 +190,7 @@ const PaymentPix = () => {
     let isValid = true
 
     const runnedTime = Math.floor(
-      (new Date().getTime() - +paymentToRecover.paymentStartedAt) / 1000
+      (new Date().getTime() - +paymentToRecover.paymentStartedAt) / 1000,
     )
 
     const remainingTime = 15 * 60 - runnedTime
@@ -229,7 +229,7 @@ const PaymentPix = () => {
           if (status) {
             const purchase = await confirmPurchase(
               paymentToRecover.socketId,
-              paymentToRecover.paymentId
+              paymentToRecover.paymentId,
             )
 
             let f = {
@@ -302,7 +302,7 @@ const PaymentPix = () => {
   const storeDataIntoPaymentSession = (
     qrCode: string,
     qrCode64: string,
-    paymentAmount: number
+    paymentAmount: number,
   ) => {
     const paymentSession = localStorage.getItem("paymentSession")
     const paymentToRecover: TPaymentSession | null = paymentSession
@@ -355,7 +355,7 @@ const PaymentPix = () => {
             storeDataIntoPaymentSession(
               qr.data.qrcodes.code,
               qr.data.qrcodes.base64,
-              orderData.transaction_amount
+              orderData.transaction_amount,
             )
             runTimer()
           }
@@ -387,7 +387,7 @@ const PaymentPix = () => {
           ? localStorage.getItem("payed") === "true"
           : false
         resolve(true)
-      }, 500)
+      }, 500),
     )
 
     return savedPayment
@@ -395,7 +395,7 @@ const PaymentPix = () => {
 
   const ignite = useCallback(async () => {
     const pendingPayment: TPaymentSession | null =
-      paymentSessionRef.current ?? localStorage.getItem("paymentSession")
+      (paymentSessionRef.current ?? localStorage.getItem("paymentSession"))
         ? JSON.parse(localStorage.getItem("paymentSession") ?? "{}")
         : null
 
@@ -404,7 +404,7 @@ const PaymentPix = () => {
     const wasExpired = localStorage.getItem("expired") === "true"
 
     const isPayed =
-      payedRef.current ?? savedPayment ? savedPayment === "true" : payed
+      (payedRef.current ?? savedPayment) ? savedPayment === "true" : payed
 
     const hasOngoingPurchase = !!pendingPayment
 
@@ -529,7 +529,7 @@ const PaymentPix = () => {
       restartTimer,
       (newTime?: string | null) => {
         if (newTime) setTime(newTime)
-      }
+      },
     )
 
     timer.start()
@@ -580,7 +580,10 @@ const PaymentPix = () => {
           order_id: sId,
           buyer_name: lctn.state.buyer ? lctn.state.buyer.name : "",
           buyer_email: lctn.state.buyer ? lctn.state.buyer.email : "",
-          products: lctn.state.tickets as any,
+          products: (lctn.state.tickets as any[]).map((i: any) => ({
+            ...i,
+            charge_client: Boolean(event?.eCommerce.chargeClient) ? 1 : 0,
+          })),
           payments: [
             {
               payment_type: "pix",
@@ -612,7 +615,7 @@ const PaymentPix = () => {
 
             localStorage.setItem(
               "paymentSession",
-              JSON.stringify(paymentSession)
+              JSON.stringify(paymentSession),
             )
           }
 
@@ -622,7 +625,7 @@ const PaymentPix = () => {
 
       return extref
     },
-    []
+    [],
   )
 
   const parsePurchaseInfo = (p: any) => {
@@ -641,7 +644,7 @@ const PaymentPix = () => {
         "ecommerce",
         t.opuid,
         event?.oid as number,
-        event?.dbName as string
+        event?.dbName as string,
       )
 
       const dt = {
@@ -819,7 +822,7 @@ const PaymentPix = () => {
           event?.dk as string,
           event?.id as string,
           event?.name as string,
-          event?.eCommerce.chargeClient
+          event?.eCommerce.chargeClient,
         )
 
         if (!Number.isNaN(orderValueAmount))
