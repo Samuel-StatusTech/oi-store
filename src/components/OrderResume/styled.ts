@@ -1,14 +1,18 @@
 import styled from "styled-components"
 
-export const Component = styled.div<{$fitContainer: boolean}>`
+export const Component = styled.div<{
+  $fitContainer: boolean
+  $reverse: boolean
+}>`
   flex: 2;
   display: flex;
-  flex-direction: column;
+  flex-direction: ${({ $reverse }) => ($reverse ? "column-reverse" : "column")};
   gap: 24px;
   border-radius: 6px;
   overflow: hidden;
   box-shadow: 0 2px 4px 4px rgba(0, 0, 0, 0.1);
-  ${({ $fitContainer }) => $fitContainer ? "align-self: stretch;" : "height: fit-content;"}
+  ${({ $fitContainer }) =>
+    $fitContainer ? "align-self: stretch;" : "height: fit-content;"}
   min-width: 380px;
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {

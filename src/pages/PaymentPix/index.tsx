@@ -988,6 +988,7 @@ const PaymentPix = () => {
               hideEventData={true}
               onlyPurchasingItems={true}
               fitContainer={true}
+              reverse={true}
               ticketsList={
                 lctn.state.disposalTickets.length > 0
                   ? lctn.state.disposalTickets

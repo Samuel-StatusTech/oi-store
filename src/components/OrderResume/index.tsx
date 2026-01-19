@@ -21,6 +21,7 @@ type Props = {
   setTickets?: (list: TTicketDisposal[]) => void
   onlyPurchasingItems?: boolean
   fitContainer?: boolean
+  reverse?: boolean
 }
 
 const OrderResume = ({
@@ -29,6 +30,7 @@ const OrderResume = ({
   ticketsList,
   onlyPurchasingItems = false,
   fitContainer = false,
+  reverse = false,
 }: Props) => {
   const navigate = useNavigate()
 
@@ -121,7 +123,7 @@ const OrderResume = ({
   }
 
   return (
-    <S.Component $fitContainer={fitContainer}>
+    <S.Component $fitContainer={fitContainer} $reverse={reverse}>
       {event?.event_banner && (
         <S.ImageContainer>
           <img src={event?.event_banner} alt={""} />
