@@ -11,7 +11,7 @@ function App() {
   const store = getStore()
 
   useEffect(() => {
-    const event = localStorage.getItem("event")
+    const event = sessionStorage.getItem("event")
     const user = localStorage.getItem("user")
 
     if (event) {

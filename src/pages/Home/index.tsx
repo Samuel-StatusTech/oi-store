@@ -26,7 +26,7 @@ const Home = () => {
   const navigate = useNavigate()
   const navigationType = useNavigationType()
 
-  const eventData = localStorage.getItem("event")
+  const eventData = sessionStorage.getItem("event")
 
   const event = eventData ? (JSON.parse(eventData) as TEventData) : null
 
@@ -53,7 +53,7 @@ const Home = () => {
 
           if (data.is_ecommerce) {
             controllers.event.setData(req.data)
-            localStorage.setItem("event", JSON.stringify(req.data))
+            sessionStorage.setItem("event", JSON.stringify(req.data))
           } else {
             controllers.event.clear()
             navigate("/eventSelect")
@@ -87,8 +87,8 @@ const Home = () => {
 
           const parsedTickets = parseDisposalTickets(
             list.filter((t) =>
-              t.active !== undefined ? (Boolean(t.active) ? t : null) : t
-            )
+              t.active !== undefined ? (Boolean(t.active) ? t : null) : t,
+            ),
           )
 
           setTickets(parsedTickets)
@@ -174,23 +174,23 @@ const Home = () => {
                 description={[
                   getDatePeriod(
                     event?.date_ini as string,
-                    event?.date_end as string
+                    event?.date_end as string,
                   ),
                   event?.date_ini
                     ? getHours(
                         new Date(
                           event?.date_ini.slice(
                             0,
-                            event?.date_ini.indexOf("T")
+                            event?.date_ini.indexOf("T"),
                           ) +
                             "T" +
                             event?.time_ini +
-                            ".000Z"
-                        )
+                            ".000Z",
+                        ),
                       )
                     : event?.time_ini
-                    ? event.time_ini.slice(0, 5)
-                    : "Dia todo",
+                      ? event.time_ini.slice(0, 5)
+                      : "Dia todo",
                 ]}
                 icon={<img src={calendar} alt={""} width={84} />}
               />

@@ -39,16 +39,19 @@ const EventSelect = () => {
             const req = await Api.get.eventInfo({ eventId: parsed[0].id })
 
             if (req.ok) {
-              localStorage.setItem("event", JSON.stringify(req.data))
+              const eventString = JSON.stringify(req.data)
+              sessionStorage.setItem("event", eventString)
+              store.controllers.event.setData(req.data)
+
               navigate("/")
             } else {
               alert(
-                "Houve um erro ao selecionar o evento. Tente novamente mais tarde"
+                "Houve um erro ao selecionar o evento. Tente novamente mais tarde",
               )
             }
           } catch (error) {
             alert(
-              "Houve um erro ao selecionar o evento. Tente novamente mais tarde"
+              "Houve um erro ao selecionar o evento. Tente novamente mais tarde",
             )
           }
         }
@@ -62,13 +65,12 @@ const EventSelect = () => {
     }
 
     setLoading(false)
-  }, [navigate])
+  }, [store.controllers.event, navigate])
 
   useEffect(() => {
-    localStorage.removeItem("event")
-
+    sessionStorage.removeItem("event")
     getData()
-  }, [store.controllers, getData])
+  }, [getData])
 
   return (
     <S.Page>

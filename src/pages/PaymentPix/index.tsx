@@ -42,7 +42,7 @@ const PaymentPix = () => {
   const lctn = useLocation()
   const navigate = useNavigate()
 
-  const eventData = localStorage.getItem("event")
+  const eventData = sessionStorage.getItem("event")
 
   const event = eventData ? (JSON.parse(eventData) as TEventData) : null
 
@@ -541,7 +541,7 @@ const PaymentPix = () => {
 
         if (req.ok) {
           const data = req.data
-          localStorage.setItem("event", JSON.stringify(data))
+          sessionStorage.setItem("event", JSON.stringify(data))
           controllers.event.setData(data)
         } else {
           alert("Erro ao carregar as informações do evento")

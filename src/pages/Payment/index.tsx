@@ -761,7 +761,7 @@ const Payment = () => {
 
         if (req.ok) {
           const data = req.data
-          localStorage.setItem("event", JSON.stringify(data))
+          sessionStorage.setItem("event", JSON.stringify(data))
           controllers.event.setData(data)
         }
       } catch (error) {

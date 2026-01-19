@@ -70,7 +70,7 @@ const MyTickets = () => {
             if (Boolean(data.is_ecommerce)) {
               controllers.event.setData(req2.data)
               updatedEventInfo = req2.data
-              localStorage.setItem("event", JSON.stringify(req2.data))
+              sessionStorage.setItem("event", JSON.stringify(req2.data))
             } else {
               controllers.event.clear()
               navigate("/eventSelect")
@@ -110,7 +110,7 @@ const MyTickets = () => {
 
   useEffect(() => {
     if (!!user) {
-      const eventData = localStorage.getItem("event")
+      const eventData = sessionStorage.getItem("event")
 
       if (eventData) {
         getData(JSON.parse(eventData))

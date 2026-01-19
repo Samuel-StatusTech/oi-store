@@ -15,9 +15,10 @@ import getStore from "../store"
 import { Api } from "../api"
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../assets/animations/loading"
+import { TEventData } from "../utils/@types/data/event"
 
 const Router = () => {
-  const { event } = getStore()
+  const { event, controllers } = getStore()
 
   const [loading, setLoading] = useState(true)
   const alreadyCheckedRef = useRef(false)
@@ -42,6 +43,15 @@ const Router = () => {
   useEffect(() => {
     window.document.title = event ? event.corporateName : "ListaPix"
   }, [event])
+
+  useEffect(() => {
+    const sessionEvent = sessionStorage.getItem("event")
+
+    if (sessionEvent !== null) {
+      const parsedSessionEvent: TEventData = JSON.parse(sessionEvent)
+      controllers.event.setData(parsedSessionEvent)
+    }
+  }, [])
 
   if (loading) {
     return (
