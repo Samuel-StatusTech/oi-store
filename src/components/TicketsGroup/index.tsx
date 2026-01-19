@@ -40,7 +40,7 @@ const TicketsGroup = ({ group_name, k, data, changeQnt }: Props) => {
       <S.Item>
         <S.GroupInfo onClick={() => setExpanded(!expanded)}>
           <S.GroupInfoMain>
-            <S.GroupName>{group_name}</S.GroupName>
+            <S.GroupName>{group_name.replace(/-/g, "\u2011")}</S.GroupName>
           </S.GroupInfoMain>
           <S.GroupInfoSecondary>
             <S.GroupBasePrice>
