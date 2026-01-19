@@ -13,7 +13,7 @@ export const Main = styled.div`
   padding: 0 0 64px 0;
 
   @media (max-width: ${({ theme }) => theme.bp.medium}px) {
-    flex-direction: column-reverse;
+    flex-direction: column;
   }
 `
 
