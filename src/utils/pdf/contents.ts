@@ -74,6 +74,8 @@ const ticketData = (
   let data: any[] = []
   let body = []
 
+  console.log(event)
+
   try {
     const hours = event.time_ini.slice(
       0,
@@ -180,9 +182,11 @@ const ticketData = (
       ],
       ...(event.eCommerce.chargeClient
         ? [
-            {
-              text: `TAXA: ${formatMoney(ticket.tax_value as number, true)}`,
-            },
+            [
+              {
+                text: `TAXA: ${formatMoney(ticket.tax_value as number, true)}`,
+              },
+            ],
           ]
         : []),
     ]
