@@ -69,7 +69,7 @@ const ticketData = (
     TRN?: string
   },
   ticketsLength: number,
-  newPage: boolean
+  newPage: boolean,
 ) => {
   let data: any[] = []
   let body = []
@@ -77,7 +77,7 @@ const ticketData = (
   try {
     const hours = event.time_ini.slice(
       0,
-      String(event.time_ini).lastIndexOf(":")
+      String(event.time_ini).lastIndexOf(":"),
     )
 
     const eventDateText =
@@ -174,15 +174,17 @@ const ticketData = (
         {
           text: `PREÇO: ${formatMoney(
             ticket.price_unit * ticket.quantity,
-            true
+            true,
           )}`,
         },
       ],
-      [
-        {
-          text: `TAXA: ${formatMoney(ticket.tax_value as number, true)}`,
-        },
-      ],
+      ...(event.eCommerce.chargeClient
+        ? [
+            {
+              text: `TAXA: ${formatMoney(ticket.tax_value as number, true)}`,
+            },
+          ]
+        : []),
     ]
 
     // nominal
