@@ -14,7 +14,6 @@ import { Api } from "../../api"
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
 import { TEventData } from "../../utils/@types/data/event"
-import { formatDate } from "date-fns"
 
 const MyTickets = () => {
   const { controllers, user, event } = getStore()
@@ -125,13 +124,24 @@ const MyTickets = () => {
 
   const renderEventDate = () => {
     if (event) {
+      const iniDate = new Date(event.date_ini)
+      const endDate = new Date(event.date_end)
+
+      const finalIniDate = iniDate.getUTCDate()
+      const finalIniMonth = String(iniDate.getUTCMonth() + 1).padStart(2, "0")
+      const finalIniYear = iniDate.getUTCFullYear()
+
+      const finalEndDate = endDate.getUTCDate()
+      const finalEndMonth = String(endDate.getUTCMonth() + 1).padStart(2, "0")
+      const finalEndYear = endDate.getUTCFullYear()
+
+      const formattedIniDate = `${finalIniDate}/${finalIniMonth}/${finalIniYear}`
+      const formattedEndDate = `${finalEndDate}/${finalEndMonth}/${finalEndYear}`
+
       const eventDateText =
         event.date_end === event.date_ini
-          ? formatDate(event.date_ini, "dd/MM/yyyy")
-          : `${formatDate(event.date_ini, "dd/MM/yyyy")} até ${formatDate(
-              event.date_end,
-              "dd/MM/yyyy"
-            )}`
+          ? formattedIniDate
+          : `${formattedIniDate} até ${formattedEndDate}`
 
       return eventDateText
     }

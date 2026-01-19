@@ -32,7 +32,6 @@ import pageTools from "../../utils/tb/pageTools/pix"
 import { TPaymentSession } from "../../utils/@types/data/paymentSession"
 import OrderResume from "../../components/OrderResume"
 import AskPhoneNumberModal from "../../components/Modal/AskPhoneNumber"
-import { formatDate } from "date-fns"
 
 const io = require("socket.io-client")
 
@@ -776,7 +775,7 @@ const PaymentPix = () => {
           targetPhone: targetPhone,
           caption: `Olá, segue seu${hasMultipleTickets ? "(s)" : ""} ingresso${
             hasMultipleTickets ? "(s)" : ""
-          } para o ${event.name} - ${formatDate(event.date_ini, "dd/MM/yyyy")}`,
+          } para o ${event.name}`,
         })
       }
     } catch (error) {}
