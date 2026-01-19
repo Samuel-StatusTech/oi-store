@@ -13,7 +13,6 @@ export const sumTickets = (ticketsList: any[]) => {
 }
 
 export const sumTaxes = (props: {
-  chargeClient: boolean
   ticketsTotal?: number
   adminTax: any
   adminTaxValue: any
@@ -26,7 +25,6 @@ export const sumTaxes = (props: {
   strComplement: string
 } => {
   const {
-    chargeClient,
     adminTax,
     adminTaxValue,
     adminTaxPercentage,
@@ -37,12 +35,11 @@ export const sumTaxes = (props: {
   let rule: "fixed" | "percentage" | "min" | "none" = "none"
 
   let total = 0
-  const shouldChargeClient = chargeClient
   const hasTax = adminTax
   const isTaxAbsolute = adminTaxValue !== 0
   const percentage = adminTaxPercentage / 100 / 100
 
-  if (hasTax && shouldChargeClient) {
+  if (hasTax) {
     if (isTaxAbsolute) rule = "fixed"
 
     const actives = tickets.filter((t) => Boolean(t.active))

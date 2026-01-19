@@ -46,7 +46,6 @@ const TicketsControl = ({
       const tTotal = calcTotal()
 
       const tax = sumTaxes({
-        chargeClient: event.eCommerce.chargeClient,
         adminTax: event?.eCommerce.adminTax,
         adminTaxMinimum: +event?.eCommerce.adminTaxMinimum,
         adminTaxPercentage: +event?.eCommerce.adminTaxPercentage,
@@ -67,7 +66,7 @@ const TicketsControl = ({
 
   const changeQnt = (
     ticketId: number | string,
-    action: "decrease" | "increase"
+    action: "decrease" | "increase",
   ) => {
     let nList = [...tickets]
 
@@ -81,7 +80,7 @@ const TicketsControl = ({
             : {
                 ...tkt,
                 qnt: tk.qnt - 1,
-              }
+              },
         )
       }
     } else if (action === "increase") {
@@ -92,7 +91,7 @@ const TicketsControl = ({
             : {
                 ...tkt,
                 qnt: tk.qnt + 1,
-              }
+              },
         )
       }
     }
@@ -208,18 +207,18 @@ const TicketsControl = ({
         (event && !checkEndingDate(event as any))
           ? renderKeepOutSellsMessage()
           : showByGroup
-          ? groups.map((g, gKey) => (
-              <TicketsGroup
-                group_name={g.name}
-                key={gKey}
-                k={6}
-                data={tickets.filter((i) => i.group_id === g.id)}
-                changeQnt={changeQnt}
-              />
-            ))
-          : tickets.map((t, k) => (
-              <Ticket k={k} key={k} ticket={t} changeQnt={changeQnt} />
-            ))}
+            ? groups.map((g, gKey) => (
+                <TicketsGroup
+                  group_name={g.name}
+                  key={gKey}
+                  k={6}
+                  data={tickets.filter((i) => i.group_id === g.id)}
+                  changeQnt={changeQnt}
+                />
+              ))
+            : tickets.map((t, k) => (
+                <Ticket k={k} key={k} ticket={t} changeQnt={changeQnt} />
+              ))}
       </S.Tickets>
       {Boolean(event?.keep_sells_online) &&
       checkEndingDate(event as any) &&

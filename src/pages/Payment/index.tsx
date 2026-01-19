@@ -513,7 +513,6 @@ const Payment = () => {
 
   const getTaxes = () => {
     return sumTaxes({
-      chargeClient: (event as TEventData).eCommerce.chargeClient,
       adminTax: (event as TEventData).eCommerce.adminTax,
       adminTaxMinimum: +(event as TEventData).eCommerce.adminTaxMinimum,
       adminTaxPercentage: +(event as TEventData).eCommerce.adminTaxPercentage,

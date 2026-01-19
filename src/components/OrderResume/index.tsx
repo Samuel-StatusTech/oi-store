@@ -71,7 +71,6 @@ const OrderResume = ({
       if (event) {
         const ticketsTotal = sumTickets(ticketsList)
         const taxesTotal = sumTaxes({
-          chargeClient: event.eCommerce.chargeClient,
           ticketsTotal,
           adminTax: event.eCommerce.adminTax,
           adminTaxMinimum: +event.eCommerce.adminTaxMinimum,
