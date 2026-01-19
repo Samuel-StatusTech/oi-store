@@ -15,6 +15,7 @@ import { ReactComponent as DownloadIcon } from "../../assets/icons/download.svg"
 import { ReactComponent as CheckCircle } from "../../assets/icons/check_circle.svg"
 import { ReactComponent as FileIcon } from "../../assets/icons/file_icon.svg"
 import { ReactComponent as WhatsappIcon } from "../../assets/icons/whatsapp.svg"
+import { ReactComponent as AttentionIcon } from "../../assets/icons/attention.svg"
 
 import { DotLottieReact } from "@lottiefiles/dotlottie-react"
 import loadingAnimation from "../../assets/animations/loading"
@@ -971,6 +972,26 @@ const PaymentPix = () => {
                   )}
                 </S.QR>
                 <S.PixTime>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "",
+                      justifyContent: "center",
+                      gap: 12,
+                      marginBottom: 12,
+                    }}
+                  >
+                    <AttentionIcon
+                      style={{
+                        minWidth: 24,
+                        maxWidth: 24,
+                        margin: "0px 12px -4px 0px"
+                      }}
+                      width={24}
+                      height={24}
+                    />
+                    <strong>Por favor, não feche nem atualize a página</strong>
+                  </div>
                   <span>
                     Você tem <strong>{time}</strong> para realizar o pagamento
                   </span>
