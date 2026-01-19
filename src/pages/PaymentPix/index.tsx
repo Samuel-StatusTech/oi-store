@@ -978,14 +978,18 @@ const PaymentPix = () => {
                       alignItems: "",
                       justifyContent: "center",
                       gap: 12,
-                      marginBottom: 12,
+                      margin: "0 auto 12px auto",
+                      padding: "6px 14px",
+                      borderRadius: 6,
+                      backgroundColor: "#fbd61850",
+                      width: 'fit-content',
                     }}
                   >
                     <AttentionIcon
                       style={{
                         minWidth: 24,
                         maxWidth: 24,
-                        margin: "0px 12px -4px 0px"
+                        margin: "0px 12px -4px 0px",
                       }}
                       width={24}
                       height={24}
