@@ -974,14 +974,11 @@ const PaymentPix = () => {
                 <S.PixTime>
                   <div
                     style={{
-                      display: "flex",
-                      alignItems: "",
-                      justifyContent: "center",
-                      gap: 12,
+                      display: "flow",
                       margin: "0 auto 12px auto",
                       padding: "6px 14px",
                       borderRadius: 6,
-                      backgroundColor: "#fbd61830",
+                      backgroundColor: "#fbd61815",
                       width: 'fit-content',
                     }}
                   >
@@ -990,11 +987,12 @@ const PaymentPix = () => {
                         minWidth: 24,
                         maxWidth: 24,
                         margin: "0px 12px -4px 0px",
+                        display: "inline"
                       }}
                       width={24}
                       height={24}
                     />
-                    <strong>Por favor, não feche nem atualize a página</strong>
+                    <span>Por favor, não feche nem atualize a página</span>
                   </div>
                   <span>
                     Você tem <strong>{time}</strong> para realizar o pagamento
