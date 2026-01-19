@@ -981,7 +981,7 @@ const PaymentPix = () => {
                       margin: "0 auto 12px auto",
                       padding: "6px 14px",
                       borderRadius: 6,
-                      backgroundColor: "#fbd61850",
+                      backgroundColor: "#fbd61830",
                       width: 'fit-content',
                     }}
                   >
