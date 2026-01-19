@@ -68,6 +68,7 @@ const EventSelect = () => {
   }, [store.controllers.event, navigate])
 
   useEffect(() => {
+    localStorage.removeItem("event")
     sessionStorage.removeItem("event")
     getData()
   }, [getData])
