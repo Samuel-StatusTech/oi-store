@@ -16,14 +16,12 @@ const getStore = create<TStore>()(
       }),
       {
         name: "global",
-        partialize: (store) => {
-          return {
-            user: store.user
-          }
+        partialize: (_) => {
+          return {}
         },
-      }
-    )
-  )
+      },
+    ),
+  ),
 )
 
 export default getStore

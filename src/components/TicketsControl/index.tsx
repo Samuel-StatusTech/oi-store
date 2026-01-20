@@ -46,17 +46,17 @@ const TicketsControl = ({
       const tTotal = calcTotal()
 
       const tax = sumTaxes({
-        adminTax: event?.eCommerce.adminTax,
-        adminTaxMinimum: +event?.eCommerce.adminTaxMinimum,
-        adminTaxPercentage: +event?.eCommerce.adminTaxPercentage,
-        adminTaxValue: +event?.eCommerce.adminTaxValue,
+        adminTax: event?.eCommerce?.adminTax,
+        adminTaxMinimum: +event?.eCommerce?.adminTaxMinimum,
+        adminTaxPercentage: +event?.eCommerce?.adminTaxPercentage,
+        adminTaxValue: +event?.eCommerce?.adminTaxValue,
         tickets: tickets,
       })
 
       setTaxes(tax)
       setTicketsTotal(tTotal)
 
-      const clientCharges = event?.eCommerce.chargeClient
+      const clientCharges = event?.eCommerce?.chargeClient
         ? tTotal + tax.value
         : tTotal
 
@@ -229,7 +229,7 @@ const TicketsControl = ({
               <span>Subtotal</span>
               <span>{formatMoney(ticketsTotal, true)}</span>
             </S.TaxResume>
-            {event?.eCommerce.chargeClient && eventHasTaxes(event) && (
+            {event?.eCommerce?.chargeClient && eventHasTaxes(event) && (
               <S.TaxResume>
                 <span>Taxas {taxes.strComplement}</span>
                 <span>

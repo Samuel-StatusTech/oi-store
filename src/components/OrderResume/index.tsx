@@ -161,7 +161,7 @@ const OrderResume = ({
             <span>Subtotal</span>
             <span>{formatMoney(ticketsTotal, true)}</span>
           </S.TotalItem>
-          {event?.eCommerce.chargeClient && eventHasTaxes(event) && (
+          {event?.eCommerce?.chargeClient && eventHasTaxes(event) && (
             <S.TotalItem>
               <span>Taxas {taxes.strComplement}</span>
               <span>{formatMoney(taxes.value, true)}</span>
@@ -171,7 +171,7 @@ const OrderResume = ({
             <span>TOTAL</span>
             <span>
               {formatMoney(
-                event?.eCommerce.chargeClient
+                event?.eCommerce?.chargeClient
                   ? ticketsTotal + taxes.value
                   : ticketsTotal,
                 true

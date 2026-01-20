@@ -49,8 +49,8 @@ const PaymentPix = () => {
 
   const { controllers } = getStore()
 
-  const user = localStorage.getItem("user")
-    ? (JSON.parse(localStorage.getItem("user") as string) as TUser)
+  const user = sessionStorage.getItem("user")
+    ? (JSON.parse(sessionStorage.getItem("user") as string) as TUser)
     : null
 
   const [time, setTime] = useState("15:00")

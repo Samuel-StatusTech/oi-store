@@ -26,6 +26,14 @@ export default function Login() {
 
   const otpInputRefs = useRef<(HTMLInputElement | null)[]>([])
 
+  /* ---------- ETAPA 0: CHECK EVENT ---------- */
+
+  // useEffect(() => {
+  //   if (step === 2) {
+  //     otpInputRefs.current[0]?.focus()
+  //   }
+  // }, [step])
+
   /* ---------- ETAPA 1: TELEFONE ---------- */
 
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -125,9 +133,9 @@ export default function Login() {
       })
 
       if (login.ok) {
-        localStorage.setItem("user", JSON.stringify(login.data))
-
         store.controllers.user.setData(login.data)
+
+        sessionStorage.setItem("user", JSON.stringify(login.data))
         navigate("/myTickets")
       } else {
         alert(

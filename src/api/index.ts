@@ -5,6 +5,7 @@ import { jwtDecode } from "jwt-decode"
 import TParams from "../utils/@types/api/params"
 import { formatDate } from "date-fns"
 import getStore from "../store"
+import { TEventData } from "../utils/@types/data/event"
 
 const backUrl = process.env.REACT_APP_BACKEND_URL
 const mailingUrl = process.env.REACT_APP_EMAIL_BACKEND_URL
@@ -42,7 +43,7 @@ axios.interceptors.request.use(function (config) {
 
     if (localToken) {
       if (localToken === "undefined") {
-        localStorage.removeItem("user")
+        sessionStorage.removeItem("user")
         localStorage.removeItem("token")
         controllers.user.clear()
 
@@ -51,7 +52,7 @@ axios.interceptors.request.use(function (config) {
         const isTokenExpired = checkTokenExpiration(localToken)
 
         if (isTokenExpired) {
-          localStorage.removeItem("user")
+          sessionStorage.removeItem("user")
           localStorage.removeItem("token")
           controllers.user.clear()
 
@@ -83,6 +84,10 @@ const getSubdomainStatus: TApi["get"]["subdomainStatus"] = async () => {
           const info = res.data
 
           if (info && info.success) {
+            const store = getStore.getState()
+
+            store.controllers.event.setData(info as TEventData)
+
             resolve({ ok: true })
           } else {
             resolve({ ok: false })

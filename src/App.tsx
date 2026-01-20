@@ -12,11 +12,12 @@ function App() {
 
   useEffect(() => {
     const event = sessionStorage.getItem("event")
-    const user = localStorage.getItem("user")
+    const user = sessionStorage.getItem("user")
+
+    if (user && !store.user) store.controllers.user.setData(JSON.parse(user))
 
     if (event) {
       if (!store.event) store.controllers.event.setData(JSON.parse(event))
-      if (user && !store.user) store.controllers.user.setData(JSON.parse(user))
     } else {
       if (
         !window.location.href.includes("eventSelect") &&
@@ -25,7 +26,8 @@ function App() {
         window.location.href = "/eventSelect"
       }
     }
-  }, [store.controllers.event, store.controllers.user, store.event, store.user])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sessionStorage, store.user, store.event])
 
   return (
     <ThemeProvider theme={theme}>

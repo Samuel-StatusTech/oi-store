@@ -74,8 +74,6 @@ const ticketData = (
   let data: any[] = []
   let body = []
 
-  console.log(event)
-
   try {
     const hours = event.time_ini.slice(
       0,

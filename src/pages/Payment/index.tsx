@@ -160,8 +160,8 @@ const Payment = () => {
   const store = getStore()
   const { event, controllers } = store
 
-  const user = localStorage.getItem("user")
-    ? JSON.parse(localStorage.getItem("user") as string)
+  const user = sessionStorage.getItem("user")
+    ? JSON.parse(sessionStorage.getItem("user") as string)
     : null
 
   const [showingCodeModal, setShowingCodeModal] = useState(false)
@@ -486,7 +486,7 @@ const Payment = () => {
       // setShowingCodeModal(false)
 
       if (login.ok) {
-        localStorage.setItem("user", JSON.stringify(login.data))
+        sessionStorage.setItem("user", JSON.stringify(login.data))
         controllers.user.setData(login.data)
 
         goToPix()
@@ -635,7 +635,7 @@ const Payment = () => {
                 user_id: newUser.data.data.id,
               }
 
-              localStorage.setItem("user", JSON.stringify(udata))
+              sessionStorage.setItem("user", JSON.stringify(udata))
               controllers.user.setData(udata)
 
               goToPix()
