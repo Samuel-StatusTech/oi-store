@@ -68,7 +68,7 @@ const OrderResume = ({
 
   const sumValues = () => {
     try {
-      if (event) {
+      if (event && event.eCommerce) {
         const ticketsTotal = sumTickets(ticketsList)
         const taxesTotal = sumTaxes({
           ticketsTotal,
@@ -114,8 +114,8 @@ const OrderResume = ({
   }, [loadEventData])
 
   useEffect(() => {
-    sumValues()
-  }, [ticketsList])
+    if (event && event.eCommerce) sumValues()
+  }, [ticketsList, event])
 
   const handleExpandResume = () => {
     setResumeExpanded(!resumeExpanded)
@@ -174,7 +174,7 @@ const OrderResume = ({
                 event?.eCommerce?.chargeClient
                   ? ticketsTotal + taxes.value
                   : ticketsTotal,
-                true
+                true,
               )}
             </span>
           </S.TotalItem>

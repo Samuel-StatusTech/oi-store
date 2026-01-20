@@ -86,7 +86,7 @@ const getSubdomainStatus: TApi["get"]["subdomainStatus"] = async () => {
           if (info && info.success) {
             const store = getStore.getState()
 
-            store.controllers.event.setData(info as TEventData)
+            if (!store.event) store.controllers.event.setData(info as TEventData)
 
             resolve({ ok: true })
           } else {
