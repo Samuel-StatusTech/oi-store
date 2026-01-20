@@ -1,6 +1,6 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "short_name": "Lista pix",
+  "name": "Compre seus ingressos num piscar de olhos",
   "icons": [
     {
       "src": "favicon.ico",
