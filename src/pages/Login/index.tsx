@@ -55,10 +55,13 @@ export default function Login() {
     try {
       const cleanPhone = phone.replace(/\D/g, "")
 
+      const dk = store.event?.dk ?? ""
+
       if (cleanPhone.length === 11) {
         await Api.post.login
           .requestCode({
             phone: cleanPhone,
+            dk: dk,
           })
           .then((res) => {
             if (res.ok) setStep(2)
@@ -102,7 +105,7 @@ export default function Login() {
 
   const handleOtpKeyDown = (
     index: number,
-    e: React.KeyboardEvent<HTMLInputElement>
+    e: React.KeyboardEvent<HTMLInputElement>,
   ) => {
     if (e.key === "Backspace" && !otp[index] && index > 0) {
       otpInputRefs.current[index - 1]?.focus()
@@ -112,10 +115,13 @@ export default function Login() {
   const handleLogin = async (code: string) => {
     setIsLoading(true)
 
+    const dk = store.event?.dk ?? ""
+
     try {
       const login = await Api.post.login.validateCode({
         phone: phone.replace(/\D/g, ""),
         code,
+        dk: dk,
       })
 
       if (login.ok) {
@@ -125,7 +131,7 @@ export default function Login() {
         navigate("/myTickets")
       } else {
         alert(
-          "Código inválido. Verifique se o código e o telefone estão corretos e tente novamente."
+          "Código inválido. Verifique se o código e o telefone estão corretos e tente novamente.",
         )
         setFailedCODE(true)
       }

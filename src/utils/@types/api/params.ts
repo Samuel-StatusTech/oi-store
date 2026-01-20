@@ -57,12 +57,13 @@ type TParams = {
       email: string
     }
     login: {
-      requestCode: { phone: string; avoidSms?: boolean }
+      requestCode: { phone: string; avoidSms?: boolean; dk?: string }
       validateCode: {
         phone: string
         code: string
         email?: string
         name?: string
+        dk?: string
       }
     }
     purchase: {

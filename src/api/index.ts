@@ -242,7 +242,7 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
           let parsed: TProduct[] = []
           list.forEach((i) => {
             const activeBatchData = i.batches.find((b: any) =>
-              Boolean(b.active)
+              Boolean(b.active),
             )
 
             const isTicketActive =
@@ -260,9 +260,7 @@ const getProducts: TApi["get"]["products"] = async ({ eventId }) => {
                 batch_name: activeBatchData.batch_name,
                 group_id: i.group_id ?? "",
                 group_name: i.group_name
-                  ? i.group_name
-                    .replace("-loja", "")
-                    .replace(`-${eventId}`, "")
+                  ? i.group_name.replace("-loja", "").replace(`-${eventId}`, "")
                   : "",
                 quantity: activeBatchData.quantity,
                 price_sell: activeBatchData.price_sell,
@@ -312,7 +310,7 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({
                 const isForEvent = shop.qr_data.split("/")[0] === eventId
                 return isForEvent
               })
-              .map((shop: any) => shop.order_id)
+              .map((shop: any) => shop.order_id),
           )
 
           ordersIds.forEach((id) => {
@@ -327,7 +325,7 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({
 
                   if (someTicket) {
                     const ticketDetailsReq = await axios.get(
-                      `/${eventId}/validate_ticket/${someTicket.qr_label}`
+                      `/${eventId}/validate_ticket/${someTicket.qr_label}`,
                     )
 
                     if (
@@ -348,7 +346,7 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({
                 })
                 .catch(() => {
                   // throw new Error()
-                })
+                }),
             )
           })
 
@@ -378,7 +376,7 @@ const getMyTickets: TApi["get"]["myTickets"] = async ({
               products: pList,
               total_price: item.products.reduce(
                 (amount: number, ticket: any) => amount + ticket.price_total,
-                0
+                0,
               ),
             }
           })
@@ -458,13 +456,14 @@ const registerUser: TApi["post"]["register"] = async ({
 const requestCode: TApi["post"]["login"]["requestCode"] = async ({
   phone,
   avoidSms,
+  dk,
 }) => {
   return new Promise(async (resolve, reject) => {
     try {
       await axios
         .post("/ecommerce/requestCode", {
           fone: phone,
-          database: "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd",
+          database: dk,
         })
         .then(async (res) => {
           if (res.data.success) {
@@ -530,6 +529,7 @@ const validateCode: TApi["post"]["login"]["validateCode"] = async ({
   code,
   email,
   name,
+  dk,
 }) => {
   return new Promise(async (resolve, reject) => {
     try {
@@ -537,7 +537,7 @@ const validateCode: TApi["post"]["login"]["validateCode"] = async ({
         .post("/ecommerce/authenticate", {
           fone: phone,
           code: code,
-          database: "DB4b9313e3cee08d9ac3d144e18870bc0db20813cd",
+          database: dk,
         })
         .then((res) => {
           const uObj = {
@@ -641,7 +641,7 @@ const sendWhatsapp: TApi["post"]["whatsapp"]["sendWhatsapp"] = async ({
           },
           {
             baseURL: mailingUrl,
-          }
+          },
         )
         .then((res) => {
           const status = res.data.sended

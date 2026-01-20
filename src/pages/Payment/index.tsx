@@ -221,7 +221,7 @@ const Payment = () => {
                   phone: form.buyer.phone,
                 },
               }
-            : t
+            : t,
         ),
       })
     }
@@ -230,7 +230,7 @@ const Payment = () => {
   const handleTicketForm = (
     ticket: TTicketForm,
     field: keyof TTicketForm["person"],
-    value: string
+    value: string,
   ) => {
     if (!user && canBuy) setCanBuy(false)
 
@@ -245,7 +245,7 @@ const Payment = () => {
                 [field]: value,
               },
             }
-          : t
+          : t,
       ),
     })
   }
@@ -285,7 +285,7 @@ const Payment = () => {
       nMask.length > 0
         ? nMask.replace(
             /(\d{1,5})?(\d{1,2})?/,
-            (_regex, $1, $2) => $1 + ($2 ? "-" + $2 : "")
+            (_regex, $1, $2) => $1 + ($2 ? "-" + $2 : ""),
           )
         : ""
 
@@ -454,10 +454,13 @@ const Payment = () => {
 
   const requestCode = async () => {
     return new Promise(async (resolve) => {
+      const dk = store.event?.dk ?? ""
+
       await Api.post.login
         .requestCode({
           phone: form.buyer.phone.replace(/\D/g, ""),
           avoidSms: true,
+          dk: dk,
         })
         .then((res) => {
           resolve(res)
@@ -470,11 +473,14 @@ const Payment = () => {
 
   const validateCode = async (code: string) => {
     try {
+      const dk = store.event?.dk ?? ""
+
       const login = await Api.post.login.validateCode({
         phone: form.buyer.phone.replace(/\D/g, ""),
         code,
         email: form.buyer.email.trim(),
         name: form.buyer.name.trim(),
+        dk: dk,
       })
 
       // setShowingCodeModal(false)
@@ -703,7 +709,7 @@ const Payment = () => {
           new Set([
             ...newErrorValue.ticketsIds,
             ...errors.fields.duplicateNames,
-          ])
+          ]),
         )
       }
 
@@ -901,7 +907,7 @@ const Payment = () => {
                                 !(
                                   !!ticket.person.name &&
                                   ticket.person.name === form.buyer.name
-                                )
+                                ),
                               )
                             }}
                           />
@@ -990,7 +996,7 @@ const Payment = () => {
           <OrderResume
             datePeriod={getDatePeriod(
               event?.date_ini as string,
-              event?.date_end as string
+              event?.date_end as string,
             )}
             ticketsList={tickets.filter((t) => t.qnt > 0)}
             setTickets={setTickets}
