@@ -75,6 +75,7 @@ const PaymentPix = () => {
 
   const isOrderConfirmingRef = useRef(false)
   const isOrderConfirmedRef = useRef(false)
+  const timerRef = useRef<any>(null)
 
   const [payed, setPayed] = useState(false)
   const [expired, setExpired] = useState(false)
@@ -524,6 +525,12 @@ const PaymentPix = () => {
   }
 
   const runTimer = (seconds = 900) => {
+    // Limpa o timer anterior se existir
+    if (timerRef.current) {
+      timerRef.current.stop()
+      timerRef.current = null
+    }
+
     const timer: any = clockdown(
       seconds,
       restartTimer,
@@ -532,6 +539,7 @@ const PaymentPix = () => {
       },
     )
 
+    timerRef.current = timer
     timer.start()
   }
 
@@ -722,6 +730,14 @@ const PaymentPix = () => {
         startSocket()
       }
     } catch (error) {}
+
+    // Cleanup: limpa o timer quando o componente desmonta
+    return () => {
+      if (timerRef.current) {
+        timerRef.current.stop()
+        timerRef.current = null
+      }
+    }
   }, [])
 
   const handleDownload = async () => {
