@@ -1,8 +1,8 @@
 import { TEventData } from "../@types/data/event"
 import { TShoppingTicket } from "../@types/data/ticket"
-import { formatCNPJ } from "../masks/cnpj"
 import { getDateString } from "../tb/date"
 import { formatMoney } from "../tb/formatMoney"
+import { getFormattedRegister } from "../tb/formatters/getFormattedRegister"
 import { monthsRelations } from "../tb/getDatePeriod"
 
 export const reportTitle = [
@@ -33,7 +33,7 @@ export const footer = (event: TEventData) => [
         style: "companyFooterTag",
       },
       {
-        text: `${formatCNPJ(event.CNPJ)}`,
+        text: `${getFormattedRegister(event.CNPJ)}`,
         fontSize: 10,
         style: "companyFooter",
       },
