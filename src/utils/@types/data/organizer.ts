@@ -3,6 +3,7 @@ export type TOrganizer = {
   cashless: boolean
   city: string
   corporateName: string
+  corporateFantasyName: string
   createdAt: number
   dbName: string
   devices: string

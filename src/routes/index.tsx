@@ -41,7 +41,7 @@ const Router = () => {
   }, [window.location.href])
 
   useEffect(() => {
-    window.document.title = event ? event.corporateName : "ListaPix"
+    window.document.title = event && event.corporateFantasyName ? event.corporateFantasyName : "ListaPix"
   }, [event])
 
   useEffect(() => {

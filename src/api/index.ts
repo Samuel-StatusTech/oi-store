@@ -204,11 +204,15 @@ const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
         const event = events.find((e: any) => e.id === eventId)
 
         if (event) {
-          const eventData = {
+          const eventData: TEventData = {
             ...req.data.info,
             ...event,
+            corporateFantasyName: req.data.info.name,
             dk: req.data.dk,
           }
+
+          console.log(`req.data.info: `, req.data.info)
+          console.log(`event: `, event)
 
           resolve({
             ok: true,

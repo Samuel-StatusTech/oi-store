@@ -38,6 +38,7 @@ export type TEventData = {
   CNPJ: string
   cashless: boolean
   corporateName: string
+  corporateFantasyName: string
   createdAt: number
   dbName: string
   devices: string
