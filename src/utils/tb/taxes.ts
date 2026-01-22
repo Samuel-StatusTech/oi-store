@@ -12,6 +12,56 @@ export const sumTickets = (ticketsList: any[]) => {
   return total
 }
 
+export const getTicketRelativeTaxes = (props: {
+  ticketCost: number
+  adminTax: any
+  adminTaxValue: any
+  adminTaxPercentage: any
+  adminTaxMinimum: any
+}): {
+  value: number
+  rule: "fixed" | "percentage" | "min" | "none"
+  strComplement: string
+} => {
+  const {
+    ticketCost,
+    adminTax,
+    adminTaxValue,
+    adminTaxPercentage,
+    adminTaxMinimum,
+  } = props
+
+  let rule: "fixed" | "percentage" | "min" | "none" = "none"
+
+  let ticketTaxes = 0
+  const hasTax = adminTax
+  const isTaxAbsolute = adminTaxValue !== 0
+  const percentage = adminTaxPercentage / 100 / 100
+
+  if (hasTax) {
+    if (isTaxAbsolute) {
+      rule = "fixed"
+      ticketTaxes = adminTaxValue
+    } else {
+      const taxMin = adminTaxMinimum
+      const calculedTax = Math.round(ticketCost * percentage)
+
+      const min = Math.max(taxMin, calculedTax)
+
+      ticketTaxes = min
+    }
+  }
+
+  const result = {
+    value: ticketTaxes,
+    rule: rule,
+    strComplement:
+      rule === "fixed" ? `(${formatMoney(adminTaxValue, true)})` : "",
+  }
+
+  return result
+}
+
 export const sumTaxes = (props: {
   ticketsTotal?: number
   adminTax: any

@@ -211,9 +211,6 @@ const getEventInfo: TApi["get"]["eventInfo"] = async ({ eventId }) => {
             dk: req.data.dk,
           }
 
-          console.log(`req.data.info: `, req.data.info)
-          console.log(`event: `, event)
-
           resolve({
             ok: true,
             data: eventData,
