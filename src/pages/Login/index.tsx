@@ -13,6 +13,7 @@ import * as S from "./styled"
 import { Api } from "../../api"
 import getStore from "../../store"
 import { useNavigate } from "react-router-dom"
+import Dialog from "../../components/DIalog"
 
 export default function Login() {
   const [step, setStep] = useState<1 | 2>(1)
@@ -20,6 +21,11 @@ export default function Login() {
   const [otp, setOtp] = useState(["", "", "", "", "", ""])
   const [isLoading, setIsLoading] = useState(false)
   const [, setFailedCODE] = useState(false)
+  const [dialogData, setDialogData] = useState({
+    opened: false,
+    title: "",
+    description: "",
+  })
 
   const store = getStore()
   const navigate = useNavigate()
@@ -73,17 +79,18 @@ export default function Login() {
           })
           .then((res) => {
             if (res.ok) setStep(2)
-            else {
-              alert(res.error)
-            }
+            else
+              setDialogData({
+                opened: true,
+                title: "Erro ao enviar código",
+                description:
+                  "Número não cadastrado, confira seu telefone.",
+              })
+
+            setIsLoading(false)
           })
       } else alert("Digite um número válido")
     } catch (error) {}
-
-    setTimeout(() => {
-      setIsLoading(false)
-      setStep(2)
-    }, 1500)
   }
 
   /* ---------- ETAPA 2: OTP ---------- */
@@ -157,6 +164,15 @@ export default function Login() {
 
   return (
     <S.Container>
+      <Dialog
+        open={dialogData.opened}
+        variant="error"
+        title={dialogData.title || "Erro ao processar código"}
+        description={dialogData.description || "Tente novamente mais tarde."}
+        onClose={() =>
+          setDialogData({ opened: false, title: "", description: "" })
+        }
+      />
       <S.Wrapper>
         {/* ---------- HEADER ---------- */}
         <S.Header>
