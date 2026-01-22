@@ -76,6 +76,7 @@ type IProps = {
   enterKeyHint?: string
   error?: boolean
   tip?: string
+  tipRed?: boolean
 }
 
 const Input = ({
@@ -86,6 +87,7 @@ const Input = ({
   enterKeyHint,
   error,
   tip,
+  tipRed = false,
 }: IProps) => {
   return (
     <S.InputWrapper>
@@ -108,6 +110,7 @@ const Input = ({
             display: "flex",
             alignItems: "center",
             gap: "6px",
+            color: tipRed ? "#f44336" : undefined,
           }}
         >
           <svg
@@ -864,7 +867,8 @@ const Payment = () => {
                       }}
                       inputMode="numeric"
                       error={formErrors.buyerPhone}
-                      tip={"Ele será usado para acessar os ingressos"}
+                      tip={"Necessário para receber os ingressos"}
+                      tipRed={true}
                     />
                     <Input
                       label={"Email"}
@@ -875,6 +879,7 @@ const Payment = () => {
                       }}
                       enterKeyHint={"done"}
                       error={formErrors.buyerEmail}
+                      tip={"Opcional"}
                     />
                   </S.FormLine>
                 </S.FormLines>
