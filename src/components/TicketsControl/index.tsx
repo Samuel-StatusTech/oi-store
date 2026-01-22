@@ -5,7 +5,11 @@ import { useNavigate } from "react-router-dom"
 import getStore from "../../store"
 import { TForm } from "../../utils/placeData/form"
 import { memo, useCallback, useEffect, useState } from "react"
-import { eventHasTaxes, sumTaxes } from "../../utils/tb/taxes"
+import {
+  eventHasTaxes,
+  getTicketRelativeTaxes,
+  sumTaxes,
+} from "../../utils/tb/taxes"
 import TicketsGroup from "../TicketsGroup"
 import Ticket from "../Ticket"
 import { checkEndingDate } from "../../utils/tb/checkEndingDate"
@@ -115,26 +119,27 @@ const TicketsControl = ({
   }
 
   const handleBuy = () => {
-    // @ts-ignore
-    if (user && !event?.nominal) {
+    if (user && event && !event.nominal) {
       const errors = checkErrors()
-
-      const itemsQnt = tickets
-        .map((t) => t.qnt)
-        .reduce((prev, current) => prev + current, 0)
-
-      const taxPerTicket = taxes.value / itemsQnt
 
       if (!errors) {
         let ptickets: any[] = []
         tickets.forEach((t) => {
           for (let k = 0; k <= t.qnt - 1; k++) {
+            const taxPerTicket = getTicketRelativeTaxes({
+              ticketCost: t.price_sell,
+              adminTax: event?.eCommerce?.adminTax,
+              adminTaxMinimum: +event.eCommerce.adminTaxMinimum,
+              adminTaxPercentage: +event.eCommerce.adminTaxPercentage,
+              adminTaxValue: +event.eCommerce.adminTaxValue,
+            })
+
             ptickets.push({
               price_sell: t.price_sell,
               batch_id: t.batch_id,
               customer_name: user.name,
               id: t.id,
-              tax_value: taxPerTicket,
+              tax_value: taxPerTicket.value,
               ticketName: t.name,
               batchName: t.batch_name,
               ticket_name: "",

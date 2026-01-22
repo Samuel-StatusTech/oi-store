@@ -22,7 +22,7 @@ import getStore from "../../store"
 import { formatCardDate } from "../../utils/masks/date"
 import { formatCardCode } from "../../utils/masks/cardcode"
 import { Api } from "../../api"
-import { sumTaxes } from "../../utils/tb/taxes"
+import { getTicketRelativeTaxes, sumTaxes } from "../../utils/tb/taxes"
 import { validEmail } from "../../utils/tb/validEmail"
 import Feedback from "../../components/Feedback"
 import { TUser } from "../../utils/@types/data/user"
@@ -561,27 +561,31 @@ const Payment = () => {
   const getTicketsList = (finalTaxValue: number) => {
     let ptickets: any[] = []
 
-    const itemsQnt = tickets
-      .map((t) => t.qnt)
-      .reduce((prev, current) => prev + current, 0)
+    if (event) {
+      form.tickets.forEach((tt) => {
+        const t = tickets.find((t) => t.id === tt.id) as TTicketDisposal
 
-    const taxPerTicket = finalTaxValue / itemsQnt
+        const taxPerTicket = getTicketRelativeTaxes({
+          ticketCost: t.price_sell,
+          adminTax: event?.eCommerce?.adminTax,
+          adminTaxMinimum: +event.eCommerce.adminTaxMinimum,
+          adminTaxPercentage: +event.eCommerce.adminTaxPercentage,
+          adminTaxValue: +event.eCommerce.adminTaxValue,
+        })
 
-    form.tickets.forEach((tt) => {
-      const t = tickets.find((t) => t.id === tt.id) as TTicketDisposal
-
-      ptickets.push({
-        price_sell: t.price_sell,
-        batch_id: t.batch_id,
-        customer_name: tt?.person.name,
-        id: t.id,
-        tax_value: taxPerTicket,
-        ticketName: t.name,
-        batchName: t.batch_name,
-        ticket_name: tt?.person.name,
-        quantity: 1,
+        ptickets.push({
+          price_sell: t.price_sell,
+          batch_id: t.batch_id,
+          customer_name: tt?.person.name,
+          id: t.id,
+          tax_value: taxPerTicket.value,
+          ticketName: t.name,
+          batchName: t.batch_name,
+          ticket_name: tt?.person.name,
+          quantity: 1,
+        })
       })
-    })
+    }
 
     return ptickets
   }
