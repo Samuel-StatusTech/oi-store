@@ -115,24 +115,27 @@ const PaymentPix = () => {
           event?.eCommerce.chargeClient ?? false,
         )
 
-        const targetEmail = (lctn.state.buyer?.email as string) ?? "seu email"
+        const targetEmail = (lctn.state.buyer?.email as string) ?? ""
         const buyerName = lctn.state.buyer?.name as string
 
-        pageTools.email.sendEmail(
-          event as TEventData,
-          user as TUser,
-          purchaseValue,
-          lctn.state.tickets,
-          {
-            ...purchaseInfo,
-            taxTotal: lctn.state.taxTotal as number,
-            transition_id: external_reference,
-            time: new Date(req.data.products[0].date).toISOString(),
-          },
-          parsedData,
-          targetEmail,
-          buyerName,
-        )
+        // Só envia email se o usuário tiver preenchido o campo de email
+        if (targetEmail && targetEmail.trim().length > 0) {
+          pageTools.email.sendEmail(
+            event as TEventData,
+            user as TUser,
+            purchaseValue,
+            lctn.state.tickets,
+            {
+              ...purchaseInfo,
+              taxTotal: lctn.state.taxTotal as number,
+              transition_id: external_reference,
+              time: new Date(req.data.products[0].date).toISOString(),
+            },
+            parsedData,
+            targetEmail,
+            buyerName,
+          )
+        }
       }
     } catch (error) {}
   }
@@ -778,7 +781,7 @@ const PaymentPix = () => {
     } catch (error) {}
   }
 
-  const sendWhatsapp = async (targetPhone: string) => {
+  const sendWhatsapp = async (targetPhone: string): Promise<boolean> => {
     try {
       if (event) {
         const file = await downloadTickets(event, buyedTickets, false, true)
@@ -786,7 +789,7 @@ const PaymentPix = () => {
         const hasMultipleTickets =
           buyedTickets.reduce((sum, current) => sum + current.quantity, 0) > 1
 
-        await Api.post.whatsapp.sendWhatsapp({
+        const result = await Api.post.whatsapp.sendWhatsapp({
           base64File: file as string,
           fileName: `Meus Ingressos para ${event.name.trim()}.pdf`,
           targetPhone: targetPhone,
@@ -794,8 +797,13 @@ const PaymentPix = () => {
             hasMultipleTickets ? "(s)" : ""
           } para o ${event.name}`,
         })
+
+        return result?.ok ?? false
       }
-    } catch (error) {}
+      return false
+    } catch (error) {
+      return false
+    }
   }
 
   const handleWhatsapp = async () => {
@@ -857,8 +865,8 @@ const PaymentPix = () => {
           setIsAskingWhatsappPhone(false)
         }}
         handleConfirm={async (phone) => {
-          await sendWhatsapp(phone)
-          setIsAskingWhatsappPhone(false)
+          const success = await sendWhatsapp(phone)
+          return success
         }}
         basePhone={lctn.state.buyer.phone}
         shown={isAskingWhatsappPhone}
@@ -944,11 +952,13 @@ const PaymentPix = () => {
                 >
                   Comprar mais
                 </S.Button>
-                <S.FeedbackIntructions $k={4}>
-                  <span>
-                    Cópia enviada para {lctn.state.buyer.email ?? "seu email"}
-                  </span>
-                </S.FeedbackIntructions>
+                {lctn.state.buyer?.email && lctn.state.buyer.email.trim().length > 0 && (
+                  <S.FeedbackIntructions $k={4}>
+                    <span>
+                      Cópia enviada para {lctn.state.buyer.email}
+                    </span>
+                  </S.FeedbackIntructions>
+                )}
               </S.PayedArea>
             )}
 

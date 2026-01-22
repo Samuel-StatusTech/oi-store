@@ -17,3 +17,14 @@ export const Button = styled.button<{ $disabled: boolean }>`
     box-shadow: 0 2px 8px 2px rgba(0, 0, 0, 0.24);
   }
 `
+
+export const SuccessMessage = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  color: ${({ theme }) => theme.colors.green.main};
+  font-size: 16px;
+  font-weight: 500;
+  text-align: center;
+`

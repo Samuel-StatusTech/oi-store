@@ -12,7 +12,7 @@ import { formatPhone } from "../../../utils/masks/phone"
 type Props = {
   shown: boolean
   basePhone: string
-  handleConfirm: (code: string) => Promise<void>
+  handleConfirm: (code: string) => Promise<boolean>
   handleClose: () => void
 }
 
@@ -25,17 +25,32 @@ const AskPhoneNumberModal = ({
   const [phone, setPhone] = useState(formatPhone(basePhone))
   const [canSend, setCanSend] = useState(true)
   const [sending, setSending] = useState(false)
+  const [success, setSuccess] = useState(false)
 
   const onConfirm = async () => {
     let finalPhone = phone
     setSending(true)
-    await handleConfirm(finalPhone)
+    const result = await handleConfirm(finalPhone)
     setSending(false)
-    setPhone("")
+    
+    if (result) {
+      setSuccess(true)
+      setPhone("")
+      // Fecha o modal após 2 segundos
+      setTimeout(() => {
+        setSuccess(false)
+        handleClose()
+      }, 2000)
+    }
   }
 
   useEffect(() => {
-    setPhone(formatPhone(basePhone))
+    if (shown) {
+      setPhone(formatPhone(basePhone))
+    } else {
+      setSuccess(false)
+      setPhone(formatPhone(basePhone))
+    }
   }, [shown, basePhone])
 
   useEffect(() => {
@@ -46,26 +61,34 @@ const AskPhoneNumberModal = ({
     <Dialog open={shown} onClose={handleClose} fullWidth maxWidth="xs">
       <DialogTitle>Enviar para o Whatsapp</DialogTitle>
       <DialogContent>
-        <Input
-          inputMode={"numeric"}
-          value={phone}
-          onChange={({ target }) =>
-            setPhone(formatPhone(target.value).slice(0, 13))
-          }
-        />
+        {success ? (
+          <S.SuccessMessage>
+            ✓ Ingressos enviados com sucesso!
+          </S.SuccessMessage>
+        ) : (
+          <Input
+            inputMode={"numeric"}
+            value={phone}
+            onChange={({ target }) =>
+              setPhone(formatPhone(target.value).slice(0, 13))
+            }
+          />
+        )}
       </DialogContent>
-      <DialogActions
-        style={{
-          padding: "8px 24px 24px",
-        }}
-      >
-        <S.Button
-          $disabled={!canSend || sending}
-          onClick={!canSend || sending ? undefined : onConfirm}
+      {!success && (
+        <DialogActions
+          style={{
+            padding: "8px 24px 24px",
+          }}
         >
-          Enviar
-        </S.Button>
-      </DialogActions>
+          <S.Button
+            $disabled={!canSend || sending}
+            onClick={!canSend || sending ? undefined : onConfirm}
+          >
+            {sending ? "Enviando..." : "Enviar"}
+          </S.Button>
+        </DialogActions>
+      )}
     </Dialog>
   )
 }

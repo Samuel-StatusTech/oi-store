@@ -417,8 +417,9 @@ const Payment = () => {
 
       const phoneField = !phoneValid || !isCellPhone
 
+      // Email é opcional: só valida se não estiver vazio
       const emailField =
-        form.buyer.email.length < 1 || !validEmail(form.buyer.email)
+        form.buyer.email.length > 0 && !validEmail(form.buyer.email)
 
       let ticketsIds: number[] = []
 
