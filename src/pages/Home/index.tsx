@@ -145,6 +145,7 @@ const Home = () => {
           className={"blured blured-vertical"}
         />
         <Container>
+          <S.BannerAndTicketsArea>
           <S.ImageContainer
             $hasBanner={!!event?.event_banner}
             $hasVerticalBanner={!!event?.event_banner_vertical}
@@ -160,6 +161,15 @@ const Home = () => {
               className={`event-banner-vertical`}
             />
           </S.ImageContainer>
+
+          <TicketsControl
+            showByGroup={groups.length > 1}
+            groups={groups}
+            tickets={tickets}
+            setTickets={setTickets}
+            inline={true}
+          />
+          </S.BannerAndTicketsArea>
         </Container>
       </S.Hero>
 
@@ -222,13 +232,6 @@ const Home = () => {
               </S.Blocks>
             )}
           </S.MainData>
-
-          <TicketsControl
-            showByGroup={groups.length > 1}
-            groups={groups}
-            tickets={tickets}
-            setTickets={setTickets}
-          />
         </S.EventDataArea>
       </Container>
 

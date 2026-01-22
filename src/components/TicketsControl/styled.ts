@@ -1,27 +1,29 @@
 import styled from "styled-components"
 
-export const Component = styled.aside`
+export const Component = styled.aside<{ $inline?: boolean }>`
   display: flex;
   flex-direction: column;
   width: 100%;
   max-width: 420px;
-  position: absolute;
-  z-index: 3;
-  top: 24px;
-  right: 0;
+  position: ${({ $inline }) => ($inline ? "unset" : "absolute")};
+  z-index: ${({ $inline }) => ($inline ? "unset" : "3")};
+  top: ${({ $inline }) => ($inline ? "unset" : "24px")};
+  right: ${({ $inline }) => ($inline ? "unset" : "0")};
   border-radius: 12px;
   overflow: hidden;
   box-shadow: 0 4px 8px 4px rgba(0, 0, 0, 0.23);
   background-color: ${({ theme }) => theme.colors.white.main};
+  flex: ${({ $inline }) => ($inline ? "0 0 auto" : "unset")};
 
   @media (max-width: ${({ theme }) => theme.bp.large}px) {
-    max-width: calc((100% / 5) * 2);
+    max-width: ${({ $inline }) => ($inline ? "420px" : "calc((100% / 5) * 2)")};
   }
 
   @media (max-width: ${({ theme }) => theme.bp.medium}px) {
     position: unset;
     z-index: unset;
     max-width: unset;
+    flex: unset;
   }
 
   opacity: 0;

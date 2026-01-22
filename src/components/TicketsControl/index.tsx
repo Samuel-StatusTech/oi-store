@@ -15,6 +15,7 @@ type Props = {
   groups: { id: string; name: string }[]
   tickets: TTicketDisposal[]
   setTickets: (list: TTicketDisposal[]) => void
+  inline?: boolean
 }
 
 const TicketsControl = ({
@@ -22,6 +23,7 @@ const TicketsControl = ({
   tickets,
   setTickets,
   groups,
+  inline = false,
 }: Props) => {
   const navigate = useNavigate()
 
@@ -198,7 +200,7 @@ const TicketsControl = ({
   }
 
   return (
-    <S.Component>
+    <S.Component $inline={inline}>
       <S.Top>
         <span>Ingressos</span>
       </S.Top>

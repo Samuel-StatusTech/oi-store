@@ -9,6 +9,8 @@ export const Page = styled.div`
 
 export const Hero = styled.div`
   position: relative;
+  width: 100vw;
+  min-height: 64svh;
   opacity: 0;
   ${({ theme }) =>
     theme.animations.types.fadeTop +
@@ -24,7 +26,7 @@ export const Hero = styled.div`
     right: 0;
     z-index: -50;
     filter: blur(60px);
-    opacity: 0;
+    opacity: 0.6;
     ${({ theme }) =>
       theme.animations.types.fade +
       theme.animations.durations.main +
@@ -36,6 +38,8 @@ export const Hero = styled.div`
   }
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    min-height: fit-content;
+    
     img.blured-horizontal {
       display: none;
     }
@@ -43,6 +47,21 @@ export const Hero = styled.div`
     img.blured-vertical {
       display: block;
     }
+  }
+`
+
+export const BannerAndTicketsArea = styled.div`
+  display: flex;
+  gap: 48px;
+  align-items: flex-start;
+  margin-top: 24px;
+  padding: 24px 0;
+  position: relative;
+  z-index: 1;
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    flex-direction: column;
+    gap: 24px;
   }
 `
 
@@ -58,7 +77,7 @@ export const ImageContainer = styled.div<{
   border-radius: 12px;
   width: fit-content;
   max-width: 100%;
-  place-self: center;
+  flex: 1;
 
   img {
     width: auto;
@@ -68,6 +87,27 @@ export const ImageContainer = styled.div<{
 
     &.event-banner-vertical {
       display: none;
+    }
+  }
+
+  @media (max-width: ${({ theme }) => theme.bp.medium}px) {
+    width: 100%;
+    height: fit-content;
+    max-height: 70svh;
+    place-self: center;
+
+    img {
+      width: 100%;
+      height: auto;
+      max-height: 70svh;
+
+      &.event-banner {
+        display: none;
+      }
+
+      &.event-banner-vertical {
+        display: inline-block;
+      }
     }
   }
 
@@ -97,9 +137,10 @@ export const EventDataArea = styled.section`
   display: flex;
   flex: 5;
   gap: 48px;
+  margin-top: 48px;
 
   @media (max-width: ${({ theme }) => theme.bp.medium}px) {
-    flex-direction: column-reverse;
+    flex-direction: column;
     z-index: unset;
     margin-top: 24px;
     gap: 24px;
