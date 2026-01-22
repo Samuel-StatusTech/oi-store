@@ -69,6 +69,8 @@ export const BlockTitle = styled.span<{ $k: number }>`
   font-size: 24px;
   font-weight: bold;
   color: #000;
+  text-align: center;
+  display: block;
 
   opacity: 0;
   ${({ $k, theme }) =>

@@ -203,8 +203,12 @@ export const FormBlock = styled.div<{ $k: number }>`
 export const FormLines = styled.div`
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
   width: 100%;
+
+  @media (max-width: ${({ theme }) => theme.bp.small}px) {
+    gap: 40px;
+  }
 `
 
 export const FormLine = styled.div`
@@ -213,6 +217,7 @@ export const FormLine = styled.div`
 
   @media (max-width: ${({ theme }) => theme.bp.small}px) {
     flex-direction: column;
+    gap: 32px;
   }
 `
 
@@ -224,7 +229,8 @@ export const InputWrapper = styled.div`
 
   & .inputTip {
     font-size: 14px;
-    color: ${({ theme }) => theme.colors.black.secondary};
+    color: #999;
+    margin-top: 4px;
   }
 `
 

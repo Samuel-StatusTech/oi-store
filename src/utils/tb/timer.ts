@@ -21,7 +21,11 @@ export const clockdown = (
   const start = () => {
     stop()
 
-    if (timerId) return
+    // Atualiza imediatamente o tempo inicial
+    if (textUpdater) {
+      const res = formatarTime(totalSeconds)
+      textUpdater(res)
+    }
 
     timerId = setInterval(() => {
       const nowTime = new Date().getTime()
