@@ -77,6 +77,9 @@ type IProps = {
   error?: boolean
   tip?: string
   tipRed?: boolean
+  noNumbers?: boolean
+  type?: string
+  capitalizeWords?: boolean
 }
 
 const Input = ({
@@ -88,13 +91,38 @@ const Input = ({
   error,
   tip,
   tipRed = false,
+  noNumbers = false,
+  type = "text",
+  capitalizeWords = false,
 }: IProps) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let newValue = e.target.value
+    if (noNumbers) {
+      newValue = newValue.replace(/[0-9]/g, "")
+    }
+    if (capitalizeWords) {
+      // Capitaliza a primeira letra de cada palavra após espaços
+      newValue = newValue
+        .toLowerCase()
+        .split(" ")
+        .map((word) => {
+          if (word.length > 0) {
+            return word.charAt(0).toUpperCase() + word.slice(1)
+          }
+          return word
+        })
+        .join(" ")
+    }
+    onChange(newValue)
+  }
+
   return (
     <S.InputWrapper>
       <S.Label>
         <S.Input
+          type={type}
           value={value}
-          onChange={(e) => onChange(e.target.value)}
+          onChange={handleChange}
           placeholder={""}
           inputMode={inputMode as any}
           enterKeyHint={enterKeyHint as any}
@@ -855,6 +883,8 @@ const Payment = () => {
                         clearFieldError("buyerName")
                       }}
                       error={formErrors.buyerName}
+                      noNumbers={true}
+                      capitalizeWords={true}
                     />
                   </S.FormLine>
                   <S.FormLine>
@@ -877,6 +907,7 @@ const Payment = () => {
                         handleForm("email", v)
                         clearFieldError("buyerEmail")
                       }}
+                      type="email"
                       enterKeyHint={"done"}
                       error={formErrors.buyerEmail}
                       tip={"Opcional"}
