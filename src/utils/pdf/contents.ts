@@ -61,6 +61,20 @@ const formatdM = (date: string | number | Date) => {
 
   return str
 }
+
+const formatHour = (str?: string) => {
+  if (!str) return "Dia todo"
+  else {
+    const _d = new Date()
+
+    const dateStr = `${_d.getFullYear()}-${String(_d.getMonth() + 1).padStart(2, "0")}-${String(_d.getDate()).padStart(2, "0")}T${str}.000Z`
+
+    const formattedHour = new Date(dateStr).toLocaleTimeString()
+
+    return formattedHour.slice(0, 5)
+  }
+}
+
 const ticketData = (
   event: TEventData,
   ticket: TShoppingTicket & {
@@ -75,13 +89,12 @@ const ticketData = (
   let body = []
 
   try {
-    const hours = event.time_ini.slice(
-      0,
-      String(event.time_ini).lastIndexOf(":"),
-    )
+    const hours = formatHour(event.time_ini)
+
+    const hasValidEndDate = Boolean(event.date_end && event.date_end !== "" && new Date(event.date_end).getTime() >= new Date(event.date_ini).getTime())
 
     const eventDateText =
-      event.date_end === event.date_ini
+      event.date_end === event.date_ini || !hasValidEndDate
         ? formatdM(event.date_ini)
         : `${formatdM(event.date_ini)} até ${formatdM(event.date_end)}`
 
