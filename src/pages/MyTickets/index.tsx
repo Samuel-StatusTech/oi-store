@@ -139,7 +139,8 @@ const MyTickets = () => {
       const formattedEndDate = `${finalEndDate}/${finalEndMonth}/${finalEndYear}`
 
       const eventDateText =
-        event.date_end === event.date_ini
+        event.date_end === event.date_ini ||
+        endDate.getTime() < iniDate.getTime()
           ? formattedIniDate
           : `${formattedIniDate} até ${formattedEndDate}`
 
